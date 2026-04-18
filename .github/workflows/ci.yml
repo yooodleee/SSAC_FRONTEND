@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  quality-gate:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # CHECK 1: 의존성 설치
+      - name: Install dependencies
+        run: npm ci
+
+      # CHECK 2: TypeScript 타입 검사
+      # WHY: 빌드 전에 타입 오류를 빠르게 발견
+      - name: Type check
+        run: npx tsc --noEmit
+
+      # CHECK 3: ESLint (레이어 위반, any 타입, 미사용 변수 등)
+      # WHY: 에이전트가 가장 자주 위반하는 규칙들을 자동으로 강제
+      - name: Lint
+        run: npm run lint
+
+      # CHECK 4: Prettier 포맷 확인
+      # WHY: 팀 전체 코드 스타일 일관성
+      - name: Format check
+        run: npx prettier --check .
+
+      # CHECK 5: Next.js 빌드 성공 확인
+      # WHY: 런타임에야 발견되는 오류(missing env, 잘못된 import 등) 조기 발견
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_BASE_URL: https://jsonplaceholder.typicode.com
+          NEXT_PUBLIC_APP_NAME: SSAC Frontend
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
