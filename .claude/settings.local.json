@@ -1,7 +1,17 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(npx next:*)",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\('next:', p.dependencies.next\\)\")",
+      "Bash(npx eslint:*)",
+      "Bash(node -e \"const pkg = require\\('./node_modules/eslint-config-next/package.json'\\); console.log\\('exports:', JSON.stringify\\(pkg.exports, null, 2\\)\\)\")",
+      "Bash(node:*)",
+      "Bash(git -C /c/Users/dhals_zn0ga5j/python_seed/SSAC_FRONTEND/SSAC_FRONTEND status --short)",
+      "Bash(git add:*)",
+      "Bash(git:*)"
     ]
   }
 }
