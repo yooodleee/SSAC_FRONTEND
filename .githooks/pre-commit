@@ -6,7 +6,7 @@
 
 echo "🔍 Pre-commit validation..."
 
-npm run validate
+node --run validate
 
 EXIT_CODE=$?
 

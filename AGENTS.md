@@ -88,19 +88,22 @@ npm run sync:api
 
 ### API 코드 작성 규칙
 
-| 규칙 | 설명 |
-| ---- | ---- |
-| **타입 import 경로** | `api-contract/generated/api-types.ts` 에서만 import |
-| **수동 타입 작성 금지** | API 응답 타입을 직접 `interface` / `type`으로 정의하지 않는다 |
-| **스펙 외 엔드포인트 금지** | `swagger.json`의 `paths`에 없는 엔드포인트 호출 코드 작성 금지 |
-| **불일치 시 행동** | 실제 동작과 Swagger가 다를 경우 임의 수정 금지 — 백엔드 팀에 이슈 제기 후 대기 |
+| 규칙                        | 설명                                                                           |
+| --------------------------- | ------------------------------------------------------------------------------ |
+| **타입 import 경로**        | `api-contract/generated/api-types.ts` 에서만 import                            |
+| **수동 타입 작성 금지**     | API 응답 타입을 직접 `interface` / `type`으로 정의하지 않는다                  |
+| **스펙 외 엔드포인트 금지** | `swagger.json`의 `paths`에 없는 엔드포인트 호출 코드 작성 금지                 |
+| **불일치 시 행동**          | 실제 동작과 Swagger가 다를 경우 임의 수정 금지 — 백엔드 팀에 이슈 제기 후 대기 |
 
 ```ts
 // ✅ 올바른 import
 import type { paths, components } from '@/api-contract/generated/api-types';
 
 // ❌ 금지: 수동 타입 작성
-interface UserResponse { id: number; name: string; }
+interface UserResponse {
+  id: number;
+  name: string;
+}
 ```
 
 ---
