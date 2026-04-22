@@ -54,24 +54,31 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
 // HTTP helpers
 // ============================================================
 
+type GetOptions = Pick<RequestOptions, 'params' | 'headers'>;
+type MutationOptions = Pick<RequestOptions, 'headers'>;
+
 export const apiClient = {
-  get<T>(endpoint: string, params?: RequestOptions['params']): Promise<T> {
-    return request<T>(endpoint, { method: 'GET', params });
+  get<T>(endpoint: string, options?: GetOptions): Promise<T> {
+    return request<T>(endpoint, { method: 'GET', ...options });
   },
 
-  post<T>(endpoint: string, body?: Record<string, unknown>): Promise<T> {
-    return request<T>(endpoint, { method: 'POST', body });
+  post<T>(endpoint: string, body?: Record<string, unknown>, options?: MutationOptions): Promise<T> {
+    return request<T>(endpoint, { method: 'POST', body, ...options });
   },
 
-  put<T>(endpoint: string, body?: Record<string, unknown>): Promise<T> {
-    return request<T>(endpoint, { method: 'PUT', body });
+  put<T>(endpoint: string, body?: Record<string, unknown>, options?: MutationOptions): Promise<T> {
+    return request<T>(endpoint, { method: 'PUT', body, ...options });
   },
 
-  patch<T>(endpoint: string, body?: Record<string, unknown>): Promise<T> {
-    return request<T>(endpoint, { method: 'PATCH', body });
+  patch<T>(
+    endpoint: string,
+    body?: Record<string, unknown>,
+    options?: MutationOptions,
+  ): Promise<T> {
+    return request<T>(endpoint, { method: 'PATCH', body, ...options });
   },
 
-  delete<T>(endpoint: string): Promise<T> {
-    return request<T>(endpoint, { method: 'DELETE' });
+  delete<T>(endpoint: string, options?: MutationOptions): Promise<T> {
+    return request<T>(endpoint, { method: 'DELETE', ...options });
   },
 };

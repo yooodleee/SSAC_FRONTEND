@@ -13,8 +13,7 @@ interface JsonPlaceholderPhoto {
 export const homeService = {
   async getCarousel(): Promise<CarouselItem[]> {
     const photos = await apiClient.get<JsonPlaceholderPhoto[]>('/photos', {
-      albumId: 1,
-      _limit: 5,
+      params: { albumId: 1, _limit: 5 },
     });
     return photos.map((p) => ({
       id: p.id,
@@ -24,7 +23,7 @@ export const homeService = {
   },
 
   async getQuiz(): Promise<QuizItem[]> {
-    const posts = await apiClient.get<Post[]>('/posts', { _limit: 3 });
+    const posts = await apiClient.get<Post[]>('/posts', { params: { _limit: 3 } });
     return posts.map((p): QuizItem => {
       const options: [string, string, string, string] = [
         p.body.slice(0, 45).replace(/\n/g, ' '),
@@ -37,7 +36,7 @@ export const homeService = {
   },
 
   async getContent(): Promise<ContentItem[]> {
-    const posts = await apiClient.get<Post[]>('/posts', { _start: 3, _limit: 6 });
+    const posts = await apiClient.get<Post[]>('/posts', { params: { _start: 3, _limit: 6 } });
     return posts.map(
       (p): ContentItem => ({
         id: p.id,
@@ -48,7 +47,7 @@ export const homeService = {
   },
 
   async getNews(): Promise<NewsItem[]> {
-    const posts = await apiClient.get<Post[]>('/posts', { _start: 9, _limit: 4 });
+    const posts = await apiClient.get<Post[]>('/posts', { params: { _start: 9, _limit: 4 } });
     return posts.map(
       (p, i): NewsItem => ({
         id: p.id,

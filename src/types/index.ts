@@ -78,6 +78,61 @@ export interface HomeData {
 }
 
 // ============================================================
+// Mypage Domain Types
+// ============================================================
+
+/** GET /api/v1/users/me → data */
+export interface UserProfile {
+  id: number;
+  email: string;
+  nickname: string;
+  createdAt: string;
+}
+
+export interface PeriodStat {
+  label: string;
+  attemptCount: number;
+  totalScore: number;
+  averageScore: number;
+  accuracyRate: number;
+}
+
+/** GET /api/v1/quiz-attempts/stats → data */
+export interface QuizStats {
+  totalScore: number;
+  totalAttempts: number;
+  averageScore: number;
+  totalCorrect: number;
+  totalQuestions: number;
+  accuracyRate: number;
+  periodStats: PeriodStat[];
+}
+
+/** Standard backend envelope: { success, data, message } */
+export interface BackendResponse<T> {
+  success: boolean;
+  data: T;
+  message: string;
+}
+
+export interface QuizHistoryItem {
+  id: number;
+  quizTitle: string;
+  category: string;
+  score: number;
+  isCorrect: boolean;
+  answeredAt: string;
+}
+
+export interface QuizHistoryPage {
+  items: QuizHistoryItem[];
+  total: number;
+  page: number;
+  limit: number;
+  hasMore: boolean;
+}
+
+// ============================================================
 // UI / Component Types
 // ============================================================
 
