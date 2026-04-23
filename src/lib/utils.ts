@@ -31,3 +31,19 @@ export function truncate(str: string, maxLength: number): string {
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+/**
+ * Returns a human-readable relative time string in Korean.
+ * e.g. "방금 전", "5분 전", "3시간 전", "2일 전"
+ */
+export function formatRelativeTime(date: string | Date): string {
+  const diff = Date.now() - new Date(date).getTime();
+  const minutes = Math.floor(diff / 60_000);
+  if (minutes < 1) return '방금 전';
+  if (minutes < 60) return `${minutes}분 전`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}시간 전`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}일 전`;
+  return formatDate(date);
+}

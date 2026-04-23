@@ -74,16 +74,20 @@ export function ContentSkeleton() {
 export function NewsSkeleton() {
   return (
     <section className="mb-12">
-      <SkeletonBlock className="h-10 w-24 mb-6" />
-      <div className="divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="flex items-start gap-4 p-5">
-            <SkeletonBlock className="h-16 w-16 flex-shrink-0 rounded-lg" />
-            <div className="flex-1">
-              <SkeletonBlock className="h-5 w-3/4 mb-2" />
-              <SkeletonBlock className="h-4 w-full mb-1" />
-              <SkeletonBlock className="h-3 w-24 mt-2" />
+      <SkeletonBlock className="h-10 w-32 mb-4" />
+      <div className="grid gap-4 sm:grid-cols-2">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="rounded-xl border border-gray-100 bg-white p-5">
+            <div className="mb-3 flex items-center justify-between">
+              <SkeletonBlock className="h-5 w-16 rounded-full" />
+              <SkeletonBlock className="h-4 w-20" />
             </div>
+            <SkeletonBlock className="h-5 w-full mb-1" />
+            <SkeletonBlock className="h-5 w-5/6 mb-3" />
+            <SkeletonBlock className="h-4 w-full mb-1" />
+            <SkeletonBlock className="h-4 w-full mb-1" />
+            <SkeletonBlock className="h-4 w-2/3 mb-3" />
+            <SkeletonBlock className="h-3 w-20" />
           </div>
         ))}
       </div>
