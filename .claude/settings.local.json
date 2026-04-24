@@ -43,7 +43,8 @@
       "Bash(./node_modules/.bin/lint-staged)",
       "Bash(C:/Program Files/nodejs/npx)",
       "Bash(./node_modules/.bin/eslint src/features/home/SearchBar.tsx)",
-      "Bash(SearchBar.tsx)"
+      "Bash(SearchBar.tsx)",
+      "WebFetch(domain:api.github.com)"
     ]
   }
 }

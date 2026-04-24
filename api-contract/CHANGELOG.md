@@ -1,3 +1,22 @@
+## 2026-04-24 12:26 동기화
+
+**추가된 엔드포인트:**
+
+- GET /api/v1/auth/naver/callback
+- GET /api/v1/auth/naver/login
+- GET /api/v1/quiz-attempts
+- GET /api/v1/quiz-attempts/stats
+- GET /api/v1/quiz-attempts/{attemptId}
+- GET /api/v1/users/me
+- PATCH /api/v1/users/me/nickname
+- POST /api/v1/auth/guest
+- POST /api/v1/auth/logout
+- POST /api/v1/auth/reissue
+- POST /api/v1/quiz-attempts
+  **제거된 엔드포인트:**
+
+*
+
 # API CHANGELOG
 
 > 이 파일은 `scripts/sync-api.sh`가 자동으로 갱신합니다.

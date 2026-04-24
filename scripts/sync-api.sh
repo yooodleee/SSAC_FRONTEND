@@ -7,6 +7,21 @@
 set -euo pipefail
 
 # ──────────────────────────────────────────────
+# .env.local 로드 (환경변수 미설정 시 폴백)
+# ──────────────────────────────────────────────
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ENV_FILE="$SCRIPT_DIR/../.env.local"
+if [[ -f "$ENV_FILE" ]]; then
+  while IFS='=' read -r key value; do
+    [[ "$key" =~ ^#.*$ || -z "$key" ]] && continue
+    value="${value%"${value##*[![:space:]]}"}"  # 후행 공백 제거
+    if [[ -n "$key" && -z "${!key+x}" ]]; then
+      export "$key=$value"
+    fi
+  done < "$ENV_FILE"
+fi
+
+# ──────────────────────────────────────────────
 # 설정
 # ──────────────────────────────────────────────
 SWAGGER_URL="${SWAGGER_URL:-${NEXT_PUBLIC_API_BASE_URL:-}/api-docs/swagger.json}"

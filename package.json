@@ -21,7 +21,8 @@
     "validate:staged": "lint-staged",
     "scaffold": "node scripts/scaffold.js",
     "prepare": "husky",
-    "sync:api": "./scripts/sync-api.sh"
+    "sync:api": "bash scripts/sync-api.sh",
+    "sync:api:local": "SWAGGER_URL=http://$(ip route show default | awk '{print $3}'):8080/api-docs/swagger.json bash scripts/sync-api.sh"
   },
   "lint-staged": {
     "*.{ts,tsx,js,mjs,cjs}": [
@@ -48,6 +49,7 @@
     "eslint-config-prettier": "^10.1.2",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
+    "openapi-typescript": "^7.13.0",
     "prettier": "^3.5.3",
     "tailwindcss": "^4",
     "typescript": "^5"
