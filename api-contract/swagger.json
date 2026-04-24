@@ -16,6 +16,47 @@
     { "name": "네이버 OAuth", "description": "네이버 소셜 로그인 API" }
   ],
   "paths": {
+    "/api/v1/users/me/logout": {
+      "post": {
+        "tags": ["Profile"],
+        "summary": "전체 디바이스 로그아웃",
+        "description": "[호출 화면] 마이페이지 > 전체 기기에서 로그아웃\n[권한 조건] 로그인 필수 (JWT Bearer 토큰)\n[특이 동작] 해당 계정으로 발급된 모든 Refresh Token을 일괄 무효화한다.\n모든 기기에서 발급된 Access Token도 다음 요청부터 차단된다.\naccessToken, refreshToken, guestId 쿠키를 즉시 삭제한다.\n",
+        "operationId": "logoutAll",
+        "responses": {
+          "401": {
+            "description": "인증 토큰이 없거나 만료되었습니다.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiResponseError" },
+                "examples": {
+                  "error": {
+                    "value": "{\"success\":false,\"data\":null,\"message\":\"인증이 필요합니다. 토큰을 확인하세요.\"}"
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "전체 디바이스 로그아웃 성공",
+            "content": { "*/*": { "schema": { "$ref": "#/components/schemas/ApiResponseVoid" } } }
+          },
+          "500": {
+            "description": "서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiResponseError" },
+                "examples": {
+                  "error": {
+                    "value": "{\"success\":false,\"data\":null,\"message\":\"서버 내부 오류가 발생했습니다.\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
     "/api/v1/quiz-attempts": {
       "get": {
         "tags": ["QuizAttempt"],
@@ -784,6 +825,15 @@
           "message": { "example": "사용자를 찾을 수 없습니다." }
         }
       },
+      "ApiResponseVoid": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "data": { "type": "object" },
+          "message": { "type": "string" },
+          "loginRequired": { "type": "boolean" }
+        }
+      },
       "AnswerItem": {
         "type": "object",
         "properties": {
@@ -896,15 +946,6 @@
           "tokenType": { "type": "string", "description": "토큰 타입", "example": "Bearer" }
         }
       },
-      "ApiResponseVoid": {
-        "type": "object",
-        "properties": {
-          "success": { "type": "boolean" },
-          "data": { "type": "object" },
-          "message": { "type": "string" },
-          "loginRequired": { "type": "boolean" }
-        }
-      },
       "UpdateNicknameRequest": {
         "type": "object",
         "properties": {
@@ -985,10 +1026,8 @@
       "PageQuizAttemptSummaryResponse": {
         "type": "object",
         "properties": {
-          "totalElements": { "type": "integer", "format": "int64" },
           "totalPages": { "type": "integer", "format": "int32" },
-          "first": { "type": "boolean" },
-          "last": { "type": "boolean" },
+          "totalElements": { "type": "integer", "format": "int64" },
           "size": { "type": "integer", "format": "int32" },
           "content": {
             "type": "array",
@@ -996,6 +1035,8 @@
           },
           "number": { "type": "integer", "format": "int32" },
           "sort": { "$ref": "#/components/schemas/SortObject" },
+          "first": { "type": "boolean" },
+          "last": { "type": "boolean" },
           "numberOfElements": { "type": "integer", "format": "int32" },
           "pageable": { "$ref": "#/components/schemas/PageableObject" },
           "empty": { "type": "boolean" }
@@ -1007,8 +1048,8 @@
           "offset": { "type": "integer", "format": "int64" },
           "sort": { "$ref": "#/components/schemas/SortObject" },
           "paged": { "type": "boolean" },
-          "pageNumber": { "type": "integer", "format": "int32" },
           "pageSize": { "type": "integer", "format": "int32" },
+          "pageNumber": { "type": "integer", "format": "int32" },
           "unpaged": { "type": "boolean" }
         }
       },
@@ -1223,10 +1264,8 @@
       "PageUserSummaryResponse": {
         "type": "object",
         "properties": {
-          "totalElements": { "type": "integer", "format": "int64" },
           "totalPages": { "type": "integer", "format": "int32" },
-          "first": { "type": "boolean" },
-          "last": { "type": "boolean" },
+          "totalElements": { "type": "integer", "format": "int64" },
           "size": { "type": "integer", "format": "int32" },
           "content": {
             "type": "array",
@@ -1234,6 +1273,8 @@
           },
           "number": { "type": "integer", "format": "int32" },
           "sort": { "$ref": "#/components/schemas/SortObject" },
+          "first": { "type": "boolean" },
+          "last": { "type": "boolean" },
           "numberOfElements": { "type": "integer", "format": "int32" },
           "pageable": { "$ref": "#/components/schemas/PageableObject" },
           "empty": { "type": "boolean" }
