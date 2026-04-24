@@ -1,3 +1,10 @@
+## 2026-04-24 17:57 동기화
+
+**추가된 엔드포인트:**
+
+- GET /api/v1/admin/users
+- PATCH /api/v1/admin/users/{userId}/role
+
 ## 2026-04-24 12:26 동기화
 
 **추가된 엔드포인트:**
