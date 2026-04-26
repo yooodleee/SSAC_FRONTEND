@@ -1,22 +1,26 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import type { NewsItem, NewsSortType } from '@/types';
+import type { components } from '@/api-contract/generated/api-types';
 import { formatRelativeTime } from '@/lib/utils';
+
+type NewsItemResponse = components['schemas']['NewsItemResponse'];
+type NewsListResponse = components['schemas']['NewsListResponse'];
+type NewsSortType = 'latest' | 'popularity';
 
 const SORT_LABELS: Record<NewsSortType, string> = {
   latest: '최신순',
-  importance: '중요도순',
+  popularity: '인기순',
 };
 
 interface Props {
-  initialItems: NewsItem[];
+  initialItems: NewsItemResponse[];
   initialError?: boolean;
 }
 
 export function NewsSectionClient({ initialItems, initialError = false }: Props) {
   const [sort, setSort] = useState<NewsSortType>('latest');
-  const [items, setItems] = useState<NewsItem[]>(initialItems);
+  const [items, setItems] = useState<NewsItemResponse[]>(initialItems);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(initialError);
 
@@ -26,8 +30,8 @@ export function NewsSectionClient({ initialItems, initialError = false }: Props)
     try {
       const res = await fetch(`/api/news?sort=${sortType}`);
       if (!res.ok) throw new Error();
-      const data = (await res.json()) as NewsItem[];
-      setItems(data);
+      const data = (await res.json()) as NewsListResponse;
+      setItems(data.contents ?? []);
     } catch {
       setError(true);
     } finally {
@@ -64,8 +68,8 @@ export function NewsSectionClient({ initialItems, initialError = false }: Props)
 
       {!loading && !error && items.length > 0 && (
         <div className="grid gap-4 sm:grid-cols-2">
-          {items.map((item) => (
-            <NewsCard key={item.id} item={item} />
+          {items.map((item, idx) => (
+            <NewsCard key={item.id ?? idx} item={item} />
           ))}
         </div>
       )}
@@ -98,37 +102,34 @@ function NewsListSkeleton() {
       {Array.from({ length: 8 }).map((_, i) => (
         <div key={i} className="animate-pulse rounded-xl border border-gray-100 bg-white p-5">
           <div className="mb-3 flex items-center justify-between">
-            <div className="h-5 w-16 rounded-full bg-gray-200" />
             <div className="h-4 w-20 rounded bg-gray-200" />
+            <div className="h-4 w-16 rounded bg-gray-200" />
           </div>
           <div className="mb-1 h-5 w-full rounded bg-gray-200" />
           <div className="mb-3 h-5 w-5/6 rounded bg-gray-200" />
           <div className="mb-1 h-4 w-full rounded bg-gray-200" />
           <div className="mb-1 h-4 w-full rounded bg-gray-200" />
           <div className="mb-3 h-4 w-2/3 rounded bg-gray-200" />
-          <div className="h-3 w-20 rounded bg-gray-200" />
+          <div className="h-3 w-24 rounded bg-gray-200" />
         </div>
       ))}
     </div>
   );
 }
 
-function NewsCard({ item }: { item: NewsItem }) {
+function NewsCard({ item }: { item: NewsItemResponse }) {
   return (
     <article className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
       <div className="flex items-center justify-between">
-        <span className="inline-block rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
-          {item.category}
-        </span>
-        <span className="text-xs text-gray-400">{item.source}</span>
+        <time dateTime={item.publishedAt} className="text-xs text-gray-400">
+          {formatRelativeTime(item.publishedAt ?? '')}
+        </time>
+        {item.viewCount !== undefined && (
+          <span className="text-xs text-gray-400">조회 {item.viewCount.toLocaleString()}</span>
+        )}
       </div>
-      <h3 className="line-clamp-2 font-semibold capitalize leading-snug text-gray-900">
-        {item.title}
-      </h3>
+      <h3 className="line-clamp-2 font-semibold leading-snug text-gray-900">{item.title}</h3>
       <p className="line-clamp-3 flex-1 text-sm leading-relaxed text-gray-500">{item.summary}</p>
-      <time dateTime={item.publishedAt} className="mt-auto text-xs text-gray-400">
-        {formatRelativeTime(item.publishedAt)}
-      </time>
     </article>
   );
 }

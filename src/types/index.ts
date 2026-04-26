@@ -108,23 +108,10 @@ export interface ContentItem {
   body: string;
 }
 
-export interface NewsItem {
-  id: number;
-  title: string;
-  summary: string;
-  source: string;
-  category: string;
-  publishedAt: string;
-  importance: number;
-}
-
-export type NewsSortType = 'latest' | 'importance';
-
 export interface HomeData {
   carousel: CarouselItem[];
   quiz: QuizItem[];
   content: ContentItem[];
-  news: NewsItem[];
 }
 
 // ============================================================

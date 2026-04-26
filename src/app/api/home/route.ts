@@ -13,14 +13,13 @@ import { homeService } from '@/services/home';
 import type { HomeData } from '@/types';
 
 export async function GET(): Promise<Response> {
-  const [carousel, quiz, content, news] = await Promise.all([
+  const [carousel, quiz, content] = await Promise.all([
     homeService.getCarousel(),
     homeService.getQuiz(),
     homeService.getContent(),
-    homeService.getNews(),
   ]);
 
-  const body: HomeData = { carousel, quiz, content, news };
+  const body: HomeData = { carousel, quiz, content };
 
   return Response.json(body, {
     headers: {
