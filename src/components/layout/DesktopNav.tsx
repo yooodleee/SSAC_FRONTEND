@@ -2,12 +2,13 @@
 
 import { useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { NAV_ITEMS } from '@/lib/navigation';
+import { NAV_ITEMS, SEGMENT_NAV_ITEMS } from '@/lib/navigation';
+import { useNavData } from '@/hooks/useNavData';
 import type { NavItem } from '@/lib/navigation';
 
-// ── Inline SVG helpers (nav-only, no abstraction layer needed) ──────────────
+// ── Inline SVG helpers ────────────────────────────────────────────────────────
 
 function NavIcon({ path }: { path: string }) {
   return (
@@ -46,15 +47,193 @@ function Chevron({ open }: { open: boolean }) {
   );
 }
 
+// ── NavLink — 드롭다운 없는 단순 링크 ───────────────────────────────────────
+
+function NavLink({
+  item,
+  active,
+  badge,
+}: {
+  item: NavItem;
+  active: boolean;
+  badge?: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={item.href}
+      aria-current={active ? 'page' : undefined}
+      className={cn(
+        'relative flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
+        active ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
+      )}
+    >
+      <NavIcon path={item.iconPath} />
+      {item.label}
+      {badge}
+    </Link>
+  );
+}
+
+// ── DropdownItem — 드롭다운 트리거 ──────────────────────────────────────────
+
+interface DropdownItemProps {
+  item: NavItem;
+  active: boolean;
+  isOpen: boolean;
+  onOpen: (href: string) => void;
+  onScheduleClose: () => void;
+  onCancelClose: () => void;
+  onContainerBlur: (e: React.FocusEvent<HTMLDivElement>, href: string) => void;
+  onTriggerKey: (e: React.KeyboardEvent<HTMLButtonElement>, item: NavItem) => void;
+  onItemKey: (e: React.KeyboardEvent<HTMLAnchorElement>, parentHref: string) => void;
+  triggerRefs: React.MutableRefObject<Map<string, HTMLButtonElement>>;
+  pathname: string;
+  onClose: () => void;
+}
+
+function DropdownItem({
+  item,
+  active,
+  isOpen,
+  onOpen,
+  onScheduleClose,
+  onCancelClose,
+  onContainerBlur,
+  onTriggerKey,
+  onItemKey,
+  triggerRefs,
+  pathname,
+  onClose,
+}: DropdownItemProps) {
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => onOpen(item.href)}
+      onMouseLeave={onScheduleClose}
+      onFocus={onCancelClose}
+      onBlur={(e) => onContainerBlur(e, item.href)}
+    >
+      <button
+        ref={(el) => {
+          if (el) triggerRefs.current.set(item.href, el);
+          else triggerRefs.current.delete(item.href);
+        }}
+        type="button"
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+        onKeyDown={(e) => onTriggerKey(e, item)}
+        className={cn(
+          'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
+          active || isOpen
+            ? 'bg-blue-50 text-blue-700'
+            : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
+        )}
+      >
+        <NavIcon path={item.iconPath} />
+        {item.label}
+        <Chevron open={isOpen} />
+      </button>
+
+      {isOpen && (
+        <ul
+          id={dropdownId(item.href)}
+          className="absolute left-0 top-full z-50 mt-1.5 w-60 overflow-hidden rounded-xl border border-gray-200 bg-white py-1.5 shadow-lg"
+        >
+          {item.children!.map((child) => {
+            const childActive = pathname === child.href;
+            return (
+              <li key={child.href}>
+                <Link
+                  href={child.href}
+                  aria-current={childActive ? 'page' : undefined}
+                  onKeyDown={(e) => onItemKey(e, item.href)}
+                  onClick={onClose}
+                  className={cn(
+                    'block px-4 py-2.5 transition-colors',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500',
+                    childActive
+                      ? 'bg-blue-50 text-blue-700'
+                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900',
+                  )}
+                >
+                  <span className="block text-sm font-medium">{child.label}</span>
+                  <span className="mt-0.5 block text-xs text-gray-500">{child.description}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+// ── NotificationBadge ────────────────────────────────────────────────────────
+
+function NotificationBadge({
+  loading,
+  unreadCount,
+  onMarkRead,
+}: {
+  loading: boolean;
+  unreadCount: number | null;
+  onMarkRead: () => void;
+}) {
+  const hasUnread = !loading && unreadCount !== null && unreadCount > 0;
+
+  return (
+    <button
+      type="button"
+      aria-label={hasUnread ? `읽지 않은 알림 ${unreadCount}개` : '알림'}
+      onClick={onMarkRead}
+      className="relative flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1"
+    >
+      {/* 벨 아이콘 */}
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        className="h-5 w-5"
+      >
+        <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+      </svg>
+      {/* 뱃지 — 로딩 중에는 영역만 유지, 데이터 확인 후 표시 */}
+      <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center">
+        {hasUnread && (
+          <span className="flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white">
+            {unreadCount! > 99 ? '99+' : unreadCount}
+          </span>
+        )}
+      </span>
+    </button>
+  );
+}
+
 // ── DesktopNav ───────────────────────────────────────────────────────────────
 
-export function DesktopNav() {
+export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [openItem, setOpenItem] = useState<string | null>(null);
   const triggerRefs = useRef(new Map<string, HTMLButtonElement>());
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // href === '/' は完全一致、他はプレフィックス一致
+  const {
+    unreadCount,
+    notificationsLoading,
+    resumeItem,
+    resumeLoading,
+    segment,
+    segmentLoading,
+    markAllRead,
+  } = useNavData(isLoggedIn);
+
   const isActive = useCallback(
     (href: string): boolean => {
       if (href === '/') return pathname === '/';
@@ -76,7 +255,6 @@ export function DesktopNav() {
     if (closeTimer.current) clearTimeout(closeTimer.current);
   };
 
-  // 드롭다운 컨테이너 바깥으로 포커스가 이동하면 닫기
   const onContainerBlur = (e: React.FocusEvent<HTMLDivElement>, href: string) => {
     const relatedTarget = e.relatedTarget;
     if (!(relatedTarget instanceof Node) || !e.currentTarget.contains(relatedTarget)) {
@@ -84,7 +262,6 @@ export function DesktopNav() {
     }
   };
 
-  // 트리거 버튼 키보드 핸들러
   const onTriggerKey = (e: React.KeyboardEvent<HTMLButtonElement>, item: NavItem) => {
     if (!item.children) return;
     switch (e.key) {
@@ -96,7 +273,6 @@ export function DesktopNav() {
       case 'ArrowDown':
         e.preventDefault();
         setOpenItem(item.href);
-        // 첫 번째 드롭다운 링크로 포커스 이동
         requestAnimationFrame(() => {
           const dropdown = document.getElementById(dropdownId(item.href));
           dropdown?.querySelector<HTMLElement>('a')?.focus();
@@ -108,7 +284,6 @@ export function DesktopNav() {
     }
   };
 
-  // 드롭다운 링크 키보드 핸들러
   const onItemKey = (e: React.KeyboardEvent<HTMLAnchorElement>, parentHref: string) => {
     const dropdown = document.getElementById(dropdownId(parentHref));
     const links = dropdown ? Array.from(dropdown.querySelectorAll<HTMLElement>('a')) : [];
@@ -151,99 +326,175 @@ export function DesktopNav() {
     }
   };
 
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.push('/');
+    router.refresh();
+  };
+
+  // 인증 필요 항목 필터링
+  const visibleItems = NAV_ITEMS.filter((item) => !item.requiresAuth || isLoggedIn);
+
+  // 세그먼트 메뉴: 로딩 완료 후 세그먼트가 있을 때만 표시 (로딩 중에는 기본 메뉴만 표시)
+  const segmentItems = !segmentLoading && segment ? (SEGMENT_NAV_ITEMS[segment] ?? []) : [];
+
+  const dropdownProps = {
+    onOpen: openMenu,
+    onScheduleClose: scheduleClose,
+    onCancelClose: cancelClose,
+    onContainerBlur,
+    onTriggerKey,
+    onItemKey,
+    triggerRefs,
+    pathname,
+    onClose: () => setOpenItem(null),
+  };
+
   return (
     <nav aria-label="주요 메뉴" className="hidden items-center gap-0.5 md:flex">
-      {NAV_ITEMS.map((item) => {
+      {/* 기본 메뉴 */}
+      {visibleItems.map((item) => {
         const active = isActive(item.href);
         const isOpen = openItem === item.href;
 
-        // 하위 메뉴 없는 단순 링크
         if (!item.children) {
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={active ? 'page' : undefined}
-              className={cn(
-                'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
-                active
-                  ? 'bg-blue-50 text-blue-700'
-                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
-              )}
-            >
-              <NavIcon path={item.iconPath} />
-              {item.label}
-            </Link>
-          );
+          return <NavLink key={item.href} item={item} active={active} />;
         }
 
-        // 하위 메뉴 있는 드롭다운 트리거
         return (
-          <div
+          <DropdownItem
             key={item.href}
-            className="relative"
-            onMouseEnter={() => openMenu(item.href)}
-            onMouseLeave={scheduleClose}
-            onFocus={cancelClose}
-            onBlur={(e) => onContainerBlur(e, item.href)}
-          >
-            <button
-              ref={(el) => {
-                if (el) triggerRefs.current.set(item.href, el);
-                else triggerRefs.current.delete(item.href);
-              }}
-              type="button"
-              aria-expanded={isOpen}
-              onKeyDown={(e) => onTriggerKey(e, item)}
-              className={cn(
-                'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
-                active || isOpen
-                  ? 'bg-blue-50 text-blue-700'
-                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
-              )}
-            >
-              <NavIcon path={item.iconPath} />
-              {item.label}
-              <Chevron open={isOpen} />
-            </button>
-
-            {isOpen && (
-              <ul
-                id={dropdownId(item.href)}
-                className="absolute left-0 top-full z-50 mt-1.5 w-60 overflow-hidden rounded-xl border border-gray-200 bg-white py-1.5 shadow-lg"
-              >
-                {item.children.map((child) => {
-                  const childActive = pathname === child.href;
-                  return (
-                    <li key={child.href}>
-                      <Link
-                        href={child.href}
-                        aria-current={childActive ? 'page' : undefined}
-                        onKeyDown={(e) => onItemKey(e, item.href)}
-                        onClick={() => setOpenItem(null)}
-                        className={cn(
-                          'block px-4 py-2.5 transition-colors',
-                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500',
-                          childActive
-                            ? 'bg-blue-50 text-blue-700'
-                            : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900',
-                        )}
-                      >
-                        <span className="block text-sm font-medium">{child.label}</span>
-                        <span className="mt-0.5 block text-xs text-gray-500">
-                          {child.description}
-                        </span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </div>
+            item={item}
+            active={active}
+            isOpen={isOpen}
+            {...dropdownProps}
+          />
         );
       })}
+
+      {/* 세그먼트 메뉴 (로딩 후 표시) */}
+      {segmentItems.map((item) => (
+        <NavLink key={item.href} item={item} active={isActive(item.href)} />
+      ))}
+
+      {/* 구분선 */}
+      <div aria-hidden="true" className="mx-1.5 h-5 border-l border-gray-200" />
+
+      {/* 인증 영역 */}
+      {isLoggedIn ? (
+        <>
+          {/* 알림 뱃지 */}
+          <NotificationBadge
+            loading={notificationsLoading}
+            unreadCount={unreadCount}
+            onMarkRead={markAllRead}
+          />
+
+          {/* 이어 보기 — 로딩 완료 후, 항목이 있을 때만 노출 */}
+          {!resumeLoading && resumeItem && (
+            <Link
+              href={resumeItem.lastPosition}
+              title={resumeItem.title}
+              className={cn(
+                'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
+              )}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                className="h-4 w-4 flex-shrink-0"
+              >
+                <path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              이어 보기
+            </Link>
+          )}
+
+          {/* 프로필 링크 */}
+          <Link
+            href="/my/profile"
+            aria-current={pathname === '/my/profile' ? 'page' : undefined}
+            className={cn(
+              'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
+              pathname.startsWith('/my')
+                ? 'bg-blue-50 text-blue-700'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
+            )}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className="h-4 w-4 flex-shrink-0"
+            >
+              <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            내 정보
+          </Link>
+
+          {/* 로그아웃 */}
+          <button
+            type="button"
+            onClick={() => void handleLogout()}
+            className={cn(
+              'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+              'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
+            )}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className="h-4 w-4 flex-shrink-0"
+            >
+              <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            로그아웃
+          </button>
+        </>
+      ) : (
+        <>
+          <Link
+            href="/login"
+            className={cn(
+              'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
+              pathname === '/login'
+                ? 'bg-blue-50 text-blue-700'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
+            )}
+          >
+            로그인
+          </Link>
+          <Link
+            href="/login"
+            className={cn(
+              'rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors',
+              'hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
+            )}
+          >
+            회원가입
+          </Link>
+        </>
+      )}
     </nav>
   );
 }
