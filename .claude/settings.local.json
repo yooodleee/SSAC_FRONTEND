@@ -54,7 +54,11 @@
       "Bash(bash -x scripts/sync-api.sh)",
       "Bash(xargs ls:*)",
       "Bash(ls -la /c/Users/dhals_zn0ga5j/python_seed/SSAC_FRONTEND/SSAC_FRONTEND/.env*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(node_modules/.bin/openapi-typescript api-contract/swagger.json --output /tmp/test-types.ts)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(echo \"exit without --output: $?\")"
     ]
   }
 }

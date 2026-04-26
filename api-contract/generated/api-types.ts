@@ -2,7 +2,7 @@
 // ⚠️  이 파일은 자동 생성됩니다 — 절대 수동으로 편집하지 마세요.
 // 생성 명령: npm run sync:api
 // 소스: http://172.17.96.1:8080/api-docs/swagger.json
-// 생성 시각: 2026-04-26 21:48:55
+// 생성 시각: 2026-04-27 00:16:39
 // ============================================================
 
 /**
@@ -441,6 +441,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/news": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 뉴스 목록 조회
+         * @description sort: latest(기본값) | popularity
+         *     page: 1-based 페이지 번호 (기본값 1)
+         *     size: 페이지 크기 (기본값 20, 최대 100)
+         */
+        get: operations["getNews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -739,9 +761,9 @@ export interface components {
             offset?: number;
             sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
-            pageSize?: number;
-            /** Format: int32 */
             pageNumber?: number;
+            /** Format: int32 */
+            pageSize?: number;
             paged?: boolean;
             unpaged?: boolean;
         };
@@ -989,6 +1011,27 @@ export interface components {
             /** Format: int64 */
             unreadCount?: number;
             notifications?: components["schemas"]["NotificationItemResponse"][];
+        };
+        ApiResponseNewsListResponse: {
+            success?: boolean;
+            data?: components["schemas"]["NewsListResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
+        NewsItemResponse: {
+            id?: string;
+            title?: string;
+            summary?: string;
+            /** Format: int32 */
+            viewCount?: number;
+            /** Format: date-time */
+            publishedAt?: string;
+        };
+        NewsListResponse: {
+            /** Format: int64 */
+            totalCount?: number;
+            hasNext?: boolean;
+            contents?: components["schemas"]["NewsItemResponse"][];
         };
     };
     responses: never;
@@ -1960,6 +2003,60 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ApiResponseNotificationListResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    getNews: {
+        parameters: {
+            query?: {
+                /**
+                 * @description 정렬 기준 (latest | popularity)
+                 * @example latest
+                 */
+                sort?: string;
+                /**
+                 * @description 페이지 번호 (1부터 시작)
+                 * @example 1
+                 */
+                page?: number;
+                /**
+                 * @description 페이지 크기 (최대 100)
+                 * @example 20
+                 */
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseNewsListResponse"];
                 };
             };
             /** @description 인증 토큰이 없거나 만료되었습니다. */

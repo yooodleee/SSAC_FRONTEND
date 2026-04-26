@@ -157,8 +157,21 @@ HEADER="// ============================================================
 
 "
 
-GENERATED=$("$OAT_BIN" "$CACHE_FILE" 2>&1)
-printf '%s%s\n' "$HEADER" "$GENERATED" > "$TYPES_FILE"
+TEMP_TYPES="$(mktemp).ts"
+
+# --output 플래그로 파일에 직접 쓴다.
+# set -e 환경에서 stdout 캡처($())는 openapi-typescript가 비정상 종료할 때
+# 스크립트 전체를 즉시 종료시켜 api-types.ts를 빈 채로 남기는 문제가 있었다.
+# if ! 구문으로 set -e 영향을 차단하고 실패를 명시적으로 처리한다.
+if ! "$OAT_BIN" "$CACHE_FILE" --output "$TEMP_TYPES" 2>&1; then
+  rm -f "$TEMP_TYPES"
+  echo "❌ openapi-typescript 실행 실패 — swagger.json이 유효한지 확인하세요."
+  echo "   이전 api-types.ts는 변경되지 않았습니다."
+  exit 1
+fi
+
+{ printf '%s' "$HEADER"; cat "$TEMP_TYPES"; } > "$TYPES_FILE"
+rm -f "$TEMP_TYPES"
 
 echo "✅ api-types.ts 생성 완료: $TYPES_FILE"
 
