@@ -1,17 +1,22 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { NavNotificationsData, NavResumeData, NavResumeItem, UserSegment } from '@/types';
+import type { components } from '@/api-contract/generated/api-types';
+
+type ResumeContentResponse = components['schemas']['ResumeContentResponse'];
+type NotificationListResponse = components['schemas']['NotificationListResponse'];
+type ResumeResponse = components['schemas']['ResumeResponse'];
+type UserSegmentResponse = components['schemas']['UserSegmentResponse'];
 
 interface NavData {
   /** null = 에러/데이터 없음, number = 로드 완료 */
   unreadCount: number | null;
   /** true = 아직 응답 없음(isLoggedIn 상태에서) */
   notificationsLoading: boolean;
-  /** null = 에러/없음, NavResumeItem = 로드 완료 */
-  resumeItem: NavResumeItem | null;
+  /** null = 에러/없음, ResumeContentResponse = 로드 완료 */
+  resumeItem: ResumeContentResponse | null;
   resumeLoading: boolean;
-  segment: UserSegment | null;
+  segment: string | null;
   segmentLoading: boolean;
   markAllRead: () => void;
 }
@@ -26,27 +31,25 @@ interface NavData {
  */
 export function useNavData(isLoggedIn: boolean): NavData {
   const [unreadCount, setUnreadCount] = useState<number | undefined>(undefined);
-  const [resumeItem, setResumeItem] = useState<NavResumeItem | null | undefined>(undefined);
-  const [segment, setSegment] = useState<UserSegment | null | undefined>(undefined);
+  const [resumeItem, setResumeItem] = useState<ResumeContentResponse | null | undefined>(undefined);
+  const [segment, setSegment] = useState<string | null | undefined>(undefined);
 
   useEffect(() => {
     if (!isLoggedIn) return;
 
     fetch('/api/nav/notifications')
-      .then((r) => (r.ok ? (r.json() as Promise<NavNotificationsData>) : Promise.reject()))
-      .then((data) => setUnreadCount(data.unreadCount))
+      .then((r) => (r.ok ? (r.json() as Promise<NotificationListResponse>) : Promise.reject()))
+      .then((data) => setUnreadCount(data.unreadCount ?? 0))
       .catch(() => setUnreadCount(0));
 
     fetch('/api/nav/resume')
-      .then((r) => (r.ok ? (r.json() as Promise<NavResumeData>) : Promise.reject()))
-      .then((data) => setResumeItem(data.item))
+      .then((r) => (r.ok ? (r.json() as Promise<ResumeResponse>) : Promise.reject()))
+      .then((data) => setResumeItem(data.hasResume ? (data.content ?? null) : null))
       .catch(() => setResumeItem(null));
 
     fetch('/api/nav/user-segment')
-      .then((r) =>
-        r.ok ? (r.json() as Promise<{ segment: UserSegment | null }>) : Promise.reject(),
-      )
-      .then((data) => setSegment(data.segment))
+      .then((r) => (r.ok ? (r.json() as Promise<UserSegmentResponse>) : Promise.reject()))
+      .then((data) => setSegment(data.segment ?? null))
       .catch(() => setSegment(null));
   }, [isLoggedIn]);
 

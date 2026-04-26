@@ -1,3 +1,14 @@
+## 2026-04-26 21:42 동기화
+
+**추가된 엔드포인트:**
+  + GET /api/notification
+  + GET /api/resume
+  + GET /api/user/segment
+  + PATCH /api/notification/read-all
+  + PATCH /api/notification/{id}/read
+  + PUT /api/resume/{id}
+
+
 ## 2026-04-24 22:00 동기화
 
 **추가된 엔드포인트:**

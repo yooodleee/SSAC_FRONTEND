@@ -336,7 +336,10 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
   const visibleItems = NAV_ITEMS.filter((item) => !item.requiresAuth || isLoggedIn);
 
   // 세그먼트 메뉴: 로딩 완료 후 세그먼트가 있을 때만 표시 (로딩 중에는 기본 메뉴만 표시)
-  const segmentItems = !segmentLoading && segment ? (SEGMENT_NAV_ITEMS[segment] ?? []) : [];
+  const segmentItems =
+    !segmentLoading && segment
+      ? ((SEGMENT_NAV_ITEMS as Record<string, readonly NavItem[] | undefined>)[segment] ?? [])
+      : [];
 
   const dropdownProps = {
     onOpen: openMenu,
@@ -391,10 +394,10 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
           />
 
           {/* 이어 보기 — 로딩 완료 후, 항목이 있을 때만 노출 */}
-          {!resumeLoading && resumeItem && (
+          {!resumeLoading && resumeItem && resumeItem.lastPosition && (
             <Link
               href={resumeItem.lastPosition}
-              title={resumeItem.title}
+              title={resumeItem.title ?? '이어 보기'}
               className={cn(
                 'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',

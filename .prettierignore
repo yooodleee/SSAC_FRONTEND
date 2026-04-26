@@ -1,0 +1,4 @@
+# Generated files — do not format
+api-contract/generated/
+api-contract/swagger.json
+api-contract/CHANGELOG.md

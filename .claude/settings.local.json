@@ -48,7 +48,13 @@
       "Bash(src/app/content/page.tsx)",
       "Bash(src/features/content/)",
       "Bash(src/app/content/[id]/page.tsx)",
-      "Bash(src/app/api/content/)"
+      "Bash(src/app/api/content/)",
+      "Bash(node_modules/.bin/openapi-typescript --version)",
+      "Bash(node_modules/.bin/openapi-typescript api-contract/swagger.json)",
+      "Bash(bash -x scripts/sync-api.sh)",
+      "Bash(xargs ls:*)",
+      "Bash(ls -la /c/Users/dhals_zn0ga5j/python_seed/SSAC_FRONTEND/SSAC_FRONTEND/.env*)",
+      "Bash(ls:*)"
     ]
   }
 }

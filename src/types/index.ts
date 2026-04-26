@@ -183,30 +183,6 @@ export interface QuizHistoryPage {
 }
 
 // ============================================================
-// Navigation Domain Types
-// ============================================================
-
-export interface NavNotificationsData {
-  unreadCount: number;
-}
-
-export interface NavResumeItem {
-  contentId: string;
-  title: string;
-  lastPosition: string;
-}
-
-export interface NavResumeData {
-  item: NavResumeItem | null;
-}
-
-export type UserSegment = 'beginner' | 'advanced';
-
-export interface NavSegmentData {
-  segment: UserSegment | null;
-}
-
-// ============================================================
 // UI / Component Types
 // ============================================================
 
