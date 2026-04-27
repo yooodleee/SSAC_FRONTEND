@@ -9,6 +9,8 @@ import { env } from '@/lib/env';
 const ERROR_MESSAGES: Record<string, string> = {
   KAKAO_AUTH_FAILED: '카카오 인증에 실패했습니다. 다시 시도해주세요.',
   KAKAO_AUTH_CANCEL: '카카오 로그인이 취소되었습니다.',
+  NAVER_AUTH_FAILED: '네이버 인증에 실패했습니다. 다시 시도해주세요.',
+  NAVER_AUTH_CANCEL: '네이버 로그인이 취소되었습니다.',
   SERVER_ERROR: '일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
   SESSION_EXPIRED: '세션이 만료되었습니다. 다시 로그인해주세요.',
 };
@@ -21,8 +23,10 @@ export function LoginForm() {
 
   const [isMockLoading, setIsMockLoading] = useState(false);
   const [isKakaoLoading, setIsKakaoLoading] = useState(false);
+  const [isNaverLoading, setIsNaverLoading] = useState(false);
 
-  const isLoading = isMockLoading || isKakaoLoading;
+  // 하나라도 진행 중이면 모든 버튼 비활성화
+  const isLoading = isMockLoading || isKakaoLoading || isNaverLoading;
 
   const errorMessage = errorCode
     ? (ERROR_MESSAGES[errorCode] ?? '오류가 발생했습니다. 다시 시도해주세요.')
@@ -31,12 +35,17 @@ export function LoginForm() {
   const handleKakaoLogin = () => {
     if (isLoading) return;
     setIsKakaoLoading(true);
-    // BE Spring Security OAuth2 엔드포인트로 직접 브라우저 네비게이션 (fetch 아님)
-    // redirectTo는 상대 경로만 허용 (BE isSafePath 검증)
     const kakaoUrl = new URL('/oauth2/authorization/kakao', env.backendUrl);
-    kakaoUrl.searchParams.set('redirectTo', redirectTo); // 항상 전달 — 미전달 시 BE default-redirect-uri로 이동
+    kakaoUrl.searchParams.set('redirectTo', redirectTo);
     window.location.href = kakaoUrl.toString();
-    // 페이지 이동 전까지 버튼 비활성화 유지 (중복 클릭 방지)
+  };
+
+  const handleNaverLogin = () => {
+    if (isLoading) return;
+    setIsNaverLoading(true);
+    // redirectTo를 sessionStorage에 저장 → 콜백 페이지에서 읽어 이동
+    sessionStorage.setItem('naverRedirectTo', redirectTo);
+    window.location.href = `${env.backendUrl}/api/v1/auth/naver/login`;
   };
 
   const handleMockLogin = async () => {
@@ -62,21 +71,39 @@ export function LoginForm() {
         </div>
       )}
 
-      {/* 카카오 로그인 버튼 (카카오 브랜드 가이드 준수) */}
-      <button
-        type="button"
-        onClick={handleKakaoLogin}
-        disabled={isLoading}
-        aria-label="카카오 로그인"
-        className="flex h-[45px] w-full items-center justify-center gap-[6px] rounded-xl bg-[#FEE500] text-[15px] font-medium text-[#000000D9] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {isKakaoLoading ? (
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#00000040] border-t-[#000000D9]" />
-        ) : (
-          <KakaoSymbol />
-        )}
-        {isKakaoLoading ? '로그인 중...' : '카카오 로그인'}
-      </button>
+      <div className="flex flex-col gap-3">
+        {/* 카카오 로그인 버튼 */}
+        <button
+          type="button"
+          onClick={handleKakaoLogin}
+          disabled={isLoading}
+          aria-label="카카오 로그인"
+          className="flex h-[45px] w-full items-center justify-center gap-[6px] rounded-xl bg-[#FEE500] text-[15px] font-medium text-[#000000D9] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {isKakaoLoading ? (
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#00000040] border-t-[#000000D9]" />
+          ) : (
+            <KakaoSymbol />
+          )}
+          {isKakaoLoading ? '로그인 중...' : '카카오 로그인'}
+        </button>
+
+        {/* 네이버 로그인 버튼 */}
+        <button
+          type="button"
+          onClick={handleNaverLogin}
+          disabled={isLoading}
+          aria-label="네이버 로그인"
+          className="flex h-[45px] w-full items-center justify-center gap-[6px] rounded-xl bg-[#03C75A] text-[15px] font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {isNaverLoading ? (
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+          ) : (
+            <NaverSymbol />
+          )}
+          {isNaverLoading ? '로그인 중...' : '네이버 로그인'}
+        </button>
+      </div>
 
       <div className="my-5 flex items-center gap-3">
         <div className="h-px flex-1 bg-gray-200" />
@@ -115,6 +142,25 @@ function KakaoSymbol() {
         clipRule="evenodd"
         d="M9 1.5C4.85786 1.5 1.5 4.21634 1.5 7.57143C1.5 9.65169 2.74364 11.4989 4.66071 12.6027L3.80357 15.8036C3.73036 16.0714 4.03393 16.2857 4.26786 16.1339L8.08036 13.6875C8.38393 13.7143 8.6875 13.7143 9 13.7143C13.1421 13.7143 16.5 11 16.5 7.57143C16.5 4.21634 13.1421 1.5 9 1.5Z"
         fill="#1A1A1A"
+      />
+    </svg>
+  );
+}
+
+/** 네이버 공식 N 심볼 SVG */
+function NaverSymbol() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M10.18 9.31L7.62 5.4H5.4V12.6H7.82V8.69L10.38 12.6H12.6V5.4H10.18V9.31Z"
+        fill="white"
       />
     </svg>
   );
