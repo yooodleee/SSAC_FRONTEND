@@ -31,3 +31,4 @@ jobs:
           NEXT_PUBLIC_API_BASE_URL: https://jsonplaceholder.typicode.com
           NEXT_PUBLIC_APP_NAME: SSAC Frontend
           NEXT_PUBLIC_APP_URL: http://localhost:3000
+          NEXT_PUBLIC_BACKEND_URL: http://localhost:8080
