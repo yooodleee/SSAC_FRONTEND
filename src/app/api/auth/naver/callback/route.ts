@@ -6,6 +6,8 @@ interface NaverCallbackResponse {
   data: {
     accessToken: string;
     tokenType: string;
+    /** 비회원 퀴즈 기록 병합 완료 여부 (BE가 포함한 경우) */
+    guestQuizMerged?: boolean;
   };
   message: string;
 }
@@ -51,8 +53,9 @@ export async function GET(request: NextRequest) {
 
     const body = (await beResponse.json()) as NaverCallbackResponse;
     const accessToken = body?.data?.accessToken;
+    const guestQuizMerged = body?.data?.guestQuizMerged ?? false;
 
-    const res = NextResponse.json({ success: true });
+    const res = NextResponse.json({ success: true, guestQuizMerged });
 
     // LoginResponse 바디의 accessToken을 httpOnly 쿠키로 저장
     if (accessToken) {
@@ -63,6 +66,9 @@ export async function GET(request: NextRequest) {
         sameSite: 'lax',
       });
     }
+
+    // 비회원 식별 쿠키 삭제 (Guest → 로그인 전환 완료)
+    res.cookies.set('guestId', '', { path: '/', maxAge: 0 });
 
     // BE의 Set-Cookie 헤더(refreshToken 등)를 클라이언트에 전달
     beResponse.headers.getSetCookie().forEach((cookie) => {

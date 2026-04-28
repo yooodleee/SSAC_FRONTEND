@@ -332,8 +332,8 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
     router.refresh();
   };
 
-  // 인증 필요 항목 필터링
-  const visibleItems = NAV_ITEMS.filter((item) => !item.requiresAuth || isLoggedIn);
+  // 모든 메뉴 항목 표시 (requiresAuth 항목은 잠금 상태로 표시)
+  const visibleItems = NAV_ITEMS;
 
   // 세그먼트 메뉴: 로딩 완료 후 세그먼트가 있을 때만 표시 (로딩 중에는 기본 메뉴만 표시)
   const segmentItems =
@@ -359,6 +359,38 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
       {visibleItems.map((item) => {
         const active = isActive(item.href);
         const isOpen = openItem === item.href;
+        const locked = !!(item.requiresAuth && !isLoggedIn);
+
+        // 비로그인 상태의 인증 필요 항목: 잠금 스타일로 로그인 페이지로 연결
+        if (locked) {
+          return (
+            <Link
+              key={item.href}
+              href={`/login?redirectTo=${encodeURIComponent(item.href)}`}
+              title="로그인이 필요한 기능입니다"
+              className={cn(
+                'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
+                'text-gray-400 hover:bg-gray-50 hover:text-gray-500',
+              )}
+            >
+              <NavIcon path={item.iconPath} />
+              {item.label}
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                className="h-3 w-3 text-gray-300"
+              >
+                <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </Link>
+          );
+        }
 
         if (!item.children) {
           return <NavLink key={item.href} item={item} active={active} />;
@@ -475,6 +507,30 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
         </>
       ) : (
         <>
+          {/* 개인화 기능 영역 로그인 유도 CTA (이어 보기, 학습 기록) */}
+          <Link
+            href="/login"
+            title="로그인하면 이어 보기와 학습 기록을 사용할 수 있습니다"
+            className={cn(
+              'flex items-center gap-1 rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 transition-colors',
+              'hover:bg-blue-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
+            )}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className="h-3 w-3"
+            >
+              <path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+              <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            이어 보기
+          </Link>
           <Link
             href="/login"
             className={cn(

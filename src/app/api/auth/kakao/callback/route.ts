@@ -22,5 +22,8 @@ export async function GET(request: NextRequest) {
     sameSite: 'lax',
   });
 
+  // 비회원 식별 쿠키 삭제 (Guest → 로그인 전환 완료)
+  res.cookies.set('guestId', '', { path: '/', maxAge: 0 });
+
   return res;
 }

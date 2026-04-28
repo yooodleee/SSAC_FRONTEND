@@ -158,8 +158,8 @@ export function MobileMenu({ appName, isLoggedIn }: { appName: string; isLoggedI
     markAllRead();
   };
 
-  // 인증 필요 항목 필터링
-  const visibleItems = NAV_ITEMS.filter((item) => !item.requiresAuth || isLoggedIn);
+  // 모든 메뉴 항목 표시 (requiresAuth 항목은 잠금 상태로 표시)
+  const visibleItems = NAV_ITEMS;
 
   // 세그먼트 메뉴: 로딩 완료 후, 세그먼트가 있을 때만 표시
   const segmentItems =
@@ -233,15 +233,47 @@ export function MobileMenu({ appName, isLoggedIn }: { appName: string; isLoggedI
               {/* 메뉴 아이템 */}
               <nav aria-label="모바일 메뉴" className="flex-1 overflow-y-auto px-3 py-4">
                 <ul className="space-y-1">
-                  {/* 이어 보기 — 로딩 완료 후, 항목이 있을 때만 노출 */}
-                  {isLoggedIn && !resumeLoading && resumeItem && resumeItem.lastPosition && (
+                  {/* 이어 보기 — 로그인 상태별 처리 */}
+                  {isLoggedIn ? (
+                    !resumeLoading &&
+                    resumeItem &&
+                    resumeItem.lastPosition && (
+                      <li>
+                        <Link
+                          href={resumeItem.lastPosition}
+                          className={cn(
+                            'flex items-center gap-3 rounded-lg bg-blue-50 px-3 py-2.5 text-sm font-medium text-blue-700 transition-colors',
+                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
+                            'hover:bg-blue-100',
+                          )}
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                            className="h-5 w-5 flex-shrink-0"
+                          >
+                            <path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                            <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span className="flex-1 truncate">
+                            이어 보기: {resumeItem.title ?? ''}
+                          </span>
+                        </Link>
+                      </li>
+                    )
+                  ) : (
+                    /* 비로그인 상태: 이어 보기 / 학습 기록 로그인 유도 CTA */
                     <li>
                       <Link
-                        href={resumeItem.lastPosition}
+                        href="/login"
                         className={cn(
-                          'flex items-center gap-3 rounded-lg bg-blue-50 px-3 py-2.5 text-sm font-medium text-blue-700 transition-colors',
-                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
-                          'hover:bg-blue-100',
+                          'flex items-center gap-3 rounded-lg border border-blue-100 bg-blue-50 px-3 py-2.5 text-sm font-medium text-blue-600 transition-colors',
+                          'hover:bg-blue-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
                         )}
                       >
                         <svg
@@ -257,7 +289,19 @@ export function MobileMenu({ appName, isLoggedIn }: { appName: string; isLoggedI
                           <path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                           <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span className="flex-1 truncate">이어 보기: {resumeItem.title ?? ''}</span>
+                        <span className="flex-1">로그인하면 이어 보기가 가능합니다</span>
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                          className="h-4 w-4 flex-shrink-0 text-blue-400"
+                        >
+                          <path d="M9 18l6-6-6-6" />
+                        </svg>
                       </Link>
                     </li>
                   )}
@@ -266,6 +310,39 @@ export function MobileMenu({ appName, isLoggedIn }: { appName: string; isLoggedI
                   {visibleItems.map((item) => {
                     const active = isActive(item.href);
                     const isExpanded = expanded === item.href;
+                    const locked = !!(item.requiresAuth && !isLoggedIn);
+
+                    // 비로그인 상태의 인증 필요 항목: 잠금 스타일로 로그인 페이지로 연결
+                    if (locked) {
+                      return (
+                        <li key={item.href}>
+                          <Link
+                            href={`/login?redirectTo=${encodeURIComponent(item.href)}`}
+                            title="로그인이 필요한 기능입니다"
+                            className={cn(
+                              'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
+                              'text-gray-400 hover:bg-gray-50 hover:text-gray-500',
+                            )}
+                          >
+                            <NavIcon path={item.iconPath} />
+                            <span className="flex-1">{item.label}</span>
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                              className="h-4 w-4 text-gray-300"
+                            >
+                              <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                          </Link>
+                        </li>
+                      );
+                    }
 
                     if (!item.children) {
                       return (

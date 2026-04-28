@@ -46,6 +46,8 @@ function KakaoCallbackContent() {
           router.replace(`/login?error=${data.errorCode ?? 'SERVER_ERROR'}`);
           return;
         }
+        // 클라이언트측 비회원 식별 정보 제거 (BFF 쿠키 삭제와 이중 보장)
+        document.cookie = 'guestId=; Max-Age=0; path=/';
         // 로그인 성공: 버튼 클릭 시 저장해둔 redirectTo로 이동
         const redirectTo = sessionStorage.getItem('kakaoRedirectTo') ?? '/';
         sessionStorage.removeItem('kakaoRedirectTo');

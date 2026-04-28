@@ -49,6 +49,13 @@ function NaverCallbackContent() {
           router.replace(`/login?error=${data.errorCode ?? 'SERVER_ERROR'}`);
           return;
         }
+        // 비회원 퀴즈 기록 병합 완료 신호 확인 → sessionStorage에 저장 후 PostLoginToast가 표시
+        const data = (await res.json().catch(() => ({}))) as { guestQuizMerged?: boolean };
+        if (data.guestQuizMerged) {
+          sessionStorage.setItem('quizMergeNotice', '1');
+        }
+        // 클라이언트측 비회원 식별 정보 제거 (BFF 쿠키 삭제와 이중 보장)
+        document.cookie = 'guestId=; Max-Age=0; path=/';
         // 로그인 성공: 버튼 클릭 시 저장해둔 redirectTo로 이동
         const redirectTo = sessionStorage.getItem('naverRedirectTo') ?? '/';
         sessionStorage.removeItem('naverRedirectTo');
