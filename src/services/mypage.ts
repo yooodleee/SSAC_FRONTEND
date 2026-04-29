@@ -1,16 +1,8 @@
-import type { BackendResponse, QuizStats, UserProfile } from '@/types';
-import { apiClient } from './api';
+import type { QuizStats, UserProfile } from '@/types';
 
 function authHeaders(token: string): { Authorization: string } {
   return { Authorization: `Bearer ${token}` };
 }
-
-export const FALLBACK_PROFILE: UserProfile = {
-  id: 0,
-  email: 'test@example.com',
-  nickname: '테스트',
-  createdAt: new Date().toISOString(),
-};
 
 export const FALLBACK_QUIZ_STATS: QuizStats = {
   totalScore: 7700,
@@ -22,16 +14,38 @@ export const FALLBACK_QUIZ_STATS: QuizStats = {
   periodStats: [],
 };
 
+function apiBaseUrl(): string {
+  const url = process.env.API_BASE_URL;
+  if (!url) throw new Error('Missing API_BASE_URL');
+  return url;
+}
+
 export async function fetchProfile(token: string): Promise<UserProfile> {
-  const res = await apiClient.get<BackendResponse<UserProfile>>('/api/v1/users/me', {
-    headers: authHeaders(token),
+  const res = await fetch(`${apiBaseUrl()}/api/v1/users/me`, {
+    headers: { ...authHeaders(token), 'Content-Type': 'application/json' },
+    cache: 'no-store',
   });
-  return res.data;
+
+  if (!res.ok) {
+    const err = { message: `HTTP ${res.status}`, status: res.status };
+    throw err;
+  }
+
+  const body = (await res.json()) as { data: UserProfile };
+  return body.data;
 }
 
 export async function fetchQuizStats(token: string): Promise<QuizStats> {
-  const res = await apiClient.get<BackendResponse<QuizStats>>('/api/v1/quiz-attempts/stats', {
-    headers: authHeaders(token),
+  const res = await fetch(`${apiBaseUrl()}/api/v1/quiz-attempts/stats`, {
+    headers: { ...authHeaders(token), 'Content-Type': 'application/json' },
+    cache: 'no-store',
   });
-  return res.data;
+
+  if (!res.ok) {
+    const err = { message: `HTTP ${res.status}`, status: res.status };
+    throw err;
+  }
+
+  const body = (await res.json()) as { data: QuizStats };
+  return body.data;
 }
