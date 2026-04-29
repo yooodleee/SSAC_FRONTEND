@@ -25,6 +25,9 @@ interface NavData {
   resumeLoading: boolean;
   segment: string | null;
   segmentLoading: boolean;
+  /** A/B 테스트 그룹. undefined = 로딩 중, null = 에러(폴백 A 사용), 'A'|'B' = 로드 완료 */
+  abGroup: 'A' | 'B' | null;
+  abGroupLoading: boolean;
 }
 
 /**
@@ -40,6 +43,7 @@ export function useNavData(isLoggedIn: boolean): NavData {
   const [notificationsError, setNotificationsError] = useState(false);
   const [resumeItem, setResumeItem] = useState<ResumeContentResponse | null | undefined>(undefined);
   const [segment, setSegment] = useState<string | null | undefined>(undefined);
+  const [abGroup, setAbGroup] = useState<'A' | 'B' | null | undefined>(undefined);
 
   useEffect(() => {
     if (!isLoggedIn) return;
@@ -73,6 +77,14 @@ export function useNavData(isLoggedIn: boolean): NavData {
       .then((data) => setSegment(data.segment ?? null))
       .catch(() => setSegment(null));
   }, [isLoggedIn, router]);
+
+  // A/B 테스트 그룹은 로그인 여부와 독립적으로 마운트 시 1회 조회
+  useEffect(() => {
+    fetch('/api/nav/ab-test')
+      .then((r) => (r.ok ? (r.json() as Promise<{ group: 'A' | 'B' }>) : Promise.reject()))
+      .then((data) => setAbGroup(data.group))
+      .catch(() => setAbGroup(null)); // 실패 시 null → 컴포넌트에서 'A'(기본) 폴백
+  }, []);
 
   const markRead = useCallback(
     (id: string) => {
@@ -118,5 +130,7 @@ export function useNavData(isLoggedIn: boolean): NavData {
     resumeLoading: isLoggedIn && resumeItem === undefined,
     segment: segment ?? null,
     segmentLoading: isLoggedIn && segment === undefined,
+    abGroup: abGroup ?? null,
+    abGroupLoading: abGroup === undefined,
   };
 }

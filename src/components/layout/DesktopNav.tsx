@@ -4,8 +4,9 @@ import { useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { NAV_ITEMS, SEGMENT_NAV_ITEMS } from '@/lib/navigation';
+import { NAV_ITEMS_BY_GROUP, SEGMENT_NAV_ITEMS } from '@/lib/navigation';
 import { useNavData } from '@/hooks/useNavData';
+import { useMenuTracking } from '@/hooks/useMenuTracking';
 import { NotificationDropdown } from '@/components/notification/NotificationDropdown';
 import type { NavItem } from '@/lib/navigation';
 
@@ -54,15 +55,18 @@ function NavLink({
   item,
   active,
   badge,
+  onTrack,
 }: {
   item: NavItem;
   active: boolean;
   badge?: React.ReactNode;
+  onTrack?: () => void;
 }) {
   return (
     <Link
       href={item.href}
       aria-current={active ? 'page' : undefined}
+      onClick={onTrack}
       className={cn(
         'relative flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
@@ -91,6 +95,8 @@ interface DropdownItemProps {
   triggerRefs: React.MutableRefObject<Map<string, HTMLButtonElement>>;
   pathname: string;
   onClose: () => void;
+  /** 자식 메뉴 항목 클릭 시 트래킹 콜백 (childHref, childLabel) */
+  onChildTrack?: (href: string, label: string) => void;
 }
 
 function DropdownItem({
@@ -106,6 +112,7 @@ function DropdownItem({
   triggerRefs,
   pathname,
   onClose,
+  onChildTrack,
 }: DropdownItemProps) {
   return (
     <div
@@ -150,7 +157,10 @@ function DropdownItem({
                   href={child.href}
                   aria-current={childActive ? 'page' : undefined}
                   onKeyDown={(e) => onItemKey(e, item.href)}
-                  onClick={onClose}
+                  onClick={() => {
+                    onChildTrack?.(child.href, child.label);
+                    onClose();
+                  }}
                   className={cn(
                     'block px-4 py-2.5 transition-colors',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500',
@@ -263,7 +273,10 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
     resumeLoading,
     segment,
     segmentLoading,
+    abGroup,
   } = useNavData(isLoggedIn);
+
+  const { track } = useMenuTracking();
 
   const isActive = useCallback(
     (href: string): boolean => {
@@ -364,7 +377,8 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
   };
 
   // 모든 메뉴 항목 표시 (requiresAuth 항목은 잠금 상태로 표시)
-  const visibleItems = NAV_ITEMS;
+  // A/B 테스트 그룹에 따라 메뉴 구조 결정 (로딩 중/실패 시 기본 A 그룹 사용)
+  const visibleItems = NAV_ITEMS_BY_GROUP[abGroup ?? 'A'];
 
   // 세그먼트 메뉴: 로딩 완료 후 세그먼트가 있을 때만 표시 (로딩 중에는 기본 메뉴만 표시)
   const segmentItems =
@@ -399,6 +413,7 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
               key={item.href}
               href={`/login?redirectTo=${encodeURIComponent(item.href)}`}
               title="로그인이 필요한 기능입니다"
+              onClick={() => track(item.href, item.label)}
               className={cn(
                 'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
@@ -424,7 +439,14 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
         }
 
         if (!item.children) {
-          return <NavLink key={item.href} item={item} active={active} />;
+          return (
+            <NavLink
+              key={item.href}
+              item={item}
+              active={active}
+              onTrack={() => track(item.href, item.label)}
+            />
+          );
         }
 
         return (
@@ -433,6 +455,7 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
             item={item}
             active={active}
             isOpen={isOpen}
+            onChildTrack={(href, label) => track(href, label)}
             {...dropdownProps}
           />
         );
@@ -440,7 +463,12 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
 
       {/* 세그먼트 메뉴 (로딩 후 표시) */}
       {segmentItems.map((item) => (
-        <NavLink key={item.href} item={item} active={isActive(item.href)} />
+        <NavLink
+          key={item.href}
+          item={item}
+          active={isActive(item.href)}
+          onTrack={() => track(item.href, item.label)}
+        />
       ))}
 
       {/* 구분선 */}
@@ -464,6 +492,7 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
             <Link
               href={resumeItem.lastPosition}
               title={resumeItem.title ?? '이어 보기'}
+              onClick={() => track(resumeItem.lastPosition!, '이어 보기')}
               className={cn(
                 'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
@@ -491,6 +520,7 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
           <Link
             href="/my/profile"
             aria-current={pathname === '/my/profile' ? 'page' : undefined}
+            onClick={() => track('/my/profile', '내 정보')}
             className={cn(
               'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
