@@ -5,9 +5,10 @@ import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { NAV_ITEMS, SEGMENT_NAV_ITEMS } from '@/lib/navigation';
+import { NAV_ITEMS_BY_GROUP, SEGMENT_NAV_ITEMS } from '@/lib/navigation';
 import type { NavItem } from '@/lib/navigation';
 import { useNavData } from '@/hooks/useNavData';
+import { useMenuTracking } from '@/hooks/useMenuTracking';
 import type { components } from '@/api-contract/generated/api-types';
 
 type NotificationItemResponse = components['schemas']['NotificationItemResponse'];
@@ -120,7 +121,10 @@ export function MobileMenu({ appName, isLoggedIn }: { appName: string; isLoggedI
     resumeLoading,
     segment,
     segmentLoading,
+    abGroup,
   } = useNavData(isLoggedIn);
+
+  const { track } = useMenuTracking();
 
   const drawerRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -180,7 +184,8 @@ export function MobileMenu({ appName, isLoggedIn }: { appName: string; isLoggedI
   };
 
   // 모든 메뉴 항목 표시 (requiresAuth 항목은 잠금 상태로 표시)
-  const visibleItems = NAV_ITEMS;
+  // A/B 테스트 그룹에 따라 메뉴 구조 결정 (로딩 중/실패 시 기본 A 그룹 사용)
+  const visibleItems = NAV_ITEMS_BY_GROUP[abGroup ?? 'A'];
 
   // 세그먼트 메뉴: 로딩 완료 후, 세그먼트가 있을 때만 표시
   const segmentItems =
@@ -262,6 +267,7 @@ export function MobileMenu({ appName, isLoggedIn }: { appName: string; isLoggedI
                       <li>
                         <Link
                           href={resumeItem.lastPosition}
+                          onClick={() => track(resumeItem.lastPosition!, '이어 보기')}
                           className={cn(
                             'flex items-center gap-3 rounded-lg bg-blue-50 px-3 py-2.5 text-sm font-medium text-blue-700 transition-colors',
                             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
@@ -340,6 +346,7 @@ export function MobileMenu({ appName, isLoggedIn }: { appName: string; isLoggedI
                           <Link
                             href={`/login?redirectTo=${encodeURIComponent(item.href)}`}
                             title="로그인이 필요한 기능입니다"
+                            onClick={() => track(item.href, item.label)}
                             className={cn(
                               'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
@@ -371,6 +378,7 @@ export function MobileMenu({ appName, isLoggedIn }: { appName: string; isLoggedI
                           <Link
                             href={item.href}
                             aria-current={active ? 'page' : undefined}
+                            onClick={() => track(item.href, item.label)}
                             className={cn(
                               'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
@@ -414,6 +422,7 @@ export function MobileMenu({ appName, isLoggedIn }: { appName: string; isLoggedI
                                   <Link
                                     href={child.href}
                                     aria-current={childActive ? 'page' : undefined}
+                                    onClick={() => track(child.href, child.label)}
                                     className={cn(
                                       'block rounded-lg px-3 py-2 text-sm transition-colors',
                                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
@@ -439,6 +448,7 @@ export function MobileMenu({ appName, isLoggedIn }: { appName: string; isLoggedI
                       <Link
                         href={item.href}
                         aria-current={isActive(item.href) ? 'page' : undefined}
+                        onClick={() => track(item.href, item.label)}
                         className={cn(
                           'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
@@ -614,6 +624,7 @@ export function MobileMenu({ appName, isLoggedIn }: { appName: string; isLoggedI
                         <Link
                           href="/my/profile"
                           aria-current={pathname === '/my/profile' ? 'page' : undefined}
+                          onClick={() => track('/my/profile', '내 정보')}
                           className={cn(
                             'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',

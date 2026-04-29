@@ -80,7 +80,11 @@
       "Bash(DesktopNav.tsx)",
       "Bash(/api/v1/users/me/nickname)",
       "Read(//usr/**)",
-      "Read(//usr/local/**)"
+      "Read(//usr/local/**)",
+      "Bash(useMenuTracking)",
+      "Bash(NAV_ITEMS_BY_GROUP[abGroup ?? \\\\\"A\\\\\"])",
+      "Bash(track)",
+      "Bash(MobileMenu.tsx)"
     ]
   }
 }
