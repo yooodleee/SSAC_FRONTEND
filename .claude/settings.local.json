@@ -72,7 +72,12 @@
       "Bash(LoginPromptModal)",
       "Bash(PostLoginToast)",
       "Bash(DesktopNav)",
-      "Bash(MobileMenu)"
+      "Bash(MobileMenu)",
+      "Bash(src/app/api/notification/[id]/read/route.ts)",
+      "Bash(src/app/api/notification/read-all/route.ts)",
+      "Bash(src/components/notification/NotificationDropdown.tsx)",
+      "Bash(useNavData.ts)",
+      "Bash(DesktopNav.tsx)"
     ]
   }
 }

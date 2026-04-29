@@ -8,6 +8,21 @@ import { cn } from '@/lib/utils';
 import { NAV_ITEMS, SEGMENT_NAV_ITEMS } from '@/lib/navigation';
 import type { NavItem } from '@/lib/navigation';
 import { useNavData } from '@/hooks/useNavData';
+import type { components } from '@/api-contract/generated/api-types';
+
+type NotificationItemResponse = components['schemas']['NotificationItemResponse'];
+
+function formatDate(dateStr: string | undefined): string {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleString('ko-KR', {
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
 
 // ── Inline SVG helpers ──────────────────────────────────────────────────────
 
@@ -92,14 +107,19 @@ export function MobileMenu({ appName, isLoggedIn }: { appName: string; isLoggedI
     () => false,
   );
 
+  const [notifOpen, setNotifOpen] = useState(false);
+
   const {
     unreadCount,
     notificationsLoading,
+    notificationsError,
+    notifications,
+    markRead,
+    markAllRead,
     resumeItem,
     resumeLoading,
     segment,
     segmentLoading,
-    markAllRead,
   } = useNavData(isLoggedIn);
 
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -156,6 +176,7 @@ export function MobileMenu({ appName, isLoggedIn }: { appName: string; isLoggedI
 
   const handleMarkAllRead = () => {
     markAllRead();
+    setNotifOpen(false);
   };
 
   // 모든 메뉴 항목 표시 (requiresAuth 항목은 잠금 상태로 표시)
@@ -439,18 +460,19 @@ export function MobileMenu({ appName, isLoggedIn }: { appName: string; isLoggedI
                 <ul className="space-y-1">
                   {isLoggedIn ? (
                     <>
-                      {/* 알림 확인 */}
+                      {/* 알림 */}
                       <li>
                         <button
                           type="button"
-                          onClick={handleMarkAllRead}
+                          aria-expanded={notifOpen}
+                          onClick={() => setNotifOpen((v) => !v)}
                           className={cn(
                             'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                             'text-gray-700 hover:bg-gray-100 hover:text-gray-900',
                             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
+                            notifOpen && 'bg-gray-100',
                           )}
                         >
-                          {/* 벨 아이콘 */}
                           <span className="relative flex h-5 w-5 flex-shrink-0 items-center justify-center">
                             <svg
                               viewBox="0 0 24 24"
@@ -464,7 +486,6 @@ export function MobileMenu({ appName, isLoggedIn }: { appName: string; isLoggedI
                             >
                               <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                             </svg>
-                            {/* 뱃지 — 로딩 중에는 영역만 유지 */}
                             <span className="absolute -right-1 -top-1">
                               {hasUnread && (
                                 <span className="flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white">
@@ -477,7 +498,115 @@ export function MobileMenu({ appName, isLoggedIn }: { appName: string; isLoggedI
                           {hasUnread && (
                             <span className="text-xs text-gray-400">읽지 않음 {unreadCount}개</span>
                           )}
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                            className={cn(
+                              'h-4 w-4 flex-shrink-0 transition-transform duration-200',
+                              notifOpen && 'rotate-90',
+                            )}
+                          >
+                            <path d="M9 18l6-6-6-6" />
+                          </svg>
                         </button>
+
+                        {/* 인라인 알림 패널 */}
+                        {notifOpen && (
+                          <div className="mt-1 ml-4 overflow-hidden rounded-lg border border-gray-100 bg-gray-50">
+                            {/* 전체 읽음 버튼 */}
+                            {hasUnread && (
+                              <div className="flex justify-end border-b border-gray-100 px-3 py-2">
+                                <button
+                                  type="button"
+                                  onClick={handleMarkAllRead}
+                                  className="text-xs text-blue-600 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1"
+                                >
+                                  전체 읽음
+                                </button>
+                              </div>
+                            )}
+
+                            <ul className="max-h-60 overflow-y-auto">
+                              {/* 로딩 */}
+                              {notificationsLoading && (
+                                <>
+                                  {[1, 2, 3].map((i) => (
+                                    <li key={i} className="flex flex-col gap-1.5 px-3 py-2.5">
+                                      <div className="h-3 w-3/4 animate-pulse rounded bg-gray-200" />
+                                      <div className="h-2.5 w-1/3 animate-pulse rounded bg-gray-100" />
+                                    </li>
+                                  ))}
+                                </>
+                              )}
+
+                              {/* 에러 */}
+                              {!notificationsLoading && notificationsError && (
+                                <li className="px-3 py-6 text-center text-xs text-red-500">
+                                  알림을 불러오지 못했습니다.
+                                </li>
+                              )}
+
+                              {/* Empty */}
+                              {!notificationsLoading &&
+                                !notificationsError &&
+                                notifications !== null &&
+                                notifications.length === 0 && (
+                                  <li className="px-3 py-6 text-center text-xs text-gray-400">
+                                    알림이 없습니다.
+                                  </li>
+                                )}
+
+                              {/* 목록 */}
+                              {!notificationsLoading &&
+                                !notificationsError &&
+                                notifications &&
+                                notifications.map((item: NotificationItemResponse) => (
+                                  <li key={item.id}>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        if (!item.isRead && item.id) markRead(item.id);
+                                      }}
+                                      className={cn(
+                                        'flex w-full flex-col gap-0.5 px-3 py-2.5 text-left transition-colors',
+                                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500',
+                                        !item.isRead
+                                          ? 'bg-blue-50 hover:bg-blue-100'
+                                          : 'hover:bg-gray-100',
+                                      )}
+                                    >
+                                      <div className="flex items-start gap-1.5">
+                                        {!item.isRead && (
+                                          <span
+                                            aria-hidden="true"
+                                            className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-500"
+                                          />
+                                        )}
+                                        <span
+                                          className={cn(
+                                            'flex-1 text-xs leading-snug',
+                                            item.isRead
+                                              ? 'text-gray-500'
+                                              : 'font-medium text-gray-900',
+                                          )}
+                                        >
+                                          {item.message}
+                                        </span>
+                                      </div>
+                                      <span className="pl-3 text-[11px] text-gray-400">
+                                        {formatDate(item.createdAt)}
+                                      </span>
+                                    </button>
+                                  </li>
+                                ))}
+                            </ul>
+                          </div>
+                        )}
                       </li>
 
                       {/* 내 정보 */}

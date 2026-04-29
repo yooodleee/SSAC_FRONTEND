@@ -6,6 +6,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { NAV_ITEMS, SEGMENT_NAV_ITEMS } from '@/lib/navigation';
 import { useNavData } from '@/hooks/useNavData';
+import { NotificationDropdown } from '@/components/notification/NotificationDropdown';
 import type { NavItem } from '@/lib/navigation';
 
 // ── Inline SVG helpers ────────────────────────────────────────────────────────
@@ -170,48 +171,75 @@ function DropdownItem({
   );
 }
 
-// ── NotificationBadge ────────────────────────────────────────────────────────
+// ── NotificationBell ─────────────────────────────────────────────────────────
 
-function NotificationBadge({
+function NotificationBell({
   loading,
+  error,
   unreadCount,
+  notifications,
   onMarkRead,
+  onMarkAllRead,
 }: {
   loading: boolean;
+  error: boolean;
   unreadCount: number | null;
-  onMarkRead: () => void;
+  notifications:
+    | import('@/api-contract/generated/api-types').components['schemas']['NotificationItemResponse'][]
+    | null;
+  onMarkRead: (id: string) => void;
+  onMarkAllRead: () => void;
 }) {
+  const [open, setOpen] = useState(false);
   const hasUnread = !loading && unreadCount !== null && unreadCount > 0;
 
   return (
-    <button
-      type="button"
-      aria-label={hasUnread ? `읽지 않은 알림 ${unreadCount}개` : '알림'}
-      onClick={onMarkRead}
-      className="relative flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1"
-    >
-      {/* 벨 아이콘 */}
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-        className="h-5 w-5"
+    <div className="relative">
+      <button
+        type="button"
+        aria-label={hasUnread ? `읽지 않은 알림 ${unreadCount}개` : '알림'}
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className="relative flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1"
       >
-        <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-      </svg>
-      {/* 뱃지 — 로딩 중에는 영역만 유지, 데이터 확인 후 표시 */}
-      <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center">
-        {hasUnread && (
-          <span className="flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white">
-            {unreadCount! > 99 ? '99+' : unreadCount}
-          </span>
-        )}
-      </span>
-    </button>
+        {/* 벨 아이콘 */}
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+          className="h-5 w-5"
+        >
+          <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        </svg>
+        {/* 뱃지 — 로딩 중에는 영역만 유지, 데이터 확인 후 표시 */}
+        <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center">
+          {hasUnread && (
+            <span className="flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white">
+              {unreadCount! > 99 ? '99+' : unreadCount}
+            </span>
+          )}
+        </span>
+      </button>
+
+      {open && (
+        <NotificationDropdown
+          loading={loading}
+          error={error}
+          notifications={notifications}
+          onMarkRead={(id) => {
+            onMarkRead(id);
+          }}
+          onMarkAllRead={() => {
+            onMarkAllRead();
+          }}
+          onClose={() => setOpen(false)}
+        />
+      )}
+    </div>
   );
 }
 
@@ -227,11 +255,14 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
   const {
     unreadCount,
     notificationsLoading,
+    notificationsError,
+    notifications,
+    markRead,
+    markAllRead,
     resumeItem,
     resumeLoading,
     segment,
     segmentLoading,
-    markAllRead,
   } = useNavData(isLoggedIn);
 
   const isActive = useCallback(
@@ -418,11 +449,14 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
       {/* 인증 영역 */}
       {isLoggedIn ? (
         <>
-          {/* 알림 뱃지 */}
-          <NotificationBadge
+          {/* 알림 */}
+          <NotificationBell
             loading={notificationsLoading}
+            error={notificationsError}
             unreadCount={unreadCount}
-            onMarkRead={markAllRead}
+            notifications={notifications}
+            onMarkRead={markRead}
+            onMarkAllRead={markAllRead}
           />
 
           {/* 이어 보기 — 로딩 완료 후, 항목이 있을 때만 노출 */}
