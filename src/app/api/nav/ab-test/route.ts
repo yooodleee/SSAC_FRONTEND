@@ -4,6 +4,13 @@ export interface AbTestResponse {
   group: 'A' | 'B';
 }
 
+interface AbTestApiResponse {
+  success: boolean;
+  data: AbTestResponse;
+  message: string | null;
+  loginRequired: boolean;
+}
+
 export async function GET(): Promise<Response> {
   const apiBaseUrl = process.env.API_BASE_URL;
 
@@ -13,7 +20,7 @@ export async function GET(): Promise<Response> {
     const guestId = cookieStore.get('guestId')?.value;
 
     try {
-      const upstream = await fetch(`${apiBaseUrl}/api/v1/ab-test/group`, {
+      const upstream = await fetch(`${apiBaseUrl}/api/ab-test/menu`, {
         headers: {
           ...(token && { Authorization: `Bearer ${token}` }),
           ...(guestId && { 'X-Guest-Id': guestId }),
@@ -22,8 +29,8 @@ export async function GET(): Promise<Response> {
       });
 
       if (upstream.ok) {
-        const data = (await upstream.json()) as AbTestResponse;
-        return Response.json(data);
+        const body = (await upstream.json()) as AbTestApiResponse;
+        return Response.json({ group: body.data.group } satisfies AbTestResponse);
       }
     } catch {
       // 백엔드 미응답 시 폴백으로 진행
