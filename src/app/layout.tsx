@@ -37,6 +37,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
       suppressHydrationWarning
     >
       <head>
+        {/* Pretendard 폰트 (CDN — 한글/영문 가변 서브셋) */}
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
         {/* FOUC 방지: React hydration 전에 data-theme 적용 */}
         <script
           dangerouslySetInnerHTML={{

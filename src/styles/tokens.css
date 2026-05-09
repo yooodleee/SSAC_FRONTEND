@@ -1,0 +1,63 @@
+/**
+ * SSAC Design Tokens
+ * CSS 변수 기반 디자인 토큰 — DESIGN.md 컬러/타이포 시스템 반영
+ * 임의 수정 금지: 변경 시 DESIGN.md 먼저 수정 후 이 파일에 반영
+ */
+
+:root {
+  /* ── 폰트 ──────────────────────────────────────────────────────────────── */
+  --font-primary: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* ── Primary (새싹 그린) ──────────────────────────────────────────────── */
+  --color-primary: #4caf82; /* 버튼, 강조, 브랜드 */
+  --color-primary-light: #e8f5ee; /* 배경, 태그 */
+  --color-primary-dark: #388e60; /* 호버, 눌림 상태 */
+
+  /* ── Neutral ──────────────────────────────────────────────────────────── */
+  --color-text-primary: #1a1a1a; /* 메인 텍스트 */
+  --color-text-secondary: #6b6b6b; /* 서브 텍스트 */
+  --color-text-disabled: #bbbbbb; /* 비활성 텍스트 */
+  --color-bg-page: #ffffff; /* 페이지 배경 */
+  --color-bg-card: #f5f5f5; /* 카드 배경 */
+  --color-border: #e8e8e8; /* 구분선 */
+
+  /* ── Semantic ─────────────────────────────────────────────────────────── */
+  --color-danger: #ff6b6b; /* 위험 / 손실 */
+  --color-warning: #ffb347; /* 경고 / 만기 임박 */
+  --color-success: #4caf82; /* 성공 / 완료 */
+  --color-info: #5b9bd5; /* 정보 / 안내 */
+
+  /* ── 타이포그래피 스케일 ──────────────────────────────────────────────── */
+  --font-size-title-lg: 28px; /* 메인 타이틀 / Bold */
+  --font-size-title-md: 22px; /* 페이지 제목 / Bold */
+  --font-size-title-sm: 18px; /* 섹션 제목 / SemiBold */
+  --font-size-body-lg: 16px; /* 카드 제목 / Medium */
+  --font-size-body-md: 15px; /* 본문 / Regular */
+  --font-size-body-sm: 13px; /* 캡션 / 태그 / Regular */
+
+  /* ── 행간 ─────────────────────────────────────────────────────────────── */
+  --line-height-heading: 1.3;
+  --line-height-body: 1.6;
+
+  /* ── 레이아웃 ─────────────────────────────────────────────────────────── */
+  --layout-max-mobile: 390px;
+  --layout-max-desktop: 1200px;
+  --layout-padding-mobile: 20px;
+  --layout-padding-desktop: 40px;
+  --layout-section-gap: 32px;
+
+  /* ── 컴포넌트 ─────────────────────────────────────────────────────────── */
+  --radius-button: 12px;
+  --card-gap-min: 12px;
+  --touch-target-min: 48px;
+}
+
+/* ── 다크모드 ────────────────────────────────────────────────────────────── */
+[data-theme='dark'] {
+  --color-bg-page: #121212;
+  --color-bg-card: #1e1e1e;
+  --color-border: #2d2d2d;
+  --color-text-primary: #f5f5f5;
+  --color-text-secondary: #aaaaaa;
+  --color-text-disabled: #555555;
+}

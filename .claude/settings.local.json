@@ -115,7 +115,12 @@
       "Bash(callback/page.tsx)",
       "Bash(error_code)",
       "Bash(172.17.96.1:8080)",
-      "Bash(localhost:3000)"
+      "Bash(localhost:3000)",
+      "Bash(DESIGN.md)",
+      "Bash(src/styles/tokens.css)",
+      "Bash(CLAUDE.md)",
+      "Bash(layout.tsx)",
+      "Bash(globals.css)"
     ]
   }
 }
