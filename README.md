@@ -44,29 +44,35 @@ src/
     └── index.ts
 ```
 
-## 시작하기
+## 배포 정보
 
-### 1. 의존성 설치
+| 환경          | 플랫폼  | URL                                           |
+| ------------- | ------- | --------------------------------------------- |
+| FE Production | Vercel  | https://ssac-frontend.vercel.app              |
+| BE Production | Railway | https://ssacbackend-production.up.railway.app |
 
-```bash
-npm install
-# 또는
-yarn install
-# 또는
-pnpm install
-```
+## 로컬 개발 환경 실행
 
-### 2. 환경 변수 설정
-
-`.env.local` 파일이 이미 생성되어 있습니다. 필요에 따라 값을 수정하세요.
+### 1. 저장소 클론
 
 ```bash
-NEXT_PUBLIC_APP_NAME=SSAC Frontend
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-NEXT_PUBLIC_API_BASE_URL=https://jsonplaceholder.typicode.com
+git clone https://github.com/SSACLAB/SSAC_FRONTEND
 ```
 
-### 3. 개발 서버 실행
+### 2. 의존성 설치
+
+```bash
+npm ci
+```
+
+### 3. 환경 변수 설정
+
+```bash
+cp .env.example .env.local
+# .env.local 파일에 값 입력
+```
+
+### 4. 개발 서버 실행
 
 ```bash
 npm run dev
@@ -74,14 +80,14 @@ npm run dev
 
 브라우저에서 [http://localhost:3000](http://localhost:3000) 을 열어 확인하세요.
 
-### 4. 빌드 & 프로덕션 실행
+### 5. 빌드 & 프로덕션 실행
 
 ```bash
 npm run build
 npm run start
 ```
 
-### 5. 코드 품질 도구
+### 6. 코드 품질 도구
 
 ```bash
 # ESLint 검사
