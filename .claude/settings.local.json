@@ -120,7 +120,15 @@
       "Bash(src/styles/tokens.css)",
       "Bash(CLAUDE.md)",
       "Bash(layout.tsx)",
-      "Bash(globals.css)"
+      "Bash(globals.css)",
+      "Bash(find .next/static/chunks -name \"*.js\" -exec du -b {} +)",
+      "Bash(find .next/static -name \"*.js\" -exec du -bc {} +)",
+      "Bash(xargs grep:*)",
+      "Bash(lint)",
+      "Bash(eslint src:*)",
+      "Bash(next lint:*)",
+      "Bash(.env.example)",
+      "Bash(.vercelignore)"
     ]
   }
 }
