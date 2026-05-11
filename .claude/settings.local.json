@@ -128,7 +128,11 @@
       "Bash(eslint src:*)",
       "Bash(next lint:*)",
       "Bash(.env.example)",
-      "Bash(.vercelignore)"
+      "Bash(.vercelignore)",
+      "Bash(src/lib/env.ts)",
+      "Bash(NEXT_PHASE)",
+      "Bash(NEXT_PUBLIC_API_BASE_URL)",
+      "Bash(NEXT_PUBLIC_BACKEND_URL)"
     ]
   }
 }

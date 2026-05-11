@@ -12,8 +12,9 @@ export const env = {
   backendUrl: process.env.NEXT_PUBLIC_BACKEND_URL ?? '',
 } as const;
 
-// 서버 사이드 시작 시 필수 PUBLIC 변수 검증 (동적 키 접근이므로 서버에서만 실행)
-if (typeof window === 'undefined') {
+// 서버 사이드 런타임 시 필수 PUBLIC 변수 검증
+// ⚠️ 빌드 타임(정적 생성)에는 실행되지 않도록 NEXT_PHASE 로 분기
+if (typeof window === 'undefined' && process.env.NEXT_PHASE !== 'phase-production-build') {
   if (!env.apiBaseUrl)
     throw new Error('Missing required environment variable: NEXT_PUBLIC_API_BASE_URL');
   if (!env.backendUrl)
