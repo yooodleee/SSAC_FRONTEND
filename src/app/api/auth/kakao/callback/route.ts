@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
     path: '/',
     maxAge: 60 * 30, // 30분
     sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
   });
 
   // 비회원 식별 쿠키 삭제 (Guest → 로그인 전환 완료)

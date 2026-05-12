@@ -12,6 +12,13 @@ function NaverSpinner() {
   );
 }
 
+/** 외부 URL로의 오픈 리다이렉트를 방지: 상대 경로만 허용 */
+function getSafeRedirectTo(raw: string | null): string {
+  const path = raw ?? '/';
+  if (!path.startsWith('/') || path.startsWith('//')) return '/';
+  return path;
+}
+
 function NaverCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -54,25 +61,17 @@ function NaverCallbackContent() {
         return;
       }
 
-      // Case 4: 기존 사용자 — BE가 accessToken 쿠키를 설정한 뒤 리다이렉트
-      if (isNewUserParam === 'false') {
-        document.cookie = 'guestId=; Max-Age=0; path=/';
-        const redirectTo = sessionStorage.getItem('naverRedirectTo') ?? '/';
-        sessionStorage.removeItem('naverRedirectTo');
-        router.replace(redirectTo);
-        router.refresh();
-        return;
-      }
-
-      // Case 5: 엣지케이스 — reissue로 인증 상태 확인
+      // Case 4 (구: 기존 사용자 — BE가 쿠키 직접 설정) 제거:
+      // 교차 출처 배포(Vercel FE / 별도 도메인 BE)에서 BE는 FE 도메인에 쿠키를 직접 심을 수 없음.
+      // isNewUser=false 포함 모든 code/state 부재 케이스를 reissue로 인증 상태 확인 후 처리.
       fetch('/api/v1/auth/reissue', { method: 'POST' })
         .then((res) => {
           if (res.ok) {
             document.cookie = 'guestId=; Max-Age=0; path=/';
-            const redirectTo = sessionStorage.getItem('naverRedirectTo') ?? '/';
+            const redirectTo = getSafeRedirectTo(sessionStorage.getItem('naverRedirectTo'));
             sessionStorage.removeItem('naverRedirectTo');
-            router.replace(redirectTo);
-            router.refresh();
+            // window.location.replace 사용 — Header(Server Component)가 새 accessToken 쿠키를 반드시 읽도록 강제
+            window.location.replace(redirectTo);
           } else {
             router.replace('/login?error=NAVER_AUTH_FAILED');
           }
@@ -116,10 +115,10 @@ function NaverCallbackContent() {
           return;
         }
         // 기존 사용자: 로그인 전 페이지로 이동
-        const redirectTo = sessionStorage.getItem('naverRedirectTo') ?? '/';
+        // window.location.replace 사용 — Header(Server Component)가 새 accessToken 쿠키를 반드시 읽도록 강제
+        const redirectTo = getSafeRedirectTo(sessionStorage.getItem('naverRedirectTo'));
         sessionStorage.removeItem('naverRedirectTo');
-        router.replace(redirectTo);
-        router.refresh();
+        window.location.replace(redirectTo);
       })
       .catch((err: unknown) => {
         if (err instanceof Error && err.name === 'AbortError') return;

@@ -12,6 +12,13 @@ function KakaoSpinner() {
   );
 }
 
+/** 외부 URL로의 오픈 리다이렉트를 방지: 상대 경로만 허용 */
+function getSafeRedirectTo(raw: string | null): string {
+  const path = raw ?? '/';
+  if (!path.startsWith('/') || path.startsWith('//')) return '/';
+  return path;
+}
+
 function KakaoCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -62,10 +69,10 @@ function KakaoCallbackContent() {
         // 클라이언트측 비회원 식별 정보 제거 (BFF 쿠키 삭제와 이중 보장)
         document.cookie = 'guestId=; Max-Age=0; path=/';
         // 기존 사용자: 로그인 전 페이지로 이동
-        const redirectTo = sessionStorage.getItem('kakaoRedirectTo') ?? '/';
+        // window.location.replace 사용 — Header(Server Component)가 새 accessToken 쿠키를 반드시 읽도록 강제
+        const redirectTo = getSafeRedirectTo(sessionStorage.getItem('kakaoRedirectTo'));
         sessionStorage.removeItem('kakaoRedirectTo');
-        router.replace(redirectTo);
-        router.refresh();
+        window.location.replace(redirectTo);
       })
       .catch((err: unknown) => {
         if (err instanceof Error && err.name === 'AbortError') return;
