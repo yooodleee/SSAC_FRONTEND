@@ -61,9 +61,19 @@ function NaverCallbackContent() {
         return;
       }
 
-      // Case 4 (구: 기존 사용자 — BE가 쿠키 직접 설정) 제거:
-      // 교차 출처 배포(Vercel FE / 별도 도메인 BE)에서 BE는 FE 도메인에 쿠키를 직접 심을 수 없음.
-      // isNewUser=false 포함 모든 code/state 부재 케이스를 reissue로 인증 상태 확인 후 처리.
+      // Case 4: 기존 사용자 — BE가 isNewUser=false와 함께 리다이렉트
+      // 네이버 OAuth는 BE가 콜백을 직접 수신 후 FE로 리다이렉트하는 구조.
+      // BE가 토큰을 URL에 포함하지 않으므로 BFF를 통한 쿠키 설정이 불가능.
+      // TODO: BE가 카카오처럼 ?token=<accessToken> 을 포함해 리다이렉트하도록 수정 필요.
+      if (isNewUserParam === 'false') {
+        document.cookie = 'guestId=; Max-Age=0; path=/';
+        const redirectTo = getSafeRedirectTo(sessionStorage.getItem('naverRedirectTo'));
+        sessionStorage.removeItem('naverRedirectTo');
+        window.location.replace(redirectTo);
+        return;
+      }
+
+      // Case 5: 엣지케이스 — reissue로 인증 상태 확인
       fetch('/api/v1/auth/reissue', { method: 'POST' })
         .then((res) => {
           if (res.ok) {
