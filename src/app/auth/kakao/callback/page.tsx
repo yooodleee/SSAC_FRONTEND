@@ -28,47 +28,51 @@ function KakaoCallbackContent() {
     if (calledRef.current) return;
     calledRef.current = true;
 
-    const token = searchParams.get('token');
-    const tempToken = searchParams.get('tempToken');
-    const provider = searchParams.get('provider');
+    const authCode = searchParams.get('authCode');
     const error = searchParams.get('error');
-    // BE가 신규 사용자임을 알릴 때 추가하는 파라미터
-    const isNewUser = searchParams.get('isNewUser') === 'true';
 
     if (error) {
       router.replace('/login?error=KAKAO_AUTH_CANCEL');
       return;
     }
 
-    // 신규 사용자: BE가 tempToken과 함께 리다이렉트 — BFF 호출 없이 바로 회원가입 플로우 진입
-    if (isNewUser && tempToken) {
-      sessionStorage.setItem('signupTempToken', tempToken);
-      if (provider) sessionStorage.setItem('signupProvider', provider);
-      document.cookie = 'guestId=; Max-Age=0; path=/';
-      router.replace('/signup/terms');
-      return;
-    }
-
-    if (!token) {
+    if (!authCode) {
       router.replace('/login?error=KAKAO_AUTH_FAILED');
       return;
     }
 
     const controller = new AbortController();
 
-    const bffUrl = new URL('/api/auth/kakao/callback', window.location.origin);
-    bffUrl.searchParams.set('token', token);
-
-    fetch(bffUrl.toString(), { signal: controller.signal })
+    fetch('/api/v1/auth/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ authCode }),
+      signal: controller.signal,
+    })
       .then(async (res) => {
         if (!res.ok) {
           const data = (await res.json().catch(() => ({}))) as { errorCode?: string };
           router.replace(`/login?error=${data.errorCode ?? 'SERVER_ERROR'}`);
           return;
         }
+        const data = (await res.json()) as {
+          isNewUser: boolean;
+          tempToken?: string;
+          provider?: string;
+        };
+
         // 클라이언트측 비회원 식별 정보 제거 (BFF 쿠키 삭제와 이중 보장)
         document.cookie = 'guestId=; Max-Age=0; path=/';
-        // 기존 사용자: 로그인 전 페이지로 이동
+
+        // 신규 회원: tempToken 저장 후 약관 동의 페이지로 이동
+        if (data.isNewUser) {
+          if (data.tempToken) sessionStorage.setItem('signupTempToken', data.tempToken);
+          if (data.provider) sessionStorage.setItem('signupProvider', data.provider);
+          router.replace('/signup/terms');
+          return;
+        }
+
+        // 기존 회원: 로그인 전 페이지로 이동
         // window.location.replace 사용 — Header(Server Component)가 새 accessToken 쿠키를 반드시 읽도록 강제
         const redirectTo = getSafeRedirectTo(sessionStorage.getItem('kakaoRedirectTo'));
         sessionStorage.removeItem('kakaoRedirectTo');
