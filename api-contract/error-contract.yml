@@ -8,8 +8,8 @@
 #   2. errors 목록 추가/변경/삭제
 #   3. FE 팀에 GitHub Issue 생성
 
-version: '1.0.0'
-updatedAt: '2026-05-03'
+version: '1.1.0'
+updatedAt: '2026-05-13'
 
 errors:
   AUTH-001:
@@ -86,3 +86,13 @@ errors:
     message: '이미 약관에 동의한 사용자입니다.'
     httpStatus: 409
     description: '소셜 로그인 재시도 등으로 이미 약관 동의가 완료된 사용자가 재접근'
+
+  USER-TYPE-001:
+    message: '사용자 유형을 선택해주세요.'
+    httpStatus: 400
+    description: 'POST /api/auth/register 요청 시 userType 필드 누락'
+
+  USER-TYPE-002:
+    message: '유효하지 않은 사용자 유형입니다.'
+    httpStatus: 400
+    description: 'POST /api/auth/register 요청 시 userType 값이 HIGH_SCHOOL | EARLY_CAREER 외의 값'

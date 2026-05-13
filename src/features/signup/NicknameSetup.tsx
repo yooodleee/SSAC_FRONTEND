@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { signupService } from '@/services/signup';
 import { cn } from '@/lib/utils';
@@ -20,6 +21,7 @@ function getHelperText(checkState: CheckState, nickname: string): string {
 }
 
 export function NicknameSetup() {
+  const router = useRouter();
   const [nickname, setNickname] = useState('');
   const [checkState, setCheckState] = useState<CheckState>('idle');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -56,19 +58,11 @@ export function NicknameSetup() {
     e.preventDefault();
     if (!canSubmit) return;
     setIsSubmitting(true);
-    try {
-      await signupService.completeSignup({ nickname: nickname.trim() });
-      // 회원가입 완료 — 임시 인증 토큰 제거
-      sessionStorage.removeItem('signupTempToken');
-      sessionStorage.removeItem('signupProvider');
-      // router.replace 대신 hard redirect — Header(Server Component)가 accessToken 쿠키를 fresh하게 읽도록 강제
-      window.location.replace('/');
-    } catch (err) {
-      console.error('[NicknameSetup] completeSignup 실패:', err);
-      setCheckState('idle');
-    } finally {
-      setIsSubmitting(false);
-    }
+    // 닉네임을 sessionStorage에 저장 후 유형 선택 페이지로 이동
+    // 회원가입 완료 API 호출은 /signup/type 에서 수행
+    sessionStorage.setItem('signupNickname', nickname.trim());
+    // router.push: history에 남겨 /signup/type에서 뒤로 가기 시 닉네임 페이지로 복귀 가능
+    router.push('/signup/type');
   }
 
   const hasError = isFormatInvalid || checkState === 'unavailable';
@@ -113,7 +107,7 @@ export function NicknameSetup() {
       </div>
 
       <Button type="submit" className="w-full" disabled={!canSubmit} isLoading={isSubmitting}>
-        완료
+        다음 →
       </Button>
     </form>
   );

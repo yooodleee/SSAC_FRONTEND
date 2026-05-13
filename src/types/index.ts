@@ -213,9 +213,13 @@ export interface NicknameCheckResponse {
   isAvailable: boolean;
 }
 
-// POST /api/auth/register — RegisterRequest 기준
+// Derived from components['schemas']['RegisterRequest']['userType']
+export type UserType = Required<components['schemas']['RegisterRequest']>['userType'];
+
+// POST /api/auth/register — RegisterRequest 기준 (tempToken은 signupService가 자동 첨부)
 export interface SignupCompleteRequest {
   nickname: string;
+  userType: UserType;
   guestId?: string;
 }
 

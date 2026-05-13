@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 
 // UI-only type: not derived from API contract
-type SignupStep = 'terms' | 'nickname';
+type SignupStep = 'terms' | 'nickname' | 'type';
 
 interface SignupProgressProps {
   currentStep: SignupStep;
@@ -11,9 +11,10 @@ const STEPS = [
   { id: 'social', label: '소셜 로그인' },
   { id: 'terms', label: '약관 동의' },
   { id: 'nickname', label: '닉네임 설정' },
+  { id: 'type', label: '유형 선택' },
 ] as const;
 
-const stepOrder: SignupStep[] = ['terms', 'nickname'];
+const stepOrder: SignupStep[] = ['terms', 'nickname', 'type'];
 
 function getStepState(
   stepId: (typeof STEPS)[number]['id'],
@@ -77,7 +78,7 @@ export function SignupProgress({ currentStep }: SignupProgressProps) {
             {index < STEPS.length - 1 && (
               <div
                 className={cn(
-                  'mx-2 mb-5 h-0.5 w-12 sm:w-20',
+                  'mx-2 mb-5 h-0.5 w-8 sm:w-12',
                   state === 'done' ? 'bg-blue-600' : 'bg-gray-200',
                 )}
                 aria-hidden="true"
