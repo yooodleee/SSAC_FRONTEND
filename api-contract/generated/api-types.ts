@@ -2,7 +2,7 @@
 // ⚠️  이 파일은 자동 생성됩니다 — 절대 수동으로 편집하지 마세요.
 // 생성 명령: npm run sync:api
 // 소스: http://172.17.96.1:8080/api-docs/swagger.json
-// 생성 시각: 2026-04-29 20:59:51
+// 생성 시각: 2026-05-13 11:00:00
 // ============================================================
 
 /**
@@ -75,6 +75,26 @@ export interface paths {
          *     [특이 동작] 서버에서 정답 검증 및 점수 계산 후 기록을 저장한다. GUEST로 제출 시 이후 로그인 시 자동 이전된다.
          */
         post: operations["submitQuiz"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 인가 코드 → JWT 교환
+         * @description OAuth 콜백이 발급한 일회용 authCode를 JWT로 교환한다. 기존 회원이면 accessToken과 refreshToken을 반환한다. 신규 회원이면 회원 가입 플로우에 사용할 tempToken과 provider를 반환한다. authCode는 30초 TTL이며 1회만 사용 가능하다.
+         */
+        post: operations["exchangeToken"];
         delete?: never;
         options?: never;
         head?: never;
@@ -158,6 +178,46 @@ export interface paths {
          *     이벤트 저장은 비동기로 처리되며, 수신 성공 즉시 204를 반환한다.
          */
         post: operations["recordMenuClick"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 약관 동의 저장
+         * @description tempToken으로 식별된 임시 등록 항목에 약관 동의 정보를 저장한다. 필수 약관(serviceTerm, privacyTerm, ageVerification) 미동의 시 400을 반환한다. tempToken 만료 시 401을 반환한다.
+         */
+        post: operations["saveTerms"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 닉네임 설정 및 회원 가입 완료
+         * @description tempToken, 닉네임, 선택적 guestId를 받아 회원 가입을 완료한다. 닉네임 규칙: 한글·영문·숫자만 허용, 2~10자, 특수문자 불허, 중복 불허. 성공 시 Access/Refresh Token과 사용자 정보를 반환한다.
+         */
+        post: operations["register"];
         delete?: never;
         options?: never;
         head?: never;
@@ -432,7 +492,7 @@ export interface paths {
         };
         /**
          * 네이버 로그인 콜백
-         * @description 네이버 인증 코드를 받아 Access Token과 Refresh Token을 HttpOnly 쿠키로 저장한 뒤 프론트엔드(oauth2.default-redirect-uri)로 리다이렉트한다. 신규 사용자는 자동 가입된다. guestId 쿠키가 있으면 비회원 퀴즈 기록을 회원 계정으로 자동 이전한다.
+         * @description 네이버 인증 코드를 처리한다. 기존 회원이면 Access/Refresh Token을 HttpOnly 쿠키로 저장 후 프론트엔드로 리다이렉트한다. 신규 회원이면 isNewUser=true와 tempToken 파라미터와 함께 회원 가입 플로우로 리다이렉트한다. guestId 쿠키가 있으면 기존 회원의 경우 비회원 퀴즈 기록을 자동 이전한다. 네이버가 error 파라미터를 전달하는 경우 FE 에러 페이지로 리다이렉트한다.
          */
         get: operations["callback_1"];
         put?: never;
@@ -480,6 +540,26 @@ export interface paths {
          *     CTR = 메뉴 클릭 수 / 전체 고유 사용자 수 * 100 (소수점 둘째 자리까지).
          */
         get: operations["getMenuStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/logs/errors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * traceId 기반 에러 로그 조회
+         * @description 특정 traceId의 전체 에러 로그를 시간 순으로 반환한다. ADMIN 권한 필요.
+         */
+        get: operations["getErrorsByTraceId"];
         put?: never;
         post?: never;
         delete?: never;
@@ -570,6 +650,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/nickname/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 닉네임 중복 확인
+         * @description 닉네임 형식 검증 및 중복 여부를 확인한다. 형식이 유효하지 않으면 400, 사용 가능하면 isAvailable: true를 반환한다.
+         */
+        get: operations["checkNickname"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/dev/mock-new-user": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * [DEV] 신규 회원 가입 플로우 모의 시작
+         * @description 카카오·네이버 OAuth 없이 tempToken을 발급하고 신규 회원 가입 플로우를 시작한다. redirect=true(기본)이면 FE 콜백 URL로 리다이렉트, redirect=false이면 JSON으로 tempToken을 반환한다.
+         */
+        get: operations["mockNewUser"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/ab-test/menu": {
         parameters: {
             query?: never;
@@ -588,6 +708,26 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/dev/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * [DEV] 테스트 사용자 삭제
+         * @description 이메일 기준으로 사용자 및 모든 연관 데이터를 삭제한다. 테스트 초기화 목적으로 사용한다.
+         */
+        delete: operations["deleteUser"];
         options?: never;
         head?: never;
         patch?: never;
@@ -712,6 +852,42 @@ export interface components {
              */
             attemptedAt?: string;
         };
+        AuthCodeExchangeRequest: {
+            /**
+             * @description BE OAuth 콜백이 발급한 일회용 인가 코드
+             * @example 550e8400-e29b-41d4-a716-446655440000
+             */
+            authCode: string;
+        };
+        AuthTokenResponse: {
+            /** @description 신규 회원 여부 */
+            isNewUser?: boolean;
+            /**
+             * @description JWT 액세스 토큰 (기존 회원 전용)
+             * @example eyJhbGciOiJIUzI1NiJ9...
+             */
+            accessToken?: string;
+            /**
+             * @description JWT 리프레시 토큰 (기존 회원 전용)
+             * @example dGhpcyBpcyBhIHJlZnJlc2g...
+             */
+            refreshToken?: string;
+            /**
+             * @description 토큰 타입 (기존 회원 전용)
+             * @example Bearer
+             */
+            tokenType?: string;
+            /**
+             * @description 임시 토큰 (신규 회원 전용 — 회원 가입 플로우에 사용)
+             * @example 550e8400-e29b-41d4-a716-446655440000
+             */
+            tempToken?: string;
+            /**
+             * @description OAuth 공급자 (신규 회원 전용)
+             * @example NAVER
+             */
+            provider?: string;
+        };
         ApiResponseLoginResponse: {
             success?: boolean;
             data?: components["schemas"]["LoginResponse"];
@@ -739,6 +915,38 @@ export interface components {
             /** Format: date-time */
             clickedAt: string;
             pageContext: string;
+        };
+        Agreements: {
+            serviceTerm: boolean;
+            privacyTerm: boolean;
+            ageVerification: boolean;
+            marketingTerm?: boolean;
+        };
+        TermsRequest: {
+            tempToken: string;
+            agreements: components["schemas"]["Agreements"];
+        };
+        RegisterRequest: {
+            tempToken: string;
+            nickname: string;
+            guestId?: string;
+        };
+        MergedInfo: {
+            /** Format: int32 */
+            quizCount?: number;
+        };
+        RegisterResponse: {
+            accessToken?: string;
+            refreshToken?: string;
+            user?: components["schemas"]["UserInfo"];
+            merged?: components["schemas"]["MergedInfo"];
+        };
+        UserInfo: {
+            /** Format: int64 */
+            id?: number;
+            nickname?: string;
+            provider?: string;
+            segment?: string;
         };
         UpdateNicknameRequest: {
             /**
@@ -891,9 +1099,9 @@ export interface components {
             sort?: components["schemas"]["SortObject"];
             first?: boolean;
             last?: boolean;
+            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
         PageableObject: {
@@ -901,10 +1109,10 @@ export interface components {
             offset?: number;
             sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
-            pageNumber?: number;
+            pageSize?: number;
             paged?: boolean;
             /** Format: int32 */
-            pageSize?: number;
+            pageNumber?: number;
             unpaged?: boolean;
         };
         SortObject: {
@@ -1110,9 +1318,9 @@ export interface components {
             sort?: components["schemas"]["SortObject"];
             first?: boolean;
             last?: boolean;
+            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
         ApiResponseListMenuClickStatResponse: {
@@ -1128,6 +1336,16 @@ export interface components {
             clickCount?: number;
             /** Format: double */
             ctr?: number;
+        };
+        ErrorLogEntry: {
+            timestamp?: string;
+            level?: string;
+            message?: string;
+            stackTrace?: string;
+        };
+        TraceLogResponse: {
+            traceId?: string;
+            logs?: components["schemas"]["ErrorLogEntry"][];
         };
         ApiResponseUserSegmentResponse: {
             success?: boolean;
@@ -1186,6 +1404,9 @@ export interface components {
             totalCount?: number;
             hasNext?: boolean;
             contents?: components["schemas"]["NewsItemResponse"][];
+        };
+        NicknameCheckResponse: {
+            isAvailable?: boolean;
         };
         AbTestGroupResponse: {
             group?: string;
@@ -1425,6 +1646,48 @@ export interface operations {
             };
         };
     };
+    exchangeToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AuthCodeExchangeRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AuthTokenResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
     reissue: {
         parameters: {
             query?: never;
@@ -1571,6 +1834,88 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    saveTerms: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TermsRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    register: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RegisterResponse"];
+                };
             };
             /** @description 인증 토큰이 없거나 만료되었습니다. */
             401: {
@@ -2216,11 +2561,15 @@ export interface operations {
     };
     callback_1: {
         parameters: {
-            query: {
+            query?: {
                 /** @description 네이버가 전달한 인증 코드 */
-                code: string;
+                code?: string;
                 /** @description CSRF 방어용 state 파라미터 */
-                state: string;
+                state?: string;
+                /** @description 네이버 에러 코드 (사용자 거부 등) */
+                error?: string;
+                /** @description 네이버 에러 설명 */
+                error_description?: string;
             };
             header?: never;
             path?: never;
@@ -2349,6 +2698,47 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ApiResponseListMenuClickStatResponse"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    getErrorsByTraceId: {
+        parameters: {
+            query: {
+                /** @description 추적할 traceId (X-Trace-Id 응답 헤더 값) */
+                traceId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TraceLogResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
                 };
             };
             /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
@@ -2530,6 +2920,88 @@ export interface operations {
             };
         };
     };
+    checkNickname: {
+        parameters: {
+            query: {
+                /** @description 확인할 닉네임 */
+                nickname: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["NicknameCheckResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    mockNewUser: {
+        parameters: {
+            query?: {
+                provider?: "KAKAO" | "NAVER";
+                redirect?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": Record<string, never>;
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
     getMenuGroup: {
         parameters: {
             query?: {
@@ -2560,6 +3032,48 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ApiResponseAbTestGroupResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    deleteUser: {
+        parameters: {
+            query: {
+                email: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": {
+                        [key: string]: string;
+                    };
                 };
             };
             /** @description 인증 토큰이 없거나 만료되었습니다. */
