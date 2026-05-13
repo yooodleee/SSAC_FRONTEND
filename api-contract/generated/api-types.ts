@@ -2,7 +2,7 @@
 // ⚠️  이 파일은 자동 생성됩니다 — 절대 수동으로 편집하지 마세요.
 // 생성 명령: npm run sync:api
 // 소스: http://172.17.96.1:8080/api-docs/swagger.json
-// 생성 시각: 2026-05-13 11:00:00
+// 생성 시각: 2026-05-13 16:32:46
 // ============================================================
 
 /**
@@ -215,7 +215,7 @@ export interface paths {
         put?: never;
         /**
          * 닉네임 설정 및 회원 가입 완료
-         * @description tempToken, 닉네임, 선택적 guestId를 받아 회원 가입을 완료한다. 닉네임 규칙: 한글·영문·숫자만 허용, 2~10자, 특수문자 불허, 중복 불허. 성공 시 Access/Refresh Token과 사용자 정보를 반환한다.
+         * @description tempToken, 닉네임, userType(HIGH_SCHOOL|EARLY_CAREER), 선택적 guestId를 받아 회원 가입을 완료한다. 닉네임 규칙: 한글·영문·숫자만 허용, 2~10자, 특수문자 불허. 성공 시 Access/Refresh Token과 사용자 정보(userType, level, onboardingCompleted 포함)를 반환한다.
          */
         post: operations["register"];
         delete?: never;
@@ -492,7 +492,7 @@ export interface paths {
         };
         /**
          * 네이버 로그인 콜백
-         * @description 네이버 인증 코드를 처리한다. 기존 회원이면 Access/Refresh Token을 HttpOnly 쿠키로 저장 후 프론트엔드로 리다이렉트한다. 신규 회원이면 isNewUser=true와 tempToken 파라미터와 함께 회원 가입 플로우로 리다이렉트한다. guestId 쿠키가 있으면 기존 회원의 경우 비회원 퀴즈 기록을 자동 이전한다. 네이버가 error 파라미터를 전달하는 경우 FE 에러 페이지로 리다이렉트한다.
+         * @description 네이버 인증 코드를 처리한다. 기존 회원이면 authCode와 isNewUser=false로 리다이렉트한다. 신규 회원이면 authCode와 isNewUser=true로 회원 가입 플로우로 리다이렉트한다. JWT/tempToken은 URL에 노출되지 않으며 FE가 POST /api/v1/auth/token으로 교환한다. guestId 쿠키가 있으면 기존 회원의 비회원 퀴즈 기록을 자동 이전한다. 네이버가 error 파라미터를 전달하는 경우 FE 에러 페이지로 리다이렉트한다.
          */
         get: operations["callback_1"];
         put?: never;
@@ -929,6 +929,11 @@ export interface components {
         RegisterRequest: {
             tempToken: string;
             nickname: string;
+            /**
+             * @description 사용자 유형 (HIGH_SCHOOL: 고3 학생 | EARLY_CAREER: 사회초년생)
+             * @enum {string}
+             */
+            userType: "HIGH_SCHOOL" | "EARLY_CAREER";
             guestId?: string;
         };
         MergedInfo: {
@@ -945,8 +950,11 @@ export interface components {
             /** Format: int64 */
             id?: number;
             nickname?: string;
-            provider?: string;
-            segment?: string;
+            /** @enum {string} */
+            userType?: "HIGH_SCHOOL" | "EARLY_CAREER";
+            /** @enum {string} */
+            level?: "SEED" | "SPROUT" | "TREE";
+            onboardingCompleted?: boolean;
         };
         UpdateNicknameRequest: {
             /**
@@ -978,6 +986,18 @@ export interface components {
              * @example 닉네임123
              */
             nickname?: string;
+            /**
+             * @description 사용자 유형
+             * @enum {string}
+             */
+            userType?: "HIGH_SCHOOL" | "EARLY_CAREER";
+            /**
+             * @description 사용자 레벨
+             * @enum {string}
+             */
+            level?: "SEED" | "SPROUT" | "TREE";
+            /** @description 온보딩 완료 여부 */
+            onboardingCompleted?: boolean;
             /**
              * Format: date-time
              * @description 가입일시
@@ -1099,9 +1119,9 @@ export interface components {
             sort?: components["schemas"]["SortObject"];
             first?: boolean;
             last?: boolean;
-            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
         PageableObject: {
@@ -1109,10 +1129,10 @@ export interface components {
             offset?: number;
             sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
-            pageSize?: number;
+            pageNumber?: number;
             paged?: boolean;
             /** Format: int32 */
-            pageNumber?: number;
+            pageSize?: number;
             unpaged?: boolean;
         };
         SortObject: {
@@ -1318,9 +1338,9 @@ export interface components {
             sort?: components["schemas"]["SortObject"];
             first?: boolean;
             last?: boolean;
-            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
         ApiResponseListMenuClickStatResponse: {
@@ -1868,8 +1888,15 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
+            /** @description 약관 동의 저장 성공 */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description TERMS-001: 필수 약관 미동의 */
+            400: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1908,8 +1935,17 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
+            /** @description 회원가입 성공 */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RegisterResponse"];
+                };
+            };
+            /** @description USER-TYPE-001: userType 누락 | USER-TYPE-002: 유효하지 않은 userType 값 | USER-003: 닉네임 형식 오류 | TERMS-001: 약관 동의 미완료 */
+            400: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1924,6 +1960,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description USER-002: 이미 사용 중인 닉네임 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RegisterResponse"];
                 };
             };
             /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
@@ -2932,8 +2977,17 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
+            /** @description 확인 성공 (isAvailable: true/false) */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["NicknameCheckResponse"];
+                };
+            };
+            /** @description USER-003: 닉네임 형식 오류 */
+            400: {
                 headers: {
                     [name: string]: unknown;
                 };

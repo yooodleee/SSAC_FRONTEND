@@ -1,4 +1,4 @@
-// Contract version: 1.0.0 / updatedAt: 2026-05-04
+// Contract version: 1.1.0 / updatedAt: 2026-05-13
 // 이 파일은 api-contract/error-contract.yml 기준으로 작성합니다.
 // ErrorCode 추가/변경/삭제 시 반드시 Contract 파일을 먼저 확인하세요.
 // 검증: npm run validate:error-mapping
@@ -19,4 +19,6 @@ export const ERROR_MESSAGES: Record<string, string> = {
   'COMMON-002': '요청 정보를 확인해주세요.',
   'TERMS-001': '필수 약관에 모두 동의해주세요.',
   'TERMS-002': '이미 회원가입이 완료된 계정입니다.',
+  'USER-TYPE-001': '사용자 유형을 선택해주세요.',
+  'USER-TYPE-002': '유효하지 않은 사용자 유형입니다.',
 };
