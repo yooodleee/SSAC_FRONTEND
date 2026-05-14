@@ -2,7 +2,7 @@
 // ⚠️  이 파일은 자동 생성됩니다 — 절대 수동으로 편집하지 마세요.
 // 생성 명령: npm run sync:api
 // 소스: http://172.17.96.1:8080/api-docs/swagger.json
-// 생성 시각: 2026-05-13 16:32:46
+// 생성 시각: 2026-05-14 15:27:27
 // ============================================================
 
 /**
@@ -75,6 +75,50 @@ export interface paths {
          *     [특이 동작] 서버에서 정답 검증 및 점수 계산 후 기록을 저장한다. GUEST로 제출 시 이후 로그인 시 자동 이전된다.
          */
         post: operations["submitQuiz"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/onboarding/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 온보딩 응답 제출
+         * @description [호출 화면] 온보딩 테스트 완료 후 제출 시 호출.
+         *     [권한 조건] 로그인 회원 전용 (USER, ADMIN).
+         *     [특이 동작] 5개 응답 필수. 총점 기준으로 레벨 자동 판정(SEED/SPROUT/TREE).
+         */
+        post: operations["submit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/onboarding/skip": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 온보딩 건너뛰기
+         * @description [호출 화면] 온보딩 테스트 건너뛰기 선택 시 호출.
+         *     [권한 조건] 로그인 회원 전용 (USER, ADMIN).
+         *     [특이 동작] 레벨을 기본값 SEED로 설정하고 온보딩 완료 처리한다.
+         */
+        post: operations["skip"];
         delete?: never;
         options?: never;
         head?: never;
@@ -455,6 +499,28 @@ export interface paths {
          *     [특이 동작] JWT의 guestId를 기준으로 본인의 기록만 반환한다.
          */
         get: operations["getGuestHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/onboarding/questions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 온보딩 문제 조회
+         * @description [호출 화면] 온보딩 테스트 시작 시 호출.
+         *     [권한 조건] 로그인 회원 전용 (USER, ADMIN).
+         *     [특이 동작] userType 미설정 시 400, 이미 완료한 경우 409 반환.
+         */
+        get: operations["getQuestions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -852,6 +918,39 @@ export interface components {
              */
             attemptedAt?: string;
         };
+        Answer: {
+            /** Format: int64 */
+            questionId: number;
+            selectedOption: string;
+        };
+        OnboardingSubmitRequest: {
+            answers: components["schemas"]["Answer"][];
+        };
+        ApiResponseOnboardingSubmitResponse: {
+            success?: boolean;
+            data?: components["schemas"]["OnboardingSubmitResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
+        OnboardingSubmitResponse: {
+            /** @enum {string} */
+            level?: "SEED" | "SPROUT" | "TREE";
+            /** Format: int32 */
+            totalScore?: number;
+            onboardingCompleted?: boolean;
+        };
+        ApiResponseOnboardingSkipResponse: {
+            success?: boolean;
+            data?: components["schemas"]["OnboardingSkipResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
+        OnboardingSkipResponse: {
+            /** @enum {string} */
+            level?: "SEED" | "SPROUT" | "TREE";
+            onboardingCompleted?: boolean;
+            skipped?: boolean;
+        };
         AuthCodeExchangeRequest: {
             /**
              * @description BE OAuth 콜백이 발급한 일회용 인가 코드
@@ -1130,9 +1229,9 @@ export interface components {
             sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
             pageNumber?: number;
-            paged?: boolean;
             /** Format: int32 */
             pageSize?: number;
+            paged?: boolean;
             unpaged?: boolean;
         };
         SortObject: {
@@ -1318,6 +1417,33 @@ export interface components {
             accuracyRate?: number;
             /** @description 기간별 통계 (최신 순) */
             periodStats?: components["schemas"]["PeriodStatResponse"][];
+        };
+        ApiResponseOnboardingQuestionsResponse: {
+            success?: boolean;
+            data?: components["schemas"]["OnboardingQuestionsResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
+        OnboardingQuestionsResponse: {
+            /** @enum {string} */
+            userType?: "HIGH_SCHOOL" | "EARLY_CAREER";
+            /** Format: int32 */
+            totalCount?: number;
+            questions?: components["schemas"]["QuestionDto"][];
+        };
+        OptionDto: {
+            id?: string;
+            label?: string;
+            /** Format: int32 */
+            score?: number;
+        };
+        QuestionDto: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int32 */
+            order?: number;
+            content?: string;
+            options?: components["schemas"]["OptionDto"][];
         };
         ApiResponsePageUserSummaryResponse: {
             success?: boolean;
@@ -1653,6 +1779,104 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ApiResponseQuizAttemptSummaryResponse"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    submit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OnboardingSubmitRequest"];
+            };
+        };
+        responses: {
+            /** @description 레벨 판정 및 저장 성공 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseOnboardingSubmitResponse"];
+                };
+            };
+            /** @description ONBOARDING-003: 응답 수 오류 / ONBOARDING-004: 유효하지 않은 문제 / ONBOARDING-005: 유형 불일치 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseOnboardingSubmitResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description ONBOARDING-002: 이미 온보딩 완료 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseOnboardingSubmitResponse"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    skip: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description SEED 레벨 설정 성공 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseOnboardingSkipResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
                 };
             };
             /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
@@ -2555,6 +2779,62 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    getQuestions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 문제 목록 조회 성공 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseOnboardingQuestionsResponse"];
+                };
+            };
+            /** @description ONBOARDING-001: userType 미설정 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseOnboardingQuestionsResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description ONBOARDING-002: 이미 온보딩 완료 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseOnboardingQuestionsResponse"];
                 };
             };
             /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */

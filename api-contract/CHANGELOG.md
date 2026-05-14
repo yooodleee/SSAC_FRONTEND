@@ -1,3 +1,11 @@
+## 2026-05-14 15:26 동기화
+
+**추가된 엔드포인트:**
+  + GET /api/v1/onboarding/questions
+  + POST /api/v1/onboarding/skip
+  + POST /api/v1/onboarding/submit
+
+
 ## 2026-05-13 10:55 동기화
 
 **추가된 엔드포인트:**

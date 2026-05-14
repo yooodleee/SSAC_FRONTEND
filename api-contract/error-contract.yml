@@ -8,8 +8,8 @@
 #   2. errors 목록 추가/변경/삭제
 #   3. FE 팀에 GitHub Issue 생성
 
-version: '1.1.0'
-updatedAt: '2026-05-13'
+version: '1.2.0'
+updatedAt: '2026-05-14'
 
 errors:
   AUTH-001:
@@ -96,3 +96,28 @@ errors:
     message: '유효하지 않은 사용자 유형입니다.'
     httpStatus: 400
     description: 'POST /api/auth/register 요청 시 userType 값이 HIGH_SCHOOL | EARLY_CAREER 외의 값'
+
+  ONBOARDING-001:
+    message: '사용자 유형이 설정되지 않았습니다.'
+    httpStatus: 400
+    description: 'GET /api/v1/onboarding/questions 요청 시 userType 미설정'
+
+  ONBOARDING-002:
+    message: '이미 온보딩을 완료한 사용자입니다.'
+    httpStatus: 400
+    description: '온보딩을 이미 완료한 사용자가 재접근'
+
+  ONBOARDING-003:
+    message: '모든 문제에 응답해주세요.'
+    httpStatus: 400
+    description: 'POST /api/v1/onboarding/submit 요청 시 응답 수 불일치'
+
+  ONBOARDING-004:
+    message: '유효하지 않은 문제입니다.'
+    httpStatus: 400
+    description: 'POST /api/v1/onboarding/submit 요청 시 유효하지 않은 questionId'
+
+  ONBOARDING-005:
+    message: '사용자 유형과 맞지 않는 문제입니다.'
+    httpStatus: 400
+    description: 'POST /api/v1/onboarding/submit 요청 시 userType 불일치'

@@ -1,4 +1,4 @@
-// Contract version: 1.1.0 / updatedAt: 2026-05-13
+// Contract version: 1.2.0 / updatedAt: 2026-05-14
 // 이 파일은 api-contract/error-contract.yml 기준으로 작성합니다.
 // ErrorCode 추가/변경/삭제 시 반드시 Contract 파일을 먼저 확인하세요.
 // 검증: npm run validate:error-mapping
@@ -21,4 +21,9 @@ export const ERROR_MESSAGES: Record<string, string> = {
   'TERMS-002': '이미 회원가입이 완료된 계정입니다.',
   'USER-TYPE-001': '사용자 유형을 선택해주세요.',
   'USER-TYPE-002': '유효하지 않은 사용자 유형입니다.',
+  'ONBOARDING-001': '사용자 유형이 설정되지 않았습니다.',
+  'ONBOARDING-002': '이미 온보딩을 완료한 사용자입니다.',
+  'ONBOARDING-003': '모든 문제에 응답해주세요.',
+  'ONBOARDING-004': '유효하지 않은 문제입니다.',
+  'ONBOARDING-005': '사용자 유형과 맞지 않는 문제입니다.',
 };
