@@ -8,17 +8,18 @@
 
 ## 🛡️ Agent Harness Protocols
 
-| 프로토콜       | 파일 위치                              | 트리거 조건                              | 실행 방식                        |
-| -------------- | -------------------------------------- | ---------------------------------------- | -------------------------------- |
-| 토큰 최적화    | docs/agent-protocols/token-optimize.md | 작업 시작 전 / 스프린트 종료             | 자동 (작업 전) + 수동 (스프린트) |
-| SC 관심사 점검 | docs/agent-protocols/sc-harness.md     | SC가 포함된 작업 지시를 받았을 때        | 자동 (구현 전 필수)              |
-| 신규 기능 개발 | docs/agent-protocols/new-feature.md    | 새로운 컴포넌트/페이지/기능 추가 요청 시 | 자동 (구현 전 필수)              |
-| 테스트 작성    | docs/agent-protocols/testing.md        | 신규 컴포넌트/훅/API 연동 구현 완료 시   | 자동 (구현 후 필수)              |
-| 하네스 감사    | docs/agent-protocols/harness-audit.md  | 하네스 점검 요청 시 / 주기적 실행        | 수동 또는 주기적                 |
-| 자가 진단      | docs/agent-protocols/self-diagnose.md  | 에러 발생 / 구현 완료 후 검증 시         | 자동 (구현 후 필수)              |
-| ADR 생성       | docs/agent-protocols/adr-create.md     | 기술적 의사결정이 발생했을 때            | 수동 (결정 시점)                 |
-| 로그 기반 진단 | docs/agent-protocols/log-diagnose.md   | 오류 발생 즉시                           | 자동 (오류 즉시)                 |
-| 디자인 시스템  | DESIGN.md                              | UI/UX 관련 작업 시                       | 자동 (구현 전 필수)              |
+| 프로토콜       | 파일 위치                                  | 트리거 조건                              | 실행 방식                        |
+| -------------- | ------------------------------------------ | ---------------------------------------- | -------------------------------- |
+| 토큰 최적화    | docs/agent-protocols/token-optimize.md     | 작업 시작 전 / 스프린트 종료             | 자동 (작업 전) + 수동 (스프린트) |
+| SC 관심사 점검 | docs/agent-protocols/sc-harness.md         | SC가 포함된 작업 지시를 받았을 때        | 자동 (구현 전 필수)              |
+| 구조 충돌 점검 | docs/agent-protocols/sc-structure-check.md | SC 포함 작업 시                          | 자동 (sc-harness 직후)           |
+| 신규 기능 개발 | docs/agent-protocols/new-feature.md        | 새로운 컴포넌트/페이지/기능 추가 요청 시 | 자동 (구현 전 필수)              |
+| 테스트 작성    | docs/agent-protocols/testing.md            | 신규 컴포넌트/훅/API 연동 구현 완료 시   | 자동 (구현 후 필수)              |
+| 하네스 감사    | docs/agent-protocols/harness-audit.md      | 하네스 점검 요청 시 / 주기적 실행        | 수동 또는 주기적                 |
+| 자가 진단      | docs/agent-protocols/self-diagnose.md      | 에러 발생 / 구현 완료 후 검증 시         | 자동 (구현 후 필수)              |
+| ADR 생성       | docs/agent-protocols/adr-create.md         | 기술적 의사결정이 발생했을 때            | 수동 (결정 시점)                 |
+| 로그 기반 진단 | docs/agent-protocols/log-diagnose.md       | 오류 발생 즉시                           | 자동 (오류 즉시)                 |
+| 디자인 시스템  | DESIGN.md                                  | UI/UX 관련 작업 시                       | 자동 (구현 전 필수)              |
 
 ---
 
@@ -29,6 +30,11 @@
 [sc-harness.md] 다음 키워드가 포함된 작업 지시를 받은 경우
 
 - "SC", "Success Criteria", "성공 조건", "백로그"
+
+[sc-structure-check.md] sc-harness.md 실행 완료 직후 자동 실행
+
+- SC가 포함된 작업 지시를 받은 경우
+- 새로운 페이지 / 컴포넌트 / API 연동 추가 요청 시
 
 [new-feature.md] 다음 요청을 받은 경우
 
@@ -73,7 +79,8 @@
 [작업 시작 전]
 0순위 token-optimize.md → 컨텍스트 최소화 (매 작업)
 1순위 sc-harness.md → SC 관심사 점검
-2순위 new-feature.md → 신규 기능 개발
+2순위 sc-structure-check.md → 프로젝트 구조 충돌 점검
+3순위 new-feature.md → 신규 기능 개발
 
 [작업 완료 후]
 3순위 testing.md → 테스트 작성
