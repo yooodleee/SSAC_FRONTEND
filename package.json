@@ -24,7 +24,10 @@
     "sync:api": "bash scripts/sync-api.sh",
     "sync:api:local": "SWAGGER_URL=http://$(ip route show default | awk '{print $3}'):8080/api-docs/swagger.json bash scripts/sync-api.sh",
     "validate:error-mapping": "node --experimental-strip-types --no-warnings scripts/validateErrorMapping.ts",
-    "lint:type-contract": "node scripts/lintTypeContract.mjs"
+    "lint:type-contract": "node scripts/lintTypeContract.mjs",
+    "logs:vercel": "bash scripts/check-vercel-logs.sh",
+    "logs:vercel:live": "vercel logs --follow",
+    "pre-deploy": "bash scripts/pre-deploy-check.sh"
   },
   "lint-staged": {
     "*.{ts,tsx,js,mjs,cjs}": [
