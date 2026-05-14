@@ -105,6 +105,28 @@ npm run format
 - **환경 변수 중앙화**: `src/lib/env.ts` 한 곳에서 관리하여 누락 시 즉시 오류 발생
 - **커스텀 훅 분리**: 비즈니스 로직을 컴포넌트 외부로 추출
 
+## Vercel 배포 관련 명령어
+
+```bash
+# 배포 목록 확인
+vercel ls
+
+# 최신 배포 로그 확인
+npm run logs:vercel
+
+# 실시간 배포 로그 스트리밍
+npm run logs:vercel:live
+
+# 배포 전 사전 검증 (TypeScript + ESLint + build)
+npm run pre-deploy
+
+# 환경 변수 목록 확인
+vercel env ls
+
+# 수동 배포 실행
+vercel --prod
+```
+
 ## API 예제 추가 방법
 
 1. `src/types/index.ts`에 타입 추가
