@@ -11,7 +11,7 @@ export default async function ProfileContent() {
   const token = cookieStore.get('accessToken')?.value;
 
   if (!token) {
-    redirect('/login?redirectTo=/my/profile');
+    redirect('/login?redirectTo=/mypage');
   }
 
   let profile;

@@ -632,12 +632,12 @@ export function MobileMenu({ appName, isLoggedIn }: { appName: string; isLoggedI
                         )}
                       </li>
 
-                      {/* 내 정보 */}
+                      {/* 마이페이지 */}
                       <li>
                         <Link
-                          href="/my/profile"
-                          aria-current={pathname === '/my/profile' ? 'page' : undefined}
-                          onClick={() => track('/my/profile', '내 정보')}
+                          href="/mypage"
+                          aria-current={pathname === '/mypage' ? 'page' : undefined}
+                          onClick={() => track('/mypage', '마이페이지')}
                           className={cn(
                             'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
@@ -658,7 +658,7 @@ export function MobileMenu({ appName, isLoggedIn }: { appName: string; isLoggedI
                           >
                             <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                           </svg>
-                          내 정보
+                          마이페이지
                         </Link>
                       </li>
 

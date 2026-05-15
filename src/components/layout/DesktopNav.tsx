@@ -528,15 +528,15 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
             </Link>
           )}
 
-          {/* 프로필 링크 */}
+          {/* 마이페이지 링크 */}
           <Link
-            href="/my/profile"
-            aria-current={pathname === '/my/profile' ? 'page' : undefined}
-            onClick={() => track('/my/profile', '내 정보')}
+            href="/mypage"
+            aria-current={pathname === '/mypage' ? 'page' : undefined}
+            onClick={() => track('/mypage', '마이페이지')}
             className={cn(
               'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
-              pathname.startsWith('/my')
+              pathname === '/mypage'
                 ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
                 : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100',
             )}
@@ -553,7 +553,7 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
             >
               <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
-            내 정보
+            마이페이지
           </Link>
 
           {/* 로그아웃 */}

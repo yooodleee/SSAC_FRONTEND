@@ -1,25 +1,9 @@
-import type { Metadata } from 'next';
-import { Suspense } from 'react';
-import Link from 'next/link';
-import ProfileContent from '@/features/my/ProfileContent';
-import ProfileSkeleton from '@/features/my/ProfileSkeleton';
+import { redirect } from 'next/navigation';
 
-export const metadata: Metadata = { title: '내 정보 | 마이페이지' };
-
-export default function ProfilePage() {
-  return (
-    <div className="container-page py-8">
-      <div className="mb-6 flex items-center gap-2 text-sm text-gray-500">
-        <Link href="/my" className="hover:text-gray-700">
-          마이페이지
-        </Link>
-        <span aria-hidden="true">/</span>
-        <span className="font-medium text-gray-900">내 정보</span>
-      </div>
-
-      <Suspense fallback={<ProfileSkeleton />}>
-        <ProfileContent />
-      </Suspense>
-    </div>
-  );
+/**
+ * /my/profile 경로는 /mypage로 통합됩니다.
+ * 기존 북마크 또는 링크 호환성을 위해 유지됩니다.
+ */
+export default function MyProfileRedirect() {
+  redirect('/mypage');
 }
