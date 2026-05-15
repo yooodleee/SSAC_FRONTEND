@@ -46,3 +46,55 @@
     opacity: 1;
   }
 }
+
+/* 온보딩 레벨 마스코트 애니메이션 */
+@keyframes ssac-grow {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes ssac-sway {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes ssac-dance {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-10px) rotate(-6deg);
+  }
+  75% {
+    transform: translateY(-10px) rotate(6deg);
+  }
+}
+
+.animate-ssac-grow {
+  animation: ssac-grow 3s ease-in-out infinite;
+}
+.animate-ssac-sway {
+  animation: ssac-sway 2s ease-in-out infinite;
+}
+.animate-ssac-dance {
+  animation: ssac-dance 0.9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-ssac-grow,
+  .animate-ssac-sway,
+  .animate-ssac-dance {
+    animation: none;
+  }
+}
