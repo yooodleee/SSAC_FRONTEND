@@ -144,7 +144,12 @@
       "Bash(scripts/check-vercel-logs.sh)",
       "Bash(scripts/pre-deploy-check.sh)",
       "Bash(logs:vercel)",
-      "Bash(logs:vercel:live)"
+      "Bash(logs:vercel:live)",
+      "Bash(/onboarding/result)",
+      "Bash(/api/v1/onboarding/result)",
+      "Bash(/api/v1/onboarding/interests)",
+      "Bash(/onboarding/test)",
+      "Bash(/home)"
     ]
   }
 }

@@ -4,6 +4,11 @@ type OnboardingQuestionsResponse = components['schemas']['OnboardingQuestionsRes
 type OnboardingSubmitRequest = components['schemas']['OnboardingSubmitRequest'];
 type OnboardingSubmitResponse = components['schemas']['OnboardingSubmitResponse'];
 type OnboardingSkipResponse = components['schemas']['OnboardingSkipResponse'];
+type OnboardingResultResponse = components['schemas']['OnboardingResultResponse'];
+type OnboardingInterestsRequest = components['schemas']['OnboardingInterestsRequest'];
+
+// BFF extends OnboardingResultResponse with nickname from users/me
+export type OnboardingResultBffResponse = OnboardingResultResponse & { nickname?: string };
 
 async function onboardingFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(path, {
@@ -51,6 +56,17 @@ export const onboardingService = {
   skipOnboarding(): Promise<OnboardingSkipResponse> {
     return onboardingFetch<OnboardingSkipResponse>('/api/v1/onboarding/skip', {
       method: 'POST',
+    });
+  },
+
+  getResult(): Promise<OnboardingResultBffResponse> {
+    return onboardingFetch<OnboardingResultBffResponse>('/api/v1/onboarding/result');
+  },
+
+  saveInterests(body: OnboardingInterestsRequest): Promise<void> {
+    return onboardingFetch<void>('/api/v1/onboarding/interests', {
+      method: 'POST',
+      body: JSON.stringify(body),
     });
   },
 };
