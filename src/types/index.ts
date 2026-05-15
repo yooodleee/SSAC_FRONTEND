@@ -302,3 +302,64 @@ export interface SearchResponse {
   query: string;
   popularKeywords: SearchSuggestion[];
 }
+
+// ============================================================
+// ⚠️ Home V1 Domain Types
+// /api/v1/home 응답 — api-types.ts의 ApiResponseObject(data: {})로만 정의됨
+// BE 팀 swagger schema 추가 요청 후 api-types.ts 이전 예정
+// ============================================================
+
+// ⚠️ API type: /api/v1/home user 필드 — api-types.ts에 없음
+export interface HomeUserInfo {
+  nickname: string;
+  level: 'SEED' | 'SPROUT' | 'TREE';
+}
+
+// ⚠️ API type: /api/v1/home todayCard 필드 — api-types.ts에 없음
+export interface TodayCardDto {
+  id: string;
+  title: string;
+  category: string;
+  categoryEmoji?: string;
+  estimatedMinutes: number;
+}
+
+// ⚠️ API type: /api/v1/home continueLearning 필드 — api-types.ts에 없음
+export interface ContinueLearningDto {
+  id: string;
+  title: string;
+  progressPercent: number;
+}
+
+// ⚠️ API type: /api/v1/home todayQuiz 필드 — api-types.ts에 없음
+export interface TodayQuizDto {
+  id: string;
+  question: string;
+}
+
+// ⚠️ API type: /api/v1/home categories 필드 — api-types.ts에 없음
+export interface CategorySummaryDto {
+  id: string;
+  emoji: string;
+  name: string;
+  completedCount: number;
+  totalCount: number;
+}
+
+// ⚠️ API type: /api/v1/home recommendedContents — ContentItemDto 확장 (category 추가)
+export interface HomeContentItemDto extends Required<components['schemas']['ContentItemDto']> {
+  category?: string;
+  categoryEmoji?: string;
+}
+
+// ⚠️ API type: /api/v1/home 전체 응답 — api-types.ts에 없음
+export interface HomeV1Data {
+  user: HomeUserInfo;
+  todayCard: TodayCardDto | null;
+  continueLearning: ContinueLearningDto | null;
+  todayQuiz: TodayQuizDto | null;
+  recommendedContents: HomeContentItemDto[];
+  categories: CategorySummaryDto[];
+  onboardingRequired?: boolean;
+  redirectTo?: string;
+}

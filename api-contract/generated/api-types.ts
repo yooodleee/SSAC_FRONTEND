@@ -2,7 +2,7 @@
 // ⚠️  이 파일은 자동 생성됩니다 — 절대 수동으로 편집하지 마세요.
 // 생성 명령: npm run sync:api
 // 소스: http://172.17.96.1:8080/api-docs/swagger.json
-// 생성 시각: 2026-05-15 10:19:22
+// 생성 시각: 2026-05-15 11:36:32
 // ============================================================
 
 /**
@@ -565,6 +565,50 @@ export interface paths {
          *     [특이 동작] userType 미설정 시 400, 이미 완료한 경우 409 반환.
          */
         get: operations["getQuestions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/home": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 홈 화면 조회
+         * @description [호출 화면] 앱 진입 시 홈 화면 데이터 조회.
+         *     [권한 조건] 로그인 회원 전용 (USER, ADMIN).
+         *     [특이 동작] 온보딩 미완료 시 onboardingRequired: true와 redirectTo 반환.
+         */
+        get: operations["getHome"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/contents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 레벨/카테고리 콘텐츠 목록 조회
+         * @description [호출 화면] 홈 카테고리 클릭 또는 레벨별 콘텐츠 목록 화면.
+         *     [권한 조건] 로그인 회원 전용 (USER, ADMIN).
+         *     [특이 동작] level 미지정 시 사용자의 현재 레벨 기준으로 필터링.
+         */
+        get: operations["getContents"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1257,7 +1301,6 @@ export interface components {
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
-            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["QuizAttemptSummaryResponse"][];
@@ -1268,23 +1311,24 @@ export interface components {
             last?: boolean;
             /** Format: int32 */
             numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
         PageableObject: {
+            /** Format: int64 */
+            offset?: number;
+            sort?: components["schemas"]["SortObject"];
             paged?: boolean;
             /** Format: int32 */
             pageNumber?: number;
             /** Format: int32 */
             pageSize?: number;
             unpaged?: boolean;
-            /** Format: int64 */
-            offset?: number;
-            sort?: components["schemas"]["SortObject"];
         };
         SortObject: {
+            empty?: boolean;
             sorted?: boolean;
             unsorted?: boolean;
-            empty?: boolean;
         };
         AnswerDetail: {
             /**
@@ -1518,6 +1562,36 @@ export interface components {
             content?: string;
             options?: components["schemas"]["OptionDto"][];
         };
+        ApiResponseObject: {
+            success?: boolean;
+            data?: Record<string, never>;
+            message?: string;
+            loginRequired?: boolean;
+        };
+        ApiResponseContentListResponse: {
+            success?: boolean;
+            data?: components["schemas"]["ContentListResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
+        ContentItemDto: {
+            id?: string;
+            title?: string;
+            difficulty?: string;
+            difficultyLabel?: string;
+            /** Format: int32 */
+            estimatedMinutes?: number;
+            isCompleted?: boolean;
+            /** Format: int64 */
+            viewCount?: number;
+        };
+        ContentListResponse: {
+            level?: string;
+            category?: string;
+            /** Format: int32 */
+            totalCount?: number;
+            contents?: components["schemas"]["ContentItemDto"][];
+        };
         ApiResponsePageUserSummaryResponse: {
             success?: boolean;
             data?: components["schemas"]["PageUserSummaryResponse"];
@@ -1529,7 +1603,6 @@ export interface components {
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
-            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["UserSummaryResponse"][];
@@ -1540,6 +1613,7 @@ export interface components {
             last?: boolean;
             /** Format: int32 */
             numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
         ApiResponseListMenuClickStatResponse: {
@@ -3002,6 +3076,87 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ApiResponseOnboardingQuestionsResponse"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    getHome: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 홈 화면 데이터 조회 성공 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseObject"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    getContents: {
+        parameters: {
+            query?: {
+                /** @description 레벨 필터 (SEED/SPROUT/TREE). 미지정 시 사용자 레벨 적용. */
+                level?: string;
+                /** @description 카테고리 필터 (realestate/tax/finance/scholarship) */
+                category?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 콘텐츠 목록 조회 성공 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseContentListResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
                 };
             };
             /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
