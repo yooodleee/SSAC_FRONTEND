@@ -7,7 +7,7 @@ type OnboardingSkipResponse = components['schemas']['OnboardingSkipResponse'];
 type OnboardingResultResponse = components['schemas']['OnboardingResultResponse'];
 type OnboardingInterestsRequest = components['schemas']['OnboardingInterestsRequest'];
 
-// BFF extends OnboardingResultResponse with nickname from users/me
+// UI-only type: BFF layer extension — BE contract에 없는 nickname 필드를 FE에서 병합
 export type OnboardingResultBffResponse = OnboardingResultResponse & { nickname?: string };
 
 async function onboardingFetch<T>(path: string, init?: RequestInit): Promise<T> {
