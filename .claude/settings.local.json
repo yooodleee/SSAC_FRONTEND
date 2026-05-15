@@ -149,7 +149,15 @@
       "Bash(/api/v1/onboarding/result)",
       "Bash(/api/v1/onboarding/interests)",
       "Bash(/onboarding/test)",
-      "Bash(/home)"
+      "Bash(/home)",
+      "Bash(rm:*)",
+      "Bash(src/app/api/v1/users/mypage/route.ts)",
+      "Bash(BE:/api/v1/users/me)",
+      "Bash(BE:/api/v1/users/mypage)",
+      "Bash(/api/v1/users/me)",
+      "Bash(/api/v1/users/mypage)",
+      "Bash(cmd:*)",
+      "Read(//tmp/**)"
     ]
   }
 }

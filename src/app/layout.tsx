@@ -4,6 +4,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { PostLoginToast } from '@/components/auth/PostLoginToast';
 import { ErrorToast } from '@/components/ui/ErrorToast';
+import { LevelUpModal } from '@/features/mypage/LevelUpModal';
 import { ThemeProvider } from '@/lib/theme';
 import './globals.css';
 
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <Footer />
           <PostLoginToast />
           <ErrorToast />
+          <LevelUpModal />
         </ThemeProvider>
       </body>
     </html>

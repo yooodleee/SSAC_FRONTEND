@@ -1,3 +1,13 @@
+## 2026-05-15 17:46 동기화
+
+**추가된 엔드포인트:**
+  + DELETE /api/v1/onboarding/result
+  + GET /api/v1/users/mypage
+  + PATCH /api/v1/users/type
+  + POST /api/v1/contents/{contentId}/complete
+  + PUT /api/v1/users/interests
+
+
 ## 2026-05-14 15:26 동기화
 
 **추가된 엔드포인트:**
