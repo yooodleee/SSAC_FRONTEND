@@ -45,9 +45,16 @@
 
 [self-diagnose.md] 다음 상황에서 실행
 
+STEP 1~3 (경량 진단):
+
 - 구현 완료 직후
-- 에러 또는 예외 상황 발생 시
+- 에러 또는 예외 상황 발생 시 (최초 1회)
 - 사용자가 "확인해줘", "점검해줘" 요청 시
+
+STEP 1~5 전체 (하네스 강화):
+
+- lint / build 동일 오류 2회 이상 반복 시
+- CI가 같은 규칙 위반으로 2회 이상 PR 차단 시
 
 [DESIGN.md] 다음 상황에서 실행
 
@@ -79,7 +86,7 @@
 
 [작업 완료 후]
 3순위 testing.md → 테스트 작성
-4순위 self-diagnose.md → 자가 점검
+4순위 self-diagnose.md → 자가 점검 (STEP 1~3 / 반복 오류 시 STEP 1~5)
 
 [오류 발생 시]
 즉시 log-diagnose.md → 로그 기반 진단
@@ -118,7 +125,9 @@
 □ 신규 컴포넌트/훅/API 연동 구현이 완료되었는가?
 → YES : testing.md 실행
 □ 구현이 완료되었는가?
-→ YES : self-diagnose.md 실행
+→ YES : self-diagnose.md STEP 1~3 실행
+□ 동일 오류가 2회 이상 반복되었는가?
+→ YES : self-diagnose.md STEP 1~5 전체 실행
 
 위 질문을 건너뛰고 바로 구현을 시작하는 것은 금지된다.
 
