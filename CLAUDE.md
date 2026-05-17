@@ -15,6 +15,7 @@
 | SC 생성/수정   | docs/agent-protocols/backlog-generate.md | SC 포함 작업 지시 시                     | 자동 (sc-harness 직후)           |
 | 신규 기능 개발 | docs/agent-protocols/new-feature.md      | 새로운 컴포넌트/페이지/기능 추가 요청 시 | 자동 (구현 전 필수)              |
 | 테스트 작성    | docs/agent-protocols/testing.md          | 신규 컴포넌트/훅/API 연동 구현 완료 시   | 자동 (구현 후 필수)              |
+| PR 체크리스트  | docs/agent-protocols/pr-checklist.md     | PR 생성 직전 / main push 전              | 수동 (PR 생성 직전)              |
 | 하네스 감사    | docs/agent-protocols/harness-audit.md    | 하네스 점검 요청 시 / 주기적 실행        | 수동 또는 주기적                 |
 | 자가 진단      | docs/agent-protocols/self-diagnose.md    | 에러 발생 / 구현 완료 후 검증 시         | 자동 (구현 후 필수)              |
 | ADR 생성       | docs/agent-protocols/adr-create.md       | 기술적 의사결정이 발생했을 때            | 수동 (결정 시점)                 |
@@ -248,16 +249,19 @@ STEP 1~5 전체 (하네스 강화):
 
 main 브랜치에 push 전 반드시 아래 절차를 수행한다:
 
-1. `npm run pre-deploy` 실행
+1. `pr-checklist.md` 실행
+   → SC 달성 / 코드 품질 / DESIGN.md / 테스트 파일 확인
+
+2. `npm run pre-deploy` 실행
    → TypeScript / ESLint / 빌드 모두 통과 확인
 
-2. 모두 통과한 경우에만 push 진행
+3. 모두 통과한 경우에만 push 진행
 
    ```bash
    git push origin main
    ```
 
-3. 배포 실패 시 즉시 실행:
+4. 배포 실패 시 즉시 실행:
    ```bash
    npm run logs:vercel
    ```
