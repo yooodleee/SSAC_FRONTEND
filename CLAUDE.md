@@ -8,19 +8,20 @@
 
 ## 🛡️ Agent Harness Protocols
 
-| 프로토콜       | 파일 위치                                | 트리거 조건                              | 실행 방식                        |
-| -------------- | ---------------------------------------- | ---------------------------------------- | -------------------------------- |
-| 토큰 최적화    | docs/agent-protocols/token-optimize.md   | 작업 시작 전 / 스프린트 종료             | 자동 (작업 전) + 수동 (스프린트) |
-| SC 관심사 점검 | docs/agent-protocols/sc-harness.md       | SC가 포함된 작업 지시를 받았을 때        | 자동 (구현 전 필수)              |
-| SC 생성/수정   | docs/agent-protocols/backlog-generate.md | SC 포함 작업 지시 시                     | 자동 (sc-harness 직후)           |
-| 신규 기능 개발 | docs/agent-protocols/new-feature.md      | 새로운 컴포넌트/페이지/기능 추가 요청 시 | 자동 (구현 전 필수)              |
-| 테스트 작성    | docs/agent-protocols/testing.md          | 신규 컴포넌트/훅/API 연동 구현 완료 시   | 자동 (구현 후 필수)              |
-| PR 체크리스트  | docs/agent-protocols/pr-checklist.md     | PR 생성 직전 / main push 전              | 수동 (PR 생성 직전)              |
-| 하네스 감사    | docs/agent-protocols/harness-audit.md    | 하네스 점검 요청 시 / 주기적 실행        | 수동 또는 주기적                 |
-| 자가 진단      | docs/agent-protocols/self-diagnose.md    | 에러 발생 / 구현 완료 후 검증 시         | 자동 (구현 후 필수)              |
-| ADR 생성       | docs/agent-protocols/adr-create.md       | 기술적 의사결정이 발생했을 때            | 수동 (결정 시점)                 |
-| 로그 기반 진단 | docs/agent-protocols/log-diagnose.md     | 오류 발생 즉시                           | 자동 (오류 즉시)                 |
-| 디자인 시스템  | DESIGN.md                                | UI/UX 관련 작업 시                       | 자동 (구현 전 필수)              |
+| 프로토콜        | 파일 위치                                | 트리거 조건                              | 실행 방식                        |
+| --------------- | ---------------------------------------- | ---------------------------------------- | -------------------------------- |
+| 토큰 최적화     | docs/agent-protocols/token-optimize.md   | 작업 시작 전 / 스프린트 종료             | 자동 (작업 전) + 수동 (스프린트) |
+| SC 관심사 점검  | docs/agent-protocols/sc-harness.md       | SC가 포함된 작업 지시를 받았을 때        | 자동 (구현 전 필수)              |
+| SC 생성/수정    | docs/agent-protocols/backlog-generate.md | SC 포함 작업 지시 시                     | 자동 (sc-harness 직후)           |
+| 신규 기능 개발  | docs/agent-protocols/new-feature.md      | 새로운 컴포넌트/페이지/기능 추가 요청 시 | 자동 (구현 전 필수)              |
+| 테스트 작성     | docs/agent-protocols/testing.md          | 신규 컴포넌트/훅/API 연동 구현 완료 시   | 자동 (구현 후 필수)              |
+| PR 체크리스트   | docs/agent-protocols/pr-checklist.md     | PR 생성 직전 / main push 전              | 수동 (PR 생성 직전)              |
+| 하네스 감사     | docs/agent-protocols/harness-audit.md    | 하네스 점검 요청 시 / 주기적 실행        | 수동 또는 주기적                 |
+| 자가 진단       | docs/agent-protocols/self-diagnose.md    | 에러 발생 / 구현 완료 후 검증 시         | 자동 (구현 후 필수)              |
+| ADR 생성        | docs/agent-protocols/adr-create.md       | 기술적 의사결정이 발생했을 때            | 수동 (결정 시점)                 |
+| Contract 동기화 | docs/agent-protocols/contract-sync.md    | API Contract 변경 시                     | 자동 (변경 감지 즉시)            |
+| 로그 기반 진단  | docs/agent-protocols/log-diagnose.md     | 오류 발생 즉시                           | 자동 (오류 즉시)                 |
+| 디자인 시스템   | DESIGN.md                                | UI/UX 관련 작업 시                       | 자동 (구현 전 필수)              |
 
 ---
 
