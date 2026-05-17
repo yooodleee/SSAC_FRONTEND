@@ -157,7 +157,8 @@
       "Bash(/api/v1/users/me)",
       "Bash(/api/v1/users/mypage)",
       "Bash(cmd:*)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(wc -l CLAUDE.md docs/agent-protocols/*.md)"
     ]
   }
 }
