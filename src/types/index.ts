@@ -350,6 +350,20 @@ export interface CategorySummaryDto {
 export interface HomeContentItemDto extends Required<components['schemas']['ContentItemDto']> {
   category?: string;
   categoryEmoji?: string;
+  /** 상위 레벨 미리보기 콘텐츠 여부 (BE 판단) */
+  isPreview?: boolean;
+  /** 미리보기 카드에 표시할 유도 메시지 (예: "나무 레벨에 도전해보세요! 🌳") */
+  previewMessage?: string;
+}
+
+// ⚠️ API type: /api/v1/home welcomeBack 필드 — api-types.ts에 없음
+export interface WelcomeBackDto {
+  /** 장기 미접속 여부 (BE 판단) */
+  isLongAbsence: boolean;
+  /** 마지막 방문 이후 경과 일수 */
+  daysSinceLastVisit: number;
+  /** BE 커스텀 환영 메시지 (없으면 FE 기본 메시지 표시) */
+  message?: string;
 }
 
 // ⚠️ API type: /api/v1/home 전체 응답 — api-types.ts에 없음
@@ -362,4 +376,6 @@ export interface HomeV1Data {
   categories: CategorySummaryDto[];
   onboardingRequired?: boolean;
   redirectTo?: string;
+  /** 복귀 환영 메시지 데이터 (isLongAbsence: true 시 FE에서 모달 표시) */
+  welcomeBack?: WelcomeBackDto;
 }

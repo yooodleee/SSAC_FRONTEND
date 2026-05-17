@@ -2,7 +2,7 @@
 // ⚠️  이 파일은 자동 생성됩니다 — 절대 수동으로 편집하지 마세요.
 // 생성 명령: npm run sync:api
 // 소스: http://172.17.96.1:8080/api-docs/swagger.json
-// 생성 시각: 2026-05-17 16:31:26
+// 생성 시각: 2026-05-17 23:21:50
 // ============================================================
 
 /**
@@ -1459,9 +1459,9 @@ export interface components {
             sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
             pageNumber?: number;
+            paged?: boolean;
             /** Format: int32 */
             pageSize?: number;
-            paged?: boolean;
             unpaged?: boolean;
         };
         QuizAttemptSummaryResponse: {
