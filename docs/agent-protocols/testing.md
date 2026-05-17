@@ -1,5 +1,10 @@
 # Testing Protocol (Jest + RTL + MSW)
 
+> **[BLOCKED: TD-001]** Jest + RTL + MSW 미설치 상태.
+> STEP 1~3 (테스트 코드 작성) 은 실행 가능하나, **STEP 4~5 (실행 및 검증) 는 실행 불가**.
+> 해제 조건: `docs/agent-protocols/adr-create.md` 절차로 ADR 작성 후 Jest 설치 완료 시.
+> → 설치 완료 후 이 배너를 삭제한다.
+
 ## 트리거 조건
 
 - 신규 컴포넌트 / 페이지 / 훅 구현 완료 시 (자동)
@@ -12,8 +17,8 @@
 STEP 1. 테스트 대상 분류
 STEP 2. 테스트 파일 생성 위치 결정
 STEP 3. 테스트 작성 (유형별 규칙 준수)
-STEP 4. 테스트 실행 및 커버리지 확인
-STEP 5. 자가 점검
+STEP 4. 테스트 실행 및 커버리지 확인 ← [BLOCKED: TD-001] Jest 미설치
+STEP 5. 자가 점검 ← [BLOCKED: TD-001] Jest 미설치
 
 ---
 
@@ -163,7 +168,9 @@ it('useNotification이 unreadCount를 올바르게 반환한다', async () => {
 
 ---
 
-## STEP 4. 테스트 실행 및 커버리지 확인
+## STEP 4. 테스트 실행 및 커버리지 확인 〔BLOCKED: TD-001〕
+
+> Jest 미설치로 이 단계는 실행 불가. Jest 설치 후 아래 절차를 진행한다.
 
 실행 명령어:
 
@@ -183,15 +190,11 @@ $ npm run test -- --watch         # 워치 모드
 → 구현 완료로 간주하지 않는다
 → 커버리지를 충족할 때까지 테스트를 추가한다
 
-> ⚠️ Jest 미설치 상태 (quality.md TD-001): `npm run test` 명령은 Jest 설치 후 사용 가능.
-> Jest + RTL + MSW 설치 전까지 이 프로토콜의 STEP 4~5는 실행 불가.
-> 설치 방법: `docs/agent-protocols/adr-create.md` 절차에 따라 ADR 작성 후 도입 결정.
-
 ---
 
-## STEP 5. 테스트 자가 점검
+## STEP 5. 테스트 자가 점검 〔BLOCKED: TD-001〕
 
-테스트 작성 완료 후 아래 항목을 반드시 확인한다:
+> Jest 미설치로 이 단계는 실행 불가. Jest 설치 후 아래 항목을 확인한다.
 
 ```
 □ 모든 테스트가 통과하는가 (npm run test)
