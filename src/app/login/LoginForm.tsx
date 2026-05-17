@@ -19,6 +19,8 @@ export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirectTo') ?? '/';
+  // '/'는 auto-login 게이트웨이이므로 소셜 로그인 후 직접 홈으로 이동
+  const sessionRedirectTo = redirectTo === '/' ? '/home' : redirectTo;
   const errorCode = searchParams.get('error');
 
   const [isMockLoading, setIsMockLoading] = useState(false);
@@ -35,8 +37,9 @@ export function LoginForm() {
   const handleKakaoLogin = () => {
     if (isLoading) return;
     setIsKakaoLoading(true);
-    // redirectTo를 sessionStorage에 저장 → 콜백 페이지에서 읽어 이동
-    sessionStorage.setItem('kakaoRedirectTo', redirectTo);
+    // sessionStorage: FE 콜백 후 이동할 경로 (auto-login 게이트웨이 우회)
+    sessionStorage.setItem('kakaoRedirectTo', sessionRedirectTo);
+    // BE URL param: BE OAuth 플로우에서 사용하는 원본 redirectTo 값 유지
     const kakaoUrl = new URL('/oauth2/authorization/kakao', env.backendUrl);
     kakaoUrl.searchParams.set('redirectTo', redirectTo);
     window.location.href = kakaoUrl.toString();
@@ -45,8 +48,8 @@ export function LoginForm() {
   const handleNaverLogin = () => {
     if (isLoading) return;
     setIsNaverLoading(true);
-    // redirectTo를 sessionStorage에 저장 → 콜백 페이지에서 읽어 이동
-    sessionStorage.setItem('naverRedirectTo', redirectTo);
+    // sessionStorage: FE 콜백 후 이동할 경로 (auto-login 게이트웨이 우회)
+    sessionStorage.setItem('naverRedirectTo', sessionRedirectTo);
     window.location.href = `${env.backendUrl}/api/v1/auth/naver/login`;
   };
 

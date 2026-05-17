@@ -29,6 +29,8 @@ export function LoginPromptModal({ isOpen, onClose, redirectTo }: LoginPromptMod
   );
 
   const redirect = redirectTo ?? pathname;
+  // '/'는 auto-login 게이트웨이이므로 소셜 로그인 후 직접 홈으로 이동
+  const sessionRedirect = redirect === '/' ? '/home' : redirect;
 
   // 모달 열림 시 스크롤 잠금
   useEffect(() => {
@@ -52,14 +54,14 @@ export function LoginPromptModal({ isOpen, onClose, redirectTo }: LoginPromptMod
   }, [isOpen, onClose]);
 
   const handleKakaoLogin = () => {
-    sessionStorage.setItem('kakaoRedirectTo', redirect);
+    sessionStorage.setItem('kakaoRedirectTo', sessionRedirect);
     const kakaoUrl = new URL('/oauth2/authorization/kakao', env.backendUrl);
     kakaoUrl.searchParams.set('redirectTo', redirect);
     window.location.href = kakaoUrl.toString();
   };
 
   const handleNaverLogin = () => {
-    sessionStorage.setItem('naverRedirectTo', redirect);
+    sessionStorage.setItem('naverRedirectTo', sessionRedirect);
     window.location.href = `${env.backendUrl}/api/v1/auth/naver/login`;
   };
 

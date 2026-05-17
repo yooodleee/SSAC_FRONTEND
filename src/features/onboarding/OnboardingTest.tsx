@@ -77,7 +77,8 @@ export function OnboardingTest() {
         return;
       }
       if (error.code === 'ONBOARDING-002') {
-        router.replace('/');
+        // 온보딩 이미 완료 — auto-login 게이트웨이(/) 경유 시 무한 루프 발생하므로 /home으로 직접 이동
+        router.replace('/home');
         return;
       }
       setFetchError('문제를 불러오지 못했어요. 잠시 후 다시 시도해주세요.');

@@ -14,8 +14,8 @@ function NaverSpinner() {
 
 /** 외부 URL로의 오픈 리다이렉트를 방지: 상대 경로만 허용 */
 function getSafeRedirectTo(raw: string | null): string {
-  const path = raw ?? '/';
-  if (!path.startsWith('/') || path.startsWith('//')) return '/';
+  const path = raw ?? '/home';
+  if (!path.startsWith('/') || path.startsWith('//')) return '/home';
   return path;
 }
 
@@ -51,13 +51,13 @@ function NaverCallbackContent() {
       return;
     }
 
-    const controller = new AbortController();
-
+    // AbortController를 사용하지 않는다.
+    // AbortController + calledRef 조합은 React StrictMode에서 충돌한다:
+    // cleanup(abort) → remount가 동기적으로 실행되어 second effect에서 calledRef=true → fetch 재시도 불가
     fetch('/api/v1/auth/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ authCode }),
-      signal: controller.signal,
     })
       .then(async (res) => {
         if (!res.ok) {
@@ -92,10 +92,6 @@ function NaverCallbackContent() {
         if (err instanceof Error && err.name === 'AbortError') return;
         router.replace('/login?error=SERVER_ERROR');
       });
-
-    return () => {
-      controller.abort();
-    };
   }, [router, searchParams]);
 
   return <NaverSpinner />;
