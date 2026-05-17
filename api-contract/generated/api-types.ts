@@ -2,7 +2,7 @@
 // ⚠️  이 파일은 자동 생성됩니다 — 절대 수동으로 편집하지 마세요.
 // 생성 명령: npm run sync:api
 // 소스: http://172.17.96.1:8080/api-docs/swagger.json
-// 생성 시각: 2026-05-15 22:58:00
+// 생성 시각: 2026-05-17 16:31:26
 // ============================================================
 
 /**
@@ -221,8 +221,11 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 토큰 재발급
-         * @description Refresh Token(쿠키)으로 새 Access Token을 발급한다. Refresh Token도 Rotation된다.
+         * 토큰 재발급 (자동 로그인)
+         * @description [호출 화면] 재접속 시 자동 로그인 처리. FE가 앱 초기화 시 refreshToken 쿠키 유무에 따라 호출.
+         *     [권한 조건] 공개 API (refreshToken 쿠키 기반 인증).
+         *     [특이 동작] 성공 시 새 refreshToken이 Set-Cookie HttpOnly 쿠키로 전달된다(Rotation).
+         *                응답 바디에 사용자 컨텍스트(userId, nickname, userType, level, onboardingCompleted)가 포함된다.
          */
         post: operations["reissue"];
         delete?: never;
@@ -1134,6 +1137,50 @@ export interface components {
              */
             provider?: string;
         };
+        ApiResponseReissueResponse: {
+            success?: boolean;
+            data?: components["schemas"]["ReissueResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
+        ReissueResponse: {
+            /**
+             * @description JWT 액세스 토큰
+             * @example eyJhbGciOiJIUzI1NiJ9...
+             */
+            accessToken?: string;
+            /**
+             * @description 토큰 타입
+             * @example Bearer
+             */
+            tokenType?: string;
+            /**
+             * Format: int64
+             * @description 사용자 ID
+             * @example 1
+             */
+            userId?: number;
+            /**
+             * @description 닉네임
+             * @example 닉네임123
+             */
+            nickname?: string;
+            /**
+             * @description 사용자 유형
+             * @enum {string}
+             */
+            userType?: "HIGH_SCHOOL" | "EARLY_CAREER";
+            /**
+             * @description 사용자 레벨
+             * @enum {string}
+             */
+            level?: "SEED" | "SPROUT" | "TREE";
+            /**
+             * @description 온보딩 완료 여부
+             * @example true
+             */
+            onboardingCompleted?: boolean;
+        };
         ApiResponseLoginResponse: {
             success?: boolean;
             data?: components["schemas"]["LoginResponse"];
@@ -1410,11 +1457,11 @@ export interface components {
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
-            paged?: boolean;
             /** Format: int32 */
             pageNumber?: number;
             /** Format: int32 */
             pageSize?: number;
+            paged?: boolean;
             unpaged?: boolean;
         };
         QuizAttemptSummaryResponse: {
@@ -2377,13 +2424,22 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
+            /** @description 재발급 성공 */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ApiResponseLoginResponse"];
+                    "*/*": components["schemas"]["ApiResponseReissueResponse"];
+                };
+            };
+            /** @description AUTH-005: refreshToken 쿠키 없음 | AUTH-003: 유효하지 않거나 만료된 토큰 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseReissueResponse"];
                 };
             };
             /** @description 인증 토큰이 없거나 만료되었습니다. */
@@ -2393,6 +2449,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description USER-001: 사용자 없음 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseReissueResponse"];
                 };
             };
             /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */

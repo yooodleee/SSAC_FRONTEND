@@ -26,8 +26,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Session expired' }, { status: 401 });
   }
 
+  // BE 응답 body에서 사용자 컨텍스트를 추출해 클라이언트에 전달
+  const beBody = (await beResponse.json()) as { data?: Record<string, unknown> };
+  const userData = beBody.data ?? {};
+
   // BE의 Set-Cookie 헤더(새 accessToken, refreshToken)를 클라이언트에 전달
-  const res = NextResponse.json({ success: true });
+  const res = NextResponse.json(userData);
   const setCookies = beResponse.headers.getSetCookie();
   setCookies.forEach((cookie) => {
     res.headers.append('Set-Cookie', cookie);
