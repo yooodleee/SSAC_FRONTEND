@@ -72,7 +72,7 @@
 ## ⚡ 전체 Protocol Execution Order
 
 [작업 시작 전]
-0순위 token-optimize.md → 컨텍스트 최소화 (매 작업)
+0순위 token-optimize.md (STEP 1만) → 컨텍스트 최소화
 1순위 sc-harness.md → SC 관심사 점검
 2순위 backlog-generate.md → 프로젝트 구조 파악 / SC 생성·수정·충돌 점검
 3순위 new-feature.md → 신규 기능 개발
@@ -86,9 +86,9 @@
 
 [수동 실행]
 
--     adr-create.md      → 기술 의사결정
--     harness-audit.md   → 전체 감사
--     token-optimize.md  → 스프린트 종료 시 전체 최적화
+- adr-create.md → 기술 의사결정
+- harness-audit.md → 전체 감사
+- token-optimize.md (STEP 1~4 전체) → 스프린트 종료 시 전체 최적화
 
 > 1순위 프로토콜 실행 결과가 중단(STOP)인 경우 이후 프로토콜은 실행되지 않는다.
 
@@ -169,7 +169,8 @@
 
 ### 자가 진단 주기
 
-□ 매 스프린트 종료 시 token-optimize.md 실행
+□ 매 작업 시작 전 : token-optimize.md STEP 1 (컨텍스트 최소화)만 실행
+□ 매 스프린트 종료 시 : token-optimize.md STEP 1~4 전체 실행
 □ 프로토콜 파일이 200줄 초과 시 즉시 분리
 □ 미사용 파일 감사는 월 1회 수동 실행
 
