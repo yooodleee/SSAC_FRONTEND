@@ -12,6 +12,7 @@
 | -------------- | ------------------------------------------ | ---------------------------------------- | -------------------------------- |
 | 토큰 최적화    | docs/agent-protocols/token-optimize.md     | 작업 시작 전 / 스프린트 종료             | 자동 (작업 전) + 수동 (스프린트) |
 | SC 관심사 점검 | docs/agent-protocols/sc-harness.md         | SC가 포함된 작업 지시를 받았을 때        | 자동 (구현 전 필수)              |
+| SC 생성/수정   | docs/agent-protocols/backlog-generate.md   | SC 포함 작업 지시 시                     | 자동 (sc-harness 직후)           |
 | 구조 충돌 점검 | docs/agent-protocols/sc-structure-check.md | SC 포함 작업 시                          | 자동 (sc-harness 직후)           |
 | 신규 기능 개발 | docs/agent-protocols/new-feature.md        | 새로운 컴포넌트/페이지/기능 추가 요청 시 | 자동 (구현 전 필수)              |
 | 테스트 작성    | docs/agent-protocols/testing.md            | 신규 컴포넌트/훅/API 연동 구현 완료 시   | 자동 (구현 후 필수)              |
@@ -79,8 +80,9 @@
 [작업 시작 전]
 0순위 token-optimize.md → 컨텍스트 최소화 (매 작업)
 1순위 sc-harness.md → SC 관심사 점검
-2순위 sc-structure-check.md → 프로젝트 구조 충돌 점검
-3순위 new-feature.md → 신규 기능 개발
+2순위 backlog-generate.md → 프로젝트 구조 파악 후 SC 생성 / 수정
+3순위 sc-structure-check.md → 프로젝트 구조 충돌 점검
+4순위 new-feature.md → 신규 기능 개발
 
 [작업 완료 후]
 3순위 testing.md → 테스트 작성
@@ -191,12 +193,26 @@
 
 ---
 
+## 🚫 SC 검토 없이 구현 금지 규칙
+
+아래 행동은 금지된다:
+
+- 외부에서 제공된 SC를 검토 없이 그대로 구현
+- 프로젝트 구조 파악 없이 SC 생성
+- DESIGN.md 확인 없이 UI 컴포넌트 구현
+- api-types.ts 확인 없이 타입 수동 정의
+- errorMessages.ts 확인 없이 ErrorCode 처리 추가
+- backlog-generate.md 실행 없이 new-feature.md 실행
+
+---
+
 ## 하네스 목록 (레거시 — 하위 호환용)
 
 | 하네스                        | 트리거 조건                       | 위치                                                 |
 | ----------------------------- | --------------------------------- | ---------------------------------------------------- |
 | 토큰 최적화                   | 작업 시작 전 / 스프린트 종료      | docs/agent-protocols/token-optimize.md               |
 | SC 관심사 점검 및 자동 재작성 | 작업 지시에 SC 항목이 포함된 경우 | [아래 참조](#1-sc-관심사-점검-및-자동-재작성-하네스) |
+| SC 생성/수정                  | SC 포함 작업 지시 시              | docs/agent-protocols/backlog-generate.md             |
 | 로그 기반 진단                | 오류 발생 즉시                    | docs/agent-protocols/log-diagnose.md                 |
 
 ---
