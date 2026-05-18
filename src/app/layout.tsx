@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { cookies } from 'next/headers';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { PostLoginToast } from '@/components/auth/PostLoginToast';
@@ -20,17 +21,20 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'SSAC Frontend',
-    template: '%s | SSAC Frontend',
+    default: '🌱 SSAC',
+    template: '%s | SSAC',
   },
-  description: 'Production-ready Next.js starter with App Router, TypeScript, and Tailwind CSS.',
+  description: '금융 문맹 탈출의 첫 걸음, 어려운 금융 지식을 싹으로 쉽게.',
 };
 
 interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
+export default async function RootLayout({ children }: RootLayoutProps) {
+  const cookieStore = await cookies();
+  const isLoggedIn = cookieStore.has('accessToken');
+
   return (
     <html
       lang="ko"
@@ -52,7 +56,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       </head>
       <body className="flex min-h-screen flex-col font-sans antialiased">
         <ThemeProvider>
-          <Header />
+          <Header isLoggedIn={isLoggedIn} />
           <main className="flex-1">{children}</main>
           <Footer />
           <PostLoginToast />

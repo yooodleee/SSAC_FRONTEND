@@ -1,22 +1,25 @@
+'use client';
+
 /**
- * Header — Server Component
+ * Header — Client Component
  *
  * 렌더링 전략:
- * - 이 컴포넌트 자체는 Server Component (즉시 SSR, JS 없음)
- * - 인터랙티브 요소(DesktopNav, MobileMenu)만 Client Component로 분리
- * - sticky + backdrop-blur + 고정 h-16으로 Layout Shift 방지
- * - 인증 상태는 accessToken 쿠키를 서버에서 읽어 자식에게 전달
+ * - Client Component (usePathname으로 경로 감지)
+ * - '/' 경로(브랜딩 랜딩 홈)에서는 null 반환 → 랜딩 헤더는 page.tsx에서 직접 렌더링
+ * - isLoggedIn은 layout.tsx에서 서버 쿠키 읽어 prop으로 전달
  */
 
-import { cookies } from 'next/headers';
+import { usePathname } from 'next/navigation';
 import { env } from '@/lib/env';
 import { DesktopNav } from './DesktopNav';
 import { MobileMenu } from './MobileMenu';
 import { NavBranding } from './NavBranding';
 
-export async function Header() {
-  const cookieStore = await cookies();
-  const isLoggedIn = cookieStore.has('accessToken');
+export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
+  const pathname = usePathname();
+
+  // 브랜딩 랜딩 홈에서는 자체 LandingHeader 사용
+  if (pathname === '/') return null;
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/90 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/90">
