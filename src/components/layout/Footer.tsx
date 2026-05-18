@@ -6,7 +6,7 @@ export function Footer() {
   const pathname = usePathname();
 
   // 로그인 페이지는 전용 레이아웃 사용 — 푸터 숨김
-  if (pathname === '/login') return null;
+  if (pathname === '/login' || pathname.startsWith('/signup')) return null;
 
   return (
     <footer className="border-t border-gray-200 bg-gray-50 dark:border-slate-700 dark:bg-slate-900">

@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
 import { SignupProgress } from '@/features/signup/SignupProgress';
 import { TermsAgreement } from '@/features/signup/TermsAgreement';
-
 export const metadata: Metadata = { title: '약관 동의' };
-
 export default function TermsPage() {
   return (
     <>

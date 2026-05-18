@@ -2,7 +2,7 @@
 // ⚠️  이 파일은 자동 생성됩니다 — 절대 수동으로 편집하지 마세요.
 // 생성 명령: npm run sync:api
 // 소스: http://172.17.96.1:8080/api-docs/swagger.json
-// 생성 시각: 2026-05-17 23:21:50
+// 생성 시각: 2026-05-18 22:38:12
 // ============================================================
 
 /**
@@ -234,6 +234,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 신규 회원 가입 완료
+         * @description [호출 화면] 회원 가입 정보 입력 화면.
+         *     [권한 조건] 공개 (tempToken으로 신원 확인).
+         *     [특이 동작] Refresh Token은 응답 body에 포함하지 않고 HttpOnly Cookie(Path=/api/v1/auth)로 전달한다.
+         */
+        post: operations["register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/register/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 이메일+비밀번호 직접 회원가입
+         * @description [호출 화면] 회원 가입 정보 입력 화면 (소셜 로그인 미사용 경로).
+         *     [권한 조건] 공개.
+         *     [특이 동작] Refresh Token은 응답 body에 포함하지 않고 HttpOnly Cookie(Path=/api/v1/auth)로 전달한다.
+         */
+        post: operations["registerWithEmail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/logout": {
         parameters: {
             query?: never;
@@ -248,6 +292,29 @@ export interface paths {
          * @description Refresh Token을 무효화하고 관련 쿠키를 삭제한다.
          */
         post: operations["logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/login/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 이메일+비밀번호 로그인
+         * @description [호출 화면] 로그인 화면 (소셜 로그인 미사용 경로).
+         *     [권한 조건] 공개.
+         *     [특이 동작] Refresh Token은 응답 body에 포함하지 않고 HttpOnly Cookie(Path=/api/v1/auth)로 전달한다.
+         *     이메일 미존재와 비밀번호 불일치를 동일한 AUTH-011로 응답한다 (보안).
+         */
+        post: operations["loginWithEmail"];
         delete?: never;
         options?: never;
         head?: never;
@@ -330,7 +397,7 @@ export interface paths {
          * 닉네임 설정 및 회원 가입 완료
          * @description tempToken, 닉네임, userType(HIGH_SCHOOL|EARLY_CAREER), 선택적 guestId를 받아 회원 가입을 완료한다. 닉네임 규칙: 한글·영문·숫자만 허용, 2~10자, 특수문자 불허. 성공 시 Access/Refresh Token과 사용자 정보(userType, level, onboardingCompleted 포함)를 반환한다.
          */
-        post: operations["register"];
+        post: operations["register_1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -746,6 +813,28 @@ export interface paths {
          * @description 네이버 인증 코드를 처리한다. 기존 회원이면 authCode와 isNewUser=false로 리다이렉트한다. 신규 회원이면 authCode와 isNewUser=true로 회원 가입 플로우로 리다이렉트한다. JWT/tempToken은 URL에 노출되지 않으며 FE가 POST /api/v1/auth/token으로 교환한다. guestId 쿠키가 있으면 기존 회원의 비회원 퀴즈 기록을 자동 이전한다. 네이버가 error 파라미터를 전달하는 경우 FE 에러 페이지로 리다이렉트한다.
          */
         get: operations["callback_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/email/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 이메일 중복 확인
+         * @description [호출 화면] 회원 가입 정보 입력 화면.
+         *     [권한 조건] 공개.
+         *     [특이 동작] 이메일 형식 오류 시 400, 사용 가능하면 isAvailable: true를 반환한다.
+         */
+        get: operations["checkEmail"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1181,6 +1270,59 @@ export interface components {
              */
             onboardingCompleted?: boolean;
         };
+        Agreements: {
+            serviceTerm: boolean;
+            privacyTerm: boolean;
+            ageVerification: boolean;
+            marketingTerm?: boolean;
+        };
+        RegisterV2Request: {
+            tempToken: string;
+            name: string;
+            birthDate: string;
+            phone: string;
+            gender?: string;
+            email: string;
+            agreements: components["schemas"]["Agreements"];
+            guestId?: string;
+        };
+        ApiResponseRegisterV2Response: {
+            success?: boolean;
+            data?: components["schemas"]["RegisterV2Response"];
+            message?: string;
+            loginRequired?: boolean;
+        };
+        RegisterV2Response: {
+            accessToken?: string;
+            tokenType?: string;
+            /** Format: int64 */
+            accessTokenExpiresIn?: number;
+            user?: components["schemas"]["UserInfo"];
+        };
+        UserInfo: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            /** @enum {string} */
+            userType?: "HIGH_SCHOOL" | "EARLY_CAREER";
+            /** @enum {string} */
+            level?: "SEED" | "SPROUT" | "TREE";
+            onboardingCompleted?: boolean;
+        };
+        EmailRegisterRequest: {
+            name: string;
+            birthDate: string;
+            phone: string;
+            gender?: string;
+            email: string;
+            password: string;
+            agreements: components["schemas"]["Agreements"];
+            guestId?: string;
+        };
+        EmailLoginRequest: {
+            email: string;
+            password: string;
+        };
         ApiResponseLoginResponse: {
             success?: boolean;
             data?: components["schemas"]["LoginResponse"];
@@ -1209,12 +1351,6 @@ export interface components {
             clickedAt: string;
             pageContext: string;
         };
-        Agreements: {
-            serviceTerm: boolean;
-            privacyTerm: boolean;
-            ageVerification: boolean;
-            marketingTerm?: boolean;
-        };
         TermsRequest: {
             tempToken: string;
             agreements: components["schemas"]["Agreements"];
@@ -1238,16 +1374,6 @@ export interface components {
             refreshToken?: string;
             user?: components["schemas"]["UserInfo"];
             merged?: components["schemas"]["MergedInfo"];
-        };
-        UserInfo: {
-            /** Format: int64 */
-            id?: number;
-            nickname?: string;
-            /** @enum {string} */
-            userType?: "HIGH_SCHOOL" | "EARLY_CAREER";
-            /** @enum {string} */
-            level?: "SEED" | "SPROUT" | "TREE";
-            onboardingCompleted?: boolean;
         };
         UpdateUserTypeRequest: {
             /** @enum {string} */
@@ -1458,10 +1584,10 @@ export interface components {
             offset?: number;
             sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
+            pageSize?: number;
+            /** Format: int32 */
             pageNumber?: number;
             paged?: boolean;
-            /** Format: int32 */
-            pageSize?: number;
             unpaged?: boolean;
         };
         QuizAttemptSummaryResponse: {
@@ -1778,6 +1904,15 @@ export interface components {
             /** Format: int32 */
             totalCount?: number;
             contents?: components["schemas"]["ContentItemDto"][];
+        };
+        ApiResponseEmailCheckResponse: {
+            success?: boolean;
+            data?: components["schemas"]["EmailCheckResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
+        EmailCheckResponse: {
+            isAvailable?: boolean;
         };
         ApiResponsePageUserSummaryResponse: {
             success?: boolean;
@@ -2471,6 +2606,126 @@ export interface operations {
             };
         };
     };
+    register: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterV2Request"];
+            };
+        };
+        responses: {
+            /** @description 회원가입 성공 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseRegisterV2Response"];
+                };
+            };
+            /** @description NAME-001: 이름 미입력 | BIRTH-001: 생일 형식 오류 | BIRTH-002: 만 14세 미만 | PHONE-001: 휴대폰 형식 오류 | GENDER-001: 성별 값 오류 | EMAIL-001: 이메일 형식 오류 | TERMS-001: 필수 약관 미동의 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseRegisterV2Response"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description EMAIL-002: 이메일 중복 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseRegisterV2Response"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    registerWithEmail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmailRegisterRequest"];
+            };
+        };
+        responses: {
+            /** @description 회원가입 성공 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseRegisterV2Response"];
+                };
+            };
+            /** @description NAME-001: 이름 미입력 | BIRTH-001: 생일 형식 오류 | BIRTH-002: 만 14세 미만 | PHONE-001: 휴대폰 형식 오류 | GENDER-001: 성별 값 오류 | EMAIL-001: 이메일 형식 오류 | PASSWORD-001: 비밀번호 형식 오류 | TERMS-001: 필수 약관 미동의 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseRegisterV2Response"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description EMAIL-002: 이메일 중복 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseRegisterV2Response"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
     logout: {
         parameters: {
             query?: never;
@@ -2489,6 +2744,57 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ApiResponseVoid"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    loginWithEmail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmailLoginRequest"];
+            };
+        };
+        responses: {
+            /** @description 로그인 성공 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseRegisterV2Response"];
+                };
+            };
+            /** @description EMAIL-001: 이메일 형식 오류 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseRegisterV2Response"];
                 };
             };
             /** @description 인증 토큰이 없거나 만료되었습니다. */
@@ -2645,7 +2951,7 @@ export interface operations {
             };
         };
     };
-    register: {
+    register_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3665,6 +3971,56 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    checkEmail: {
+        parameters: {
+            query: {
+                /** @description 확인할 이메일 주소 */
+                email: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 확인 성공 (isAvailable: true/false) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseEmailCheckResponse"];
+                };
+            };
+            /** @description EMAIL-001: 이메일 형식 오류 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseEmailCheckResponse"];
+                };
             };
             /** @description 인증 토큰이 없거나 만료되었습니다. */
             401: {
