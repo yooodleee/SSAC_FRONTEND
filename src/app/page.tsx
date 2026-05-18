@@ -1,66 +1,39 @@
-'use client';
-
-import { Suspense, useEffect, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useAutoLogin } from '@/hooks/useAutoLogin';
-
-const Spinner = () => (
-  <div className="flex min-h-screen items-center justify-center">
-    <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-  </div>
-);
-
 /**
- * Kakao OAuth 브리지:
- * BE의 Spring Security 성공 핸들러가 redirectTo='/' 설정으로 인해
- * authCode를 루트 경로(?authCode=...)로 보내는 경우를 처리한다.
- * authCode를 /auth/kakao/callback으로 전달해 기존 콜백 플로우를 재사용한다.
- */
-function KakaoAuthCodeBridge({ authCode }: { authCode: string }) {
-  const router = useRouter();
-  const calledRef = useRef(false);
-
-  useEffect(() => {
-    if (calledRef.current) return;
-    calledRef.current = true;
-    router.replace(`/auth/kakao/callback?authCode=${encodeURIComponent(authCode)}`);
-  }, [authCode, router]);
-
-  return <Spinner />;
-}
-
-/** 자동 로그인 게이트웨이: refreshToken으로 세션 복원 후 라우팅 결정 */
-function AutoLoginGateway() {
-  useAutoLogin();
-  return <Spinner />;
-}
-
-/**
- * 앱 진입점 — 자동 로그인 게이트웨이
+ * 앱 진입점 — 브랜딩 랜딩 홈 (/)
  *
- * 1. authCode 파라미터가 있는 경우 (Kakao OAuth BE 리다이렉트):
- *    → /auth/kakao/callback으로 전달 (authCode 교환 플로우)
+ * 라우팅 분기:
+ *   / → 브랜딩 랜딩 홈 (인증 상태와 무관하게 접근 가능)
+ *   /home → 맞춤 홈 화면 (로그인 필요)
  *
- * 2. authCode 파라미터가 없는 경우 (일반 진입):
- *    - refreshToken 유효 + 온보딩 완료   → /home
- *    - refreshToken 유효 + 온보딩 미완료  → /onboarding/test
- *    - refreshToken 없음/만료             → /login
+ * 특이 동작:
+ *   - authCode 파라미터가 있는 경우 (Kakao OAuth BE 리다이렉트):
+ *     → /auth/kakao/callback으로 전달 (authCode 교환 플로우)
+ *   - isLoggedIn: 서버에서 accessToken 쿠키 확인 후 Client에 전달
+ *     → 전역 Header는 pathname='/'이면 null 반환 (LandingHeader가 대신 렌더링)
  */
-function RootContent() {
-  const searchParams = useSearchParams();
-  const authCode = searchParams.get('authCode');
 
-  if (authCode) {
-    return <KakaoAuthCodeBridge authCode={authCode} />;
-  }
+import { Suspense } from 'react';
+import { cookies } from 'next/headers';
+import { LandingPageClient } from '@/features/landing/LandingPageClient';
 
-  return <AutoLoginGateway />;
-}
-
-export default function RootPage() {
+function LandingSpinner() {
   return (
-    <Suspense fallback={<Spinner />}>
-      <RootContent />
+    <div
+      className="flex min-h-screen items-center justify-center"
+      style={{ backgroundColor: '#1a1a1a' }}
+    >
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+    </div>
+  );
+}
+
+export default async function RootPage() {
+  const cookieStore = await cookies();
+  const isLoggedIn = cookieStore.has('accessToken');
+
+  return (
+    <Suspense fallback={<LandingSpinner />}>
+      <LandingPageClient isLoggedIn={isLoggedIn} />
     </Suspense>
   );
 }
