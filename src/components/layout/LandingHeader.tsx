@@ -121,25 +121,17 @@ export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
                 홈으로
               </Link>
             ) : (
-              <>
-                <Link
-                  href="/login"
-                  className={cn(
-                    'min-h-[48px] rounded-md px-4 py-2 text-sm font-medium transition-colors duration-300',
-                    textClass,
-                    hoverBg,
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400',
-                  )}
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/login"
-                  className="min-h-[48px] rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-                >
-                  Join
-                </Link>
-              </>
+              <Link
+                href="/login"
+                className={cn(
+                  'flex h-9 items-center rounded-md px-4 text-sm font-medium transition-colors duration-300',
+                  textClass,
+                  hoverBg,
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400',
+                )}
+              >
+                로그인 하기
+              </Link>
             )}
           </div>
 
@@ -276,26 +268,16 @@ export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
               홈으로
             </Link>
           ) : (
-            <div className="flex gap-2">
-              <Link
-                href="/login"
-                onClick={() => setMobileOpen(false)}
-                className={cn(
-                  'flex-1 rounded-lg px-3 py-2.5 text-center text-sm font-medium',
-                  'min-h-[48px]',
-                  scrolled ? 'text-gray-700 hover:bg-gray-100' : 'text-white hover:bg-white/10',
-                )}
-              >
-                Login
-              </Link>
-              <Link
-                href="/login"
-                onClick={() => setMobileOpen(false)}
-                className="flex-1 min-h-[48px] rounded-lg bg-blue-600 px-3 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-700"
-              >
-                Join
-              </Link>
-            </div>
+            <Link
+              href="/login"
+              onClick={() => setMobileOpen(false)}
+              className={cn(
+                'flex min-h-[48px] items-center rounded-lg px-3 text-sm font-medium',
+                scrolled ? 'text-gray-700 hover:bg-gray-100' : 'text-white hover:bg-white/10',
+              )}
+            >
+              로그인 하기
+            </Link>
           )}
         </div>
       )}

@@ -21,10 +21,13 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: '🌱 SSAC',
+    default: 'SSAC',
     template: '%s | SSAC',
   },
   description: '금융 문맹 탈출의 첫 걸음, 어려운 금융 지식을 싹으로 쉽게.',
+  icons: {
+    icon: '/gress.png',
+  },
 };
 
 interface RootLayoutProps {

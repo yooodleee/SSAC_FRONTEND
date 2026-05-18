@@ -166,7 +166,12 @@
       "Bash(app/page.tsx)",
       "Bash(components/layout/Header.tsx)",
       "Bash(components/layout/LandingHeader.tsx)",
-      "Bash(features/landing/)"
+      "Bash(features/landing/)",
+      "Bash(LandingHeader.tsx)",
+      "Bash(Header.tsx)",
+      "Bash(Footer.tsx)",
+      "Bash(/login)",
+      "Bash(src/app/login/page.tsx)"
     ]
   }
 }
