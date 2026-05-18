@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/Button';
 
 // UI-only type: not derived from API contract
 type TermsId = 'service' | 'privacy' | 'age' | 'marketing';
@@ -153,9 +152,13 @@ export function TermsModal({ termsId, onClose }: TermsModalProps) {
           </pre>
         </div>
         <div className="border-t px-6 py-4">
-          <Button className="w-full" onClick={onClose}>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-10 w-full items-center justify-center rounded-lg bg-black text-sm font-medium text-white hover:bg-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-500"
+          >
             확인
-          </Button>
+          </button>
         </div>
       </div>
     </div>

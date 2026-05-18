@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
 import { SignupProgress } from '@/features/signup/SignupProgress';
 import { NicknameSetup } from '@/features/signup/NicknameSetup';
-
 export const metadata: Metadata = { title: '닉네임 설정' };
-
 export default function NicknamePage() {
   return (
     <>

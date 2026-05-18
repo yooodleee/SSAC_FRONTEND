@@ -171,7 +171,12 @@
       "Bash(Header.tsx)",
       "Bash(Footer.tsx)",
       "Bash(/login)",
-      "Bash(src/app/login/page.tsx)"
+      "Bash(src/app/login/page.tsx)",
+      "Bash(SignupPageClient.tsx)",
+      "Bash(handleSubmit)",
+      "Bash(isSocialFlow)",
+      "Bash(/api/v1/auth/register)",
+      "Bash(/api/v1/auth/register/email)"
     ]
   }
 }

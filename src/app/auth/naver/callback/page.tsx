@@ -78,7 +78,7 @@ function NaverCallbackContent() {
         if (data.isNewUser) {
           if (data.tempToken) sessionStorage.setItem('signupTempToken', data.tempToken);
           if (data.provider) sessionStorage.setItem('signupProvider', data.provider);
-          router.replace('/signup/terms');
+          router.replace('/signup');
           return;
         }
 
