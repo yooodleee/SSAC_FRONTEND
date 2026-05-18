@@ -1,23 +1,18 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import { LoginForm } from './LoginForm';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { LoginPageClient } from './LoginPageClient';
 
 export const metadata: Metadata = { title: '로그인' };
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const cookieStore = await cookies();
+  if (cookieStore.has('accessToken')) redirect('/home');
+
   return (
-    <div className="container-page flex min-h-[60vh] flex-col items-center justify-center py-16">
-      <div className="w-full max-w-sm">
-        <h1 className="mb-2 text-center text-2xl font-bold text-gray-900 dark:text-slate-100">
-          로그인
-        </h1>
-        <p className="mb-8 text-center text-sm text-gray-500 dark:text-slate-400">
-          서비스를 이용하려면 로그인이 필요합니다.
-        </p>
-        <Suspense>
-          <LoginForm />
-        </Suspense>
-      </div>
-    </div>
+    <Suspense fallback={<div className="flex min-h-screen bg-white" />}>
+      <LoginPageClient />
+    </Suspense>
   );
 }
