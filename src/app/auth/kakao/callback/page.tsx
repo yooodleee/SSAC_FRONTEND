@@ -1,13 +1,35 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { Suspense, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+const prefersReducedMotion =
+  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 function KakaoSpinner() {
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
-      <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-[#FEE500]" />
-      <p className="text-sm text-gray-500">카카오 로그인 처리 중...</p>
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        background: '#FFFFFF',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 9999,
+      }}
+      role="status"
+      aria-label="페이지를 불러오는 중입니다."
+    >
+      {prefersReducedMotion ? (
+        <img src="/gress.png" alt="SSAC" width={80} height={80} />
+      ) : (
+        <img src="/assets/ssac-loading.gif" alt="로딩 중" width={200} height={200} />
+      )}
     </div>
   );
 }
