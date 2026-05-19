@@ -58,7 +58,8 @@ export function LoginForm() {
     setIsMockLoading(true);
     try {
       await fetch('/api/auth/login', { method: 'POST' });
-      router.push(redirectTo);
+      // '/' 진입 시 redirectTo 기본값이 '/'이므로 /home으로 이동
+      router.push(redirectTo === '/' ? '/home' : redirectTo);
       router.refresh();
     } finally {
       setIsMockLoading(false);

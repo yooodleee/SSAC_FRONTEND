@@ -176,7 +176,13 @@
       "Bash(handleSubmit)",
       "Bash(isSocialFlow)",
       "Bash(/api/v1/auth/register)",
-      "Bash(/api/v1/auth/register/email)"
+      "Bash(/api/v1/auth/register/email)",
+      "Bash([)",
+      "Bash(기])",
+      "Bash(닉네임}!])",
+      "Bash(UserSidePanel)",
+      "Bash(/account-settings/)",
+      "Bash(src/features/home/LevelCard.tsx)"
     ]
   }
 }

@@ -2,7 +2,7 @@
 // ⚠️  이 파일은 자동 생성됩니다 — 절대 수동으로 편집하지 마세요.
 // 생성 명령: npm run sync:api
 // 소스: http://172.17.96.1:8080/api-docs/swagger.json
-// 생성 시각: 2026-05-18 22:38:12
+// 생성 시각: 2026-05-19 12:56:14
 // ============================================================
 
 /**
@@ -163,6 +163,28 @@ export interface paths {
          *     [특이 동작] 1개 이상 3개 이하 선택 필수. 기존 데이터 덮어씀.
          */
         post: operations["saveInterests"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/contents/{contentId}/view": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 콘텐츠 조회 이력 기록
+         * @description [호출 화면] 콘텐츠 상세 진입 시 호출.
+         *     [권한 조건] 로그인 회원 전용.
+         *     [특이 동작] 콘텐츠 열람 이력을 저장한다.
+         */
+        post: operations["recordView"];
         delete?: never;
         options?: never;
         head?: never;
@@ -426,6 +448,49 @@ export interface paths {
         patch: operations["updateUserType"];
         trace?: never;
     };
+    "/api/v1/users/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * 개인정보 수정
+         * @description [호출 화면] 마이페이지 > 개인정보 수정 화면.
+         *     [권한 조건] 로그인 회원 전용 (USER, ADMIN).
+         *     [특이 동작] null 필드는 변경하지 않는다.
+         */
+        patch: operations["updateProfile"];
+        trace?: never;
+    };
+    "/api/v1/users/nickname": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * 닉네임 수정 (단축 경로)
+         * @description [호출 화면] 마이페이지 > 닉네임 수정.
+         *     [권한 조건] 로그인 회원 전용 (USER, ADMIN).
+         */
+        patch: operations["updateNickname"];
+        trace?: never;
+    };
     "/api/v1/users/me/nickname": {
         parameters: {
             query?: never;
@@ -445,7 +510,7 @@ export interface paths {
          *     [권한 조건] 로그인 회원 전용 (USER, ADMIN).
          *     [특이 동작] 닉네임 중복 시 409 반환. 닉네임 정책: 2~20자, 특수문자 제한.
          */
-        patch: operations["updateNickname"];
+        patch: operations["updateNickname_1"];
         trace?: never;
     };
     "/api/v1/admin/users/{userId}/role": {
@@ -586,6 +651,33 @@ export interface paths {
          *     [특이 동작] 토큰의 이메일로 사용자를 식별하며 타인 프로필 조회 불가.
          */
         get: operations["getProfile"];
+        put?: never;
+        post?: never;
+        /**
+         * 회원 탈퇴
+         * @description [호출 화면] 마이페이지 > 회원 탈퇴.
+         *     [권한 조건] 로그인 회원 전용 (USER, ADMIN).
+         *     [특이 동작] Soft delete + 개인정보 익명화 + 쿠키 삭제.
+         */
+        delete: operations["withdraw"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/me/viewed-contents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 내가 본 콘텐츠 목록 조회
+         * @description [호출 화면] 마이페이지 > 내가 본 콘텐츠.
+         *     [권한 조건] 로그인 회원 전용 (USER, ADMIN).
+         */
+        get: operations["getViewedContents"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1225,6 +1317,17 @@ export interface components {
              * @example NAVER
              */
             provider?: string;
+            /** @description 사용자 정보 (기존 회원 전용) */
+            userInfo?: components["schemas"]["UserInfo"];
+        };
+        UserInfo: {
+            id?: string;
+            nickname?: string;
+            name?: string;
+            email?: string;
+            level?: string;
+            onboardingCompleted?: boolean;
+            userType?: string;
         };
         ApiResponseReissueResponse: {
             success?: boolean;
@@ -1299,16 +1402,6 @@ export interface components {
             accessTokenExpiresIn?: number;
             user?: components["schemas"]["UserInfo"];
         };
-        UserInfo: {
-            /** Format: int64 */
-            id?: number;
-            name?: string;
-            /** @enum {string} */
-            userType?: "HIGH_SCHOOL" | "EARLY_CAREER";
-            /** @enum {string} */
-            level?: "SEED" | "SPROUT" | "TREE";
-            onboardingCompleted?: boolean;
-        };
         EmailRegisterRequest: {
             name: string;
             birthDate: string;
@@ -1379,53 +1472,32 @@ export interface components {
             /** @enum {string} */
             userType: "HIGH_SCHOOL" | "EARLY_CAREER";
         };
+        UpdateProfileRequest: {
+            name?: string;
+            birthDate?: string;
+            phone?: string;
+            gender?: string;
+            email?: string;
+        };
+        ApiResponseUpdateProfileResponse: {
+            success?: boolean;
+            data?: components["schemas"]["UpdateProfileResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
+        UpdateProfileResponse: {
+            name?: string;
+            birthDate?: string;
+            phone?: string;
+            gender?: string;
+            email?: string;
+        };
         UpdateNicknameRequest: {
             /**
              * @description 변경할 닉네임
              * @example 새닉네임123
              */
             nickname: string;
-        };
-        ApiResponseProfileResponse: {
-            success?: boolean;
-            data?: components["schemas"]["ProfileResponse"];
-            message?: string;
-            loginRequired?: boolean;
-        };
-        ProfileResponse: {
-            /**
-             * Format: int64
-             * @description 사용자 ID
-             * @example 1
-             */
-            id?: number;
-            /**
-             * @description 이메일
-             * @example user@example.com
-             */
-            email?: string;
-            /**
-             * @description 닉네임
-             * @example 닉네임123
-             */
-            nickname?: string;
-            /**
-             * @description 사용자 유형
-             * @enum {string}
-             */
-            userType?: "HIGH_SCHOOL" | "EARLY_CAREER";
-            /**
-             * @description 사용자 레벨
-             * @enum {string}
-             */
-            level?: "SEED" | "SPROUT" | "TREE";
-            /** @description 온보딩 완료 여부 */
-            onboardingCompleted?: boolean;
-            /**
-             * Format: date-time
-             * @description 가입일시
-             */
-            createdAt?: string;
         };
         UpdateRoleRequest: {
             /**
@@ -1480,6 +1552,11 @@ export interface components {
             id?: string;
             email?: string;
             nickname?: string;
+            name?: string;
+            /** Format: date */
+            birthDate?: string;
+            phone?: string;
+            gender?: string;
             userType?: string;
             userTypeLabel?: string;
             level?: string;
@@ -1501,6 +1578,27 @@ export interface components {
             correctRate?: number;
             /** Format: int32 */
             continuousLearningDays?: number;
+        };
+        ApiResponseViewedContentsResponse: {
+            success?: boolean;
+            data?: components["schemas"]["ViewedContentsResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
+        ViewedContentDto: {
+            id?: string;
+            title?: string;
+            category?: string;
+            categoryEmoji?: string;
+            difficulty?: string;
+            /** Format: date-time */
+            viewedAt?: string;
+            isCompleted?: boolean;
+        };
+        ViewedContentsResponse: {
+            /** Format: int32 */
+            totalCount?: number;
+            contents?: components["schemas"]["ViewedContentDto"][];
         };
         ApiResponseRecommendationResponse: {
             success?: boolean;
@@ -1572,11 +1670,11 @@ export interface components {
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
+            pageable?: components["schemas"]["PageableObject"];
             first?: boolean;
             last?: boolean;
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
         PageableObject: {
@@ -1584,9 +1682,9 @@ export interface components {
             offset?: number;
             sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
-            pageSize?: number;
-            /** Format: int32 */
             pageNumber?: number;
+            /** Format: int32 */
+            pageSize?: number;
             paged?: boolean;
             unpaged?: boolean;
         };
@@ -1931,11 +2029,11 @@ export interface components {
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
+            pageable?: components["schemas"]["PageableObject"];
             first?: boolean;
             last?: boolean;
             /** Format: int32 */
             numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
         ApiResponseListMenuClickStatResponse: {
@@ -2428,6 +2526,44 @@ export interface operations {
             };
             /** @description ONBOARDING-007: 도메인 개수 범위 초과 */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    recordView: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contentId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 이력 저장 성공 */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3058,7 +3194,112 @@ export interface operations {
             };
         };
     };
+    updateProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProfileRequest"];
+            };
+        };
+        responses: {
+            /** @description 개인정보 수정 성공 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseUpdateProfileResponse"];
+                };
+            };
+            /** @description 유효성 검사 실패 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseUpdateProfileResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
     updateNickname: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateNicknameRequest"];
+            };
+        };
+        responses: {
+            /** @description 닉네임 수정 성공 */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description 닉네임 유효성 검사 실패 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 이미 사용 중인 닉네임 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    updateNickname_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3076,18 +3317,14 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "*/*": components["schemas"]["ApiResponseProfileResponse"];
-                };
+                content?: never;
             };
             /** @description 닉네임 유효성 검사 실패 */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "*/*": components["schemas"]["ApiResponseProfileResponse"];
-                };
+                content?: never;
             };
             /** @description 인증 토큰이 없거나 만료되었습니다. */
             401: {
@@ -3103,27 +3340,21 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "*/*": components["schemas"]["ApiResponseProfileResponse"];
-                };
+                content?: never;
             };
             /** @description 사용자를 찾을 수 없음 */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "*/*": components["schemas"]["ApiResponseProfileResponse"];
-                };
+                content?: never;
             };
             /** @description 이미 사용 중인 닉네임 */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "*/*": components["schemas"]["ApiResponseProfileResponse"];
-                };
+                content?: never;
             };
             /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
             500: {
@@ -3450,6 +3681,80 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ApiResponseMyPageResponse"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    withdraw: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 회원 탈퇴 성공 */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    getViewedContents: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 내가 본 콘텐츠 조회 성공 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseViewedContentsResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
                 };
             };
             /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
