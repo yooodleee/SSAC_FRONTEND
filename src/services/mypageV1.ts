@@ -3,10 +3,16 @@ import type { components } from '@/../api-contract/generated/api-types';
 
 type MyPageResponse = components['schemas']['MyPageResponse'];
 type ApiResponseMyPageResponse = components['schemas']['ApiResponseMyPageResponse'];
+type UpdateProfileRequest = components['schemas']['UpdateProfileRequest'];
+type ApiResponseUpdateProfileResponse = components['schemas']['ApiResponseUpdateProfileResponse'];
 
 export const mypageV1Service = {
   getMyPage(): Promise<ApiResponseMyPageResponse> {
     return apiClient.get<ApiResponseMyPageResponse>('/api/v1/users/mypage');
+  },
+
+  updateProfile(data: UpdateProfileRequest): Promise<ApiResponseUpdateProfileResponse> {
+    return apiClient.patch<ApiResponseUpdateProfileResponse>('/api/v1/users/profile', data);
   },
 
   updateInterests(domainIds: string[]): Promise<void> {

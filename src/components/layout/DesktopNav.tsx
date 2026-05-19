@@ -2,13 +2,15 @@
 
 import { useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { NAV_ITEMS_BY_GROUP, SEGMENT_NAV_ITEMS } from '@/lib/navigation';
 import { useNavData } from '@/hooks/useNavData';
 import { useMenuTracking } from '@/hooks/useMenuTracking';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { NotificationDropdown } from '@/components/notification/NotificationDropdown';
 import { ThemeToggle } from './ThemeToggle';
+import { UserSidePanel } from './UserSidePanel';
 import type { NavItem } from '@/lib/navigation';
 
 // ── Inline SVG helpers ────────────────────────────────────────────────────────
@@ -262,10 +264,11 @@ function NotificationBell({
 
 export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
   const pathname = usePathname();
-  const router = useRouter();
   const [openItem, setOpenItem] = useState<string | null>(null);
+  const [sidePanelOpen, setSidePanelOpen] = useState(false);
   const triggerRefs = useRef(new Map<string, HTMLButtonElement>());
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { nickname } = useCurrentUser(isLoggedIn);
 
   const {
     unreadCount,
@@ -375,12 +378,6 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
     }
   };
 
-  const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    router.push('/');
-    router.refresh();
-  };
-
   // 모든 메뉴 항목 표시 (requiresAuth 항목은 잠금 상태로 표시)
   // A/B 테스트 그룹에 따라 메뉴 구조 결정 (로딩 중/실패 시 기본 A 그룹 사용)
   const visibleItems = NAV_ITEMS_BY_GROUP[abGroup ?? 'A'];
@@ -404,111 +401,154 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
   };
 
   return (
-    <nav aria-label="주요 메뉴" className="hidden items-center gap-0.5 md:flex">
-      {/* 기본 메뉴 */}
-      {visibleItems.map((item) => {
-        const active = isActive(item.href);
-        const isOpen = openItem === item.href;
-        const locked = !!(item.requiresAuth && !isLoggedIn);
+    <>
+      <nav aria-label="주요 메뉴" className="hidden items-center gap-0.5 md:flex">
+        {/* 기본 메뉴 */}
+        {visibleItems.map((item) => {
+          const active = isActive(item.href);
+          const isOpen = openItem === item.href;
+          const locked = !!(item.requiresAuth && !isLoggedIn);
 
-        // 비로그인 상태의 인증 필요 항목: 잠금 스타일로 로그인 페이지로 연결
-        if (locked) {
-          return (
-            <Link
-              key={item.href}
-              href={`/login?redirectTo=${encodeURIComponent(item.href)}`}
-              title="로그인이 필요한 기능입니다"
-              onClick={() => track(item.href, item.label)}
-              className={cn(
-                'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
-                'text-gray-400 hover:bg-gray-50 hover:text-gray-500 dark:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-500',
-              )}
-            >
-              <NavIcon path={item.iconPath} />
-              {item.label}
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                className="h-3 w-3 text-gray-300 dark:text-slate-600"
+          // 비로그인 상태의 인증 필요 항목: 잠금 스타일로 로그인 페이지로 연결
+          if (locked) {
+            return (
+              <Link
+                key={item.href}
+                href={`/login?redirectTo=${encodeURIComponent(item.href)}`}
+                title="로그인이 필요한 기능입니다"
+                onClick={() => track(item.href, item.label)}
+                className={cn(
+                  'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
+                  'text-gray-400 hover:bg-gray-50 hover:text-gray-500 dark:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-500',
+                )}
               >
-                <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </Link>
-          );
-        }
+                <NavIcon path={item.iconPath} />
+                {item.label}
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                  className="h-3 w-3 text-gray-300 dark:text-slate-600"
+                >
+                  <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </Link>
+            );
+          }
 
-        if (!item.children) {
+          if (!item.children) {
+            return (
+              <NavLink
+                key={item.href}
+                item={item}
+                active={active}
+                onTrack={() => track(item.href, item.label)}
+              />
+            );
+          }
+
           return (
-            <NavLink
+            <DropdownItem
               key={item.href}
               item={item}
               active={active}
-              onTrack={() => track(item.href, item.label)}
+              isOpen={isOpen}
+              onChildTrack={(href, label) => track(href, label)}
+              {...dropdownProps}
             />
           );
-        }
+        })}
 
-        return (
-          <DropdownItem
+        {/* 세그먼트 메뉴 (로딩 후 표시) */}
+        {segmentItems.map((item) => (
+          <NavLink
             key={item.href}
             item={item}
-            active={active}
-            isOpen={isOpen}
-            onChildTrack={(href, label) => track(href, label)}
-            {...dropdownProps}
+            active={isActive(item.href)}
+            onTrack={() => track(item.href, item.label)}
           />
-        );
-      })}
+        ))}
 
-      {/* 세그먼트 메뉴 (로딩 후 표시) */}
-      {segmentItems.map((item) => (
-        <NavLink
-          key={item.href}
-          item={item}
-          active={isActive(item.href)}
-          onTrack={() => track(item.href, item.label)}
+        {/* 테마 전환 버튼 */}
+        <ThemeToggle />
+
+        {/* 구분선 */}
+        <div
+          aria-hidden="true"
+          className="mx-1.5 h-5 border-l border-gray-200 dark:border-slate-700"
         />
-      ))}
 
-      {/* 테마 전환 버튼 */}
-      <ThemeToggle />
+        {/* 인증 영역 */}
+        {isLoggedIn ? (
+          <>
+            {/* 알림 */}
+            <NotificationBell
+              loading={notificationsLoading}
+              error={notificationsError}
+              unreadCount={unreadCount}
+              notifications={notifications}
+              onMarkRead={markRead}
+              onMarkAllRead={markAllRead}
+            />
 
-      {/* 구분선 */}
-      <div
-        aria-hidden="true"
-        className="mx-1.5 h-5 border-l border-gray-200 dark:border-slate-700"
-      />
+            {/* 이어 보기 — 로딩 완료 후, 항목이 있을 때만 노출 */}
+            {!resumeLoading && resumeItem && resumeItem.lastPosition && (
+              <Link
+                href={resumeItem.lastPosition}
+                title={resumeItem.title ?? '이어 보기'}
+                onClick={() => track(resumeItem.lastPosition!, '이어 보기')}
+                className={cn(
+                  'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                  'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
+                  'dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
+                )}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                  className="h-4 w-4 flex-shrink-0"
+                >
+                  <path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                이어 보기
+              </Link>
+            )}
 
-      {/* 인증 영역 */}
-      {isLoggedIn ? (
-        <>
-          {/* 알림 */}
-          <NotificationBell
-            loading={notificationsLoading}
-            error={notificationsError}
-            unreadCount={unreadCount}
-            notifications={notifications}
-            onMarkRead={markRead}
-            onMarkAllRead={markAllRead}
-          />
-
-          {/* 이어 보기 — 로딩 완료 후, 항목이 있을 때만 노출 */}
-          {!resumeLoading && resumeItem && resumeItem.lastPosition && (
-            <Link
-              href={resumeItem.lastPosition}
-              title={resumeItem.title ?? '이어 보기'}
-              onClick={() => track(resumeItem.lastPosition!, '이어 보기')}
+            {/* Hi 닉네임! — 사이드 패널 트리거 */}
+            <button
+              type="button"
+              onClick={() => setSidePanelOpen(true)}
               className={cn(
-                'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
-                'dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
+                'flex items-center gap-1.5 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-900 transition-colors',
+                'hover:bg-gray-100',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1',
+              )}
+            >
+              Hi {nickname ?? '...'}!
+            </button>
+          </>
+        ) : (
+          <>
+            {/* 개인화 기능 영역 로그인 유도 CTA (이어 보기, 학습 기록) */}
+            <Link
+              href="/login"
+              title="로그인하면 이어 보기와 학습 기록을 사용할 수 있습니다"
+              className={cn(
+                'flex items-center gap-1 rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 transition-colors',
+                'hover:bg-blue-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
+                'dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50',
               )}
             >
               <svg
@@ -519,120 +559,47 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 aria-hidden="true"
-                className="h-4 w-4 flex-shrink-0"
+                className="h-3 w-3"
               >
                 <path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                 <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               이어 보기
             </Link>
-          )}
+            <Link
+              href="/login"
+              className={cn(
+                'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
+                pathname === '/login'
+                  ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100',
+              )}
+            >
+              로그인
+            </Link>
+            <Link
+              href="/login"
+              className={cn(
+                'rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors',
+                'hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
+              )}
+            >
+              회원가입
+            </Link>
+          </>
+        )}
+      </nav>
 
-          {/* 마이페이지 링크 */}
-          <Link
-            href="/mypage"
-            aria-current={pathname === '/mypage' ? 'page' : undefined}
-            onClick={() => track('/mypage', '마이페이지')}
-            className={cn(
-              'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
-              pathname === '/mypage'
-                ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100',
-            )}
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-              className="h-4 w-4 flex-shrink-0"
-            >
-              <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            마이페이지
-          </Link>
-
-          {/* 로그아웃 */}
-          <button
-            type="button"
-            onClick={() => void handleLogout()}
-            className={cn(
-              'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-              'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
-              'dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
-            )}
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-              className="h-4 w-4 flex-shrink-0"
-            >
-              <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            로그아웃
-          </button>
-        </>
-      ) : (
-        <>
-          {/* 개인화 기능 영역 로그인 유도 CTA (이어 보기, 학습 기록) */}
-          <Link
-            href="/login"
-            title="로그인하면 이어 보기와 학습 기록을 사용할 수 있습니다"
-            className={cn(
-              'flex items-center gap-1 rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 transition-colors',
-              'hover:bg-blue-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
-              'dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50',
-            )}
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-              className="h-3 w-3"
-            >
-              <path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-              <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            이어 보기
-          </Link>
-          <Link
-            href="/login"
-            className={cn(
-              'flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
-              pathname === '/login'
-                ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100',
-            )}
-          >
-            로그인
-          </Link>
-          <Link
-            href="/login"
-            className={cn(
-              'rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors',
-              'hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1',
-            )}
-          >
-            회원가입
-          </Link>
-        </>
+      {/* Hi 닉네임! 사이드 패널 */}
+      {isLoggedIn && (
+        <UserSidePanel
+          isOpen={sidePanelOpen}
+          onClose={() => setSidePanelOpen(false)}
+          nickname={nickname ?? ''}
+        />
       )}
-    </nav>
+    </>
   );
 }
 

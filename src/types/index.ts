@@ -5,8 +5,8 @@ import type { components } from '@/api-contract/generated/api-types';
 // 수동 정의 제거 → api-contract/generated/api-types.ts 스키마 참조
 // ============================================================
 
-/** Migrated: components['schemas']['ProfileResponse'] */
-export type UserProfile = Required<components['schemas']['ProfileResponse']>;
+/** Migrated: components['schemas']['MyPageResponse'] (ProfileResponse → MyPageResponse로 변경됨) */
+export type UserProfile = Required<components['schemas']['MyPageResponse']>;
 
 /** Migrated: components['schemas']['PeriodStatResponse'] */
 export type PeriodStat = Required<components['schemas']['PeriodStatResponse']>;

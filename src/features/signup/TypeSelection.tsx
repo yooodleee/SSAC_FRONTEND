@@ -57,7 +57,7 @@ export function TypeSelection() {
       sessionStorage.removeItem('signupProvider');
       sessionStorage.removeItem('signupNickname');
       // hard redirect — Header(Server Component)가 새 accessToken 쿠키를 반드시 읽도록 강제
-      window.location.replace('/onboarding/test');
+      window.location.replace('/home');
     } catch (err) {
       const code = (err as { code?: string }).code;
       setErrorMsg(getErrorMessage(code));

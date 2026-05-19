@@ -18,8 +18,15 @@ import { NavBranding } from './NavBranding';
 export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
   const pathname = usePathname();
 
-  // 브랜딩 랜딩 홈 / 로그인 페이지는 자체 헤더 사용
-  if (pathname === '/' || pathname === '/login' || pathname.startsWith('/signup')) return null;
+  // 브랜딩 랜딩 홈 / 로그인 / 맞춤 홈 페이지는 자체 헤더 사용
+  if (
+    pathname === '/' ||
+    pathname === '/login' ||
+    pathname.startsWith('/signup') ||
+    pathname === '/home' ||
+    pathname.startsWith('/home/')
+  )
+    return null;
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/90 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/90">
