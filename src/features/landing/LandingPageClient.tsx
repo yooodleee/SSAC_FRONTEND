@@ -15,13 +15,33 @@ import { ContentGallery } from './ContentGallery';
 import { NewsDomainScroller } from './NewsDomainScroller';
 import { TechSection } from './TechSection';
 
+/* eslint-disable @next/next/no-img-element */
+const prefersReducedMotion =
+  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 function Spinner() {
   return (
     <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: '#1a1a1a' }}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        background: '#FFFFFF',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 9999,
+      }}
+      role="status"
+      aria-label="페이지를 불러오는 중입니다."
     >
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+      {prefersReducedMotion ? (
+        <img src="/gress.png" alt="SSAC" width={80} height={80} />
+      ) : (
+        <img src="/assets/ssac-loading.gif" alt="로딩 중" width={200} height={200} />
+      )}
     </div>
   );
 }

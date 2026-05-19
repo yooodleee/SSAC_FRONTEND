@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /**
  * 앱 진입점 — 브랜딩 랜딩 홈 (/)
  *
@@ -15,14 +16,32 @@
 import { Suspense } from 'react';
 import { cookies } from 'next/headers';
 import { LandingPageClient } from '@/features/landing/LandingPageClient';
+const prefersReducedMotion =
+  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function LandingSpinner() {
   return (
     <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: '#1a1a1a' }}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        background: '#FFFFFF',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 9999,
+      }}
+      role="status"
+      aria-label="페이지를 불러오는 중입니다."
     >
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+      {prefersReducedMotion ? (
+        <img src="/gress.png" alt="SSAC" width={80} height={80} />
+      ) : (
+        <img src="/assets/ssac-loading.gif" alt="로딩 중" width={200} height={200} />
+      )}
     </div>
   );
 }
