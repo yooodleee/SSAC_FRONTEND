@@ -2,7 +2,7 @@
 // ⚠️  이 파일은 자동 생성됩니다 — 절대 수동으로 편집하지 마세요.
 // 생성 명령: npm run sync:api
 // 소스: http://172.17.96.1:8080/api-docs/swagger.json
-// 생성 시각: 2026-05-19 12:56:14
+// 생성 시각: 2026-05-20 17:48:49
 // ============================================================
 
 /**
@@ -163,6 +163,26 @@ export interface paths {
          *     [특이 동작] 1개 이상 3개 이하 선택 필수. 기존 데이터 덮어씀.
          */
         post: operations["saveInterests"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 피드백 전송
+         * @description 사용자가 개발팀에 피드백을 전송한다. 비로그인 사용자는 userId를 null로 보낸다.
+         */
+        post: operations["submitFeedback"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1269,6 +1289,22 @@ export interface components {
         OnboardingInterestsRequest: {
             domainIds: string[];
         };
+        FeedbackRequest: {
+            message?: string;
+            userId?: string;
+            pageUrl?: string;
+        };
+        ApiResponseFeedbackResponse: {
+            success?: boolean;
+            data?: components["schemas"]["FeedbackResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
+        FeedbackResponse: {
+            feedbackId?: string;
+            /** Format: date-time */
+            createdAt?: string;
+        };
         ApiResponseContentCompleteResponse: {
             success?: boolean;
             data?: components["schemas"]["ContentCompleteResponse"];
@@ -1670,22 +1706,22 @@ export interface components {
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            pageable?: components["schemas"]["PageableObject"];
             first?: boolean;
             last?: boolean;
             /** Format: int32 */
             numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
         PageableObject: {
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
+            paged?: boolean;
             /** Format: int32 */
             pageNumber?: number;
             /** Format: int32 */
             pageSize?: number;
-            paged?: boolean;
             unpaged?: boolean;
         };
         QuizAttemptSummaryResponse: {
@@ -2029,11 +2065,11 @@ export interface components {
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            pageable?: components["schemas"]["PageableObject"];
             first?: boolean;
             last?: boolean;
             /** Format: int32 */
             numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
         ApiResponseListMenuClickStatResponse: {
@@ -2530,6 +2566,48 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    submitFeedback: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FeedbackRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseFeedbackResponse"];
+                };
             };
             /** @description 인증 토큰이 없거나 만료되었습니다. */
             401: {
