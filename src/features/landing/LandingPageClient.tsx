@@ -10,6 +10,7 @@
 import { useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { LandingHeader } from '@/components/layout/LandingHeader';
+import { FeedbackWidget } from '@/components/shared/FeedbackWidget';
 import { HeroSection } from './HeroSection';
 import { ContentGallery } from './ContentGallery';
 import { NewsDomainScroller } from './NewsDomainScroller';
@@ -94,6 +95,9 @@ export function LandingPageClient({ isLoggedIn }: LandingPageClientProps) {
 
       {/* 섹션 4: TECH (Coming Soon) */}
       <TechSection />
+
+      {/* 개발팀 문의 플로팅 버튼 */}
+      <FeedbackWidget />
     </>
   );
 }
