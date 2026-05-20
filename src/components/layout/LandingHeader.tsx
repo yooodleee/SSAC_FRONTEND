@@ -13,24 +13,20 @@
  *   / (브랜딩 랜딩 홈), /home (맞춤 홈 화면)
  */
 
-import { useState } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { UserSidePanel } from './UserSidePanel';
+import { MegaMenu, NAV_MENU_ITEMS } from '@/components/shared/MegaMenu';
+import type { NavMenuId } from '@/components/shared/MegaMenu';
 
 interface LandingHeaderProps {
   isLoggedIn: boolean;
 }
-
-const NAV_ITEMS = [
-  { label: '모든 콘텐츠', href: '/content' },
-  { label: '새로운 소식', href: '/news' },
-  { label: 'TECH', href: '/#tech' },
-  { label: 'FAQ', href: '/#faq' },
-] as const;
 
 function SearchIcon() {
   return (
@@ -54,8 +50,27 @@ export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sidePanelOpen, setSidePanelOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
+  const [openTab, setOpenTab] = useState<NavMenuId | null>(null);
   const router = useRouter();
+  const pathname = usePathname();
   const { nickname } = useCurrentUser(isLoggedIn);
+
+  // 경로 기반 활성 탭 계산
+  const pathActiveTab: NavMenuId | null = (() => {
+    if (pathname.startsWith('/content')) return 'contents';
+    if (pathname.startsWith('/news')) return 'news';
+    return null;
+  })();
+
+  const headerRef = useRef<HTMLElement>(null);
+
+  const handleTabToggle = useCallback((tabId: NavMenuId) => {
+    setOpenTab((prev) => (prev === tabId ? null : tabId));
+  }, []);
+
+  const closePanel = useCallback(() => {
+    setOpenTab(null);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +81,7 @@ export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
 
   return (
     <>
-      <header className="fixed left-0 right-0 top-0 z-50 bg-black">
+      <header ref={headerRef} className="fixed left-0 right-0 top-0 z-50 bg-black">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           {/* relative flex: 로고 좌측 고정 / 메뉴 탭 절대 중앙 / 검색+인증 우측 */}
           <div className="relative flex h-16 items-center">
@@ -92,15 +107,35 @@ export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
               aria-label="전역 메뉴"
               className="absolute right-1/2 hidden items-center gap-3 pr-3 md:flex"
             >
-              {NAV_ITEMS.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="rounded-full px-4 py-2 text-sm font-semibold tracking-wide text-white/85 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-                >
-                  {item.label}
-                </Link>
-              ))}
+              {NAV_MENU_ITEMS.map((item) => {
+                const isOpen = openTab === item.id;
+                const isActive = isOpen || pathActiveTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    aria-expanded={isOpen}
+                    aria-controls="mega-menu-panel"
+                    onClick={() => handleTabToggle(item.id)}
+                    className={cn(
+                      'relative rounded-full px-4 py-2 text-sm font-semibold tracking-wide transition-colors',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400',
+                      isActive
+                        ? 'text-white bg-white/20'
+                        : 'text-white/85 hover:bg-white/10 hover:text-white',
+                    )}
+                  >
+                    {item.label}
+                    {/* 활성 탭 하단 인디케이터 */}
+                    {isActive && (
+                      <span
+                        aria-hidden="true"
+                        className="absolute bottom-0 left-1/2 h-0.5 w-4/5 -translate-x-1/2 rounded-full bg-white"
+                      />
+                    )}
+                  </button>
+                );
+              })}
             </nav>
 
             {/* 검색창 + 인증 버튼 — 중앙(left-1/2)부터 우측 끝까지 */}
@@ -184,6 +219,9 @@ export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
           </div>
         </div>
 
+        {/* 메가 메뉴 패널 */}
+        {openTab && <MegaMenu activeTab={openTab} onClose={closePanel} headerRef={headerRef} />}
+
         {/* 모바일 드로어 */}
         {mobileOpen && (
           <div
@@ -211,17 +249,24 @@ export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
             </form>
 
             {/* 메뉴 */}
-            <nav className={cn('flex flex-col gap-1')}>
-              {NAV_ITEMS.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="min-h-[48px] rounded-lg px-3 py-2.5 text-sm font-semibold tracking-wide text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-                >
-                  {item.label}
-                </Link>
-              ))}
+            <nav className="flex flex-col gap-1">
+              {NAV_MENU_ITEMS.map((item) => {
+                const isActive = pathActiveTab === item.id;
+                return (
+                  <Link
+                    key={item.id}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(
+                      'min-h-[48px] rounded-lg px-3 py-2.5 text-sm font-semibold tracking-wide',
+                      isActive ? 'text-[#4CAF82] bg-[#E8F5EE]/20' : 'text-white hover:bg-white/10',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400',
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
             </nav>
 
             <div className="my-3 border-t border-white/10" />
