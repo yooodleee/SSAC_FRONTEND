@@ -183,7 +183,9 @@
       "Bash(UserSidePanel)",
       "Bash(/account-settings/)",
       "Bash(src/features/home/LevelCard.tsx)",
-      "Bash(/)"
+      "Bash(/)",
+      "Bash(src/components/shared/MegaMenu/)",
+      "Bash(src/components/layout/LandingHeader.tsx)"
     ]
   }
 }
