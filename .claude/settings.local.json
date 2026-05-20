@@ -182,7 +182,8 @@
       "Bash(닉네임}!])",
       "Bash(UserSidePanel)",
       "Bash(/account-settings/)",
-      "Bash(src/features/home/LevelCard.tsx)"
+      "Bash(src/features/home/LevelCard.tsx)",
+      "Bash(/)"
     ]
   }
 }
