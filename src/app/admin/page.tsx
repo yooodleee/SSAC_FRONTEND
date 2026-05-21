@@ -32,33 +32,41 @@ export default async function AdminPage() {
   const stats = data.stats;
 
   return (
-    <div className="flex min-h-screen bg-[#F9F9F9]">
-      <AdminSidebar />
+    <div className="min-h-screen bg-white">
+      <div className="mx-auto max-w-6xl px-4 pt-20 pb-6 sm:px-6 md:pt-28">
+        <div className="flex gap-6">
+          <AdminSidebar />
 
-      <main className="flex-1 px-8 py-8">
-        <h1 className="mb-6 text-xl font-bold text-[#1A1A1A]">관리자 홈</h1>
+          <main className="min-w-0 flex-1 pb-20 md:pb-0">
+            <div className="space-y-8">
+              {/* 레벨 카드 */}
+              <section aria-label="관리자 카드">
+                <AdminLevelCard nickname={nickname} />
+              </section>
 
-        <div className="mb-8 max-w-md">
-          <AdminLevelCard nickname={nickname} />
+              {/* 통계 카드 */}
+              {stats && (
+                <section aria-label="관리자 통계">
+                  <div className="grid grid-cols-2 gap-4 max-w-md">
+                    <div className="rounded-2xl border border-[#E8E8E8] bg-white px-6 py-5 shadow-sm">
+                      <p className="mb-1 text-xs text-gray-400">전체 사용자</p>
+                      <p className="text-2xl font-bold text-[#1B4332]">
+                        {(stats.totalUsers ?? 0).toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-[#E8E8E8] bg-white px-6 py-5 shadow-sm">
+                      <p className="mb-1 text-xs text-gray-400">전체 피드백</p>
+                      <p className="text-2xl font-bold text-[#1B4332]">
+                        {(stats.totalFeedbacks ?? 0).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                </section>
+              )}
+            </div>
+          </main>
         </div>
-
-        {stats && (
-          <div className="grid grid-cols-2 gap-4 max-w-md">
-            <div className="rounded-2xl border border-[#E8E8E8] bg-white px-6 py-5 shadow-sm">
-              <p className="mb-1 text-xs text-gray-400">전체 사용자</p>
-              <p className="text-2xl font-bold text-[#1B4332]">
-                {(stats.totalUsers ?? 0).toLocaleString()}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-[#E8E8E8] bg-white px-6 py-5 shadow-sm">
-              <p className="mb-1 text-xs text-gray-400">전체 피드백</p>
-              <p className="text-2xl font-bold text-[#1B4332]">
-                {(stats.totalFeedbacks ?? 0).toLocaleString()}
-              </p>
-            </div>
-          </div>
-        )}
-      </main>
+      </div>
     </div>
   );
 }

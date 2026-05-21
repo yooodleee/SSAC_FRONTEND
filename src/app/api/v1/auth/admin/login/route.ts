@@ -10,12 +10,12 @@ export async function POST(request: NextRequest) {
   if (!backendUrl) return NextResponse.json({ errorCode: 'SERVER_ERROR' }, { status: 500 });
 
   try {
-    const body = await request.json();
+    const reqBody = await request.json();
 
     const beResponse = await fetch(new URL('/api/v1/auth/admin/login', backendUrl).toString(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify(reqBody),
     });
 
     if (!beResponse.ok) {
@@ -29,20 +29,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const data = (await beResponse.json()) as {
-      accessToken?: string;
-      tokenType?: string;
-      accessTokenExpiresIn?: number;
-      user?: { id?: number; nickname?: string; role?: string };
+    const body = (await beResponse.json()) as {
+      data?: {
+        accessToken?: string;
+        tokenType?: string;
+        accessTokenExpiresIn?: number;
+        user?: { id?: number; nickname?: string; role?: string };
+      };
     };
+    const loginData = body.data;
 
-    const res = NextResponse.json({ success: true, user: data.user });
+    const res = NextResponse.json({ success: true, user: loginData?.user });
 
-    if (data.accessToken) {
-      res.cookies.set('accessToken', data.accessToken, {
+    if (loginData?.accessToken) {
+      res.cookies.set('accessToken', loginData.accessToken, {
         httpOnly: true,
         path: '/',
-        maxAge: data.accessTokenExpiresIn ?? 60 * 30,
+        maxAge: loginData.accessTokenExpiresIn ?? 60 * 30,
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
       });

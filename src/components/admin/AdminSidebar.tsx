@@ -5,73 +5,66 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 const ADMIN_NAV_ITEMS = [
-  {
-    label: '관리자 홈',
-    href: '/admin',
-    icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-        className="h-4 w-4 shrink-0"
-      >
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-        <polyline points="9 22 9 12 15 12 15 22" />
-      </svg>
-    ),
-  },
-  {
-    label: '피드백 관리',
-    href: '/admin/feedbacks',
-    icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-        className="h-4 w-4 shrink-0"
-      >
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-      </svg>
-    ),
-  },
+  { label: '관리자 홈', href: '/admin' },
+  { label: '피드백 관리', href: '/admin/feedbacks' },
 ] as const;
 
 export function AdminSidebar() {
   const pathname = usePathname();
 
-  return (
-    <aside className="flex h-full w-56 flex-col border-r border-[#E8E8E8] bg-white">
-      {/* 로고 영역 */}
-      <div className="flex h-16 items-center px-5 border-b border-[#E8E8E8]">
-        <span className="text-base font-bold text-[#1B4332]">SSAC 관리자</span>
-      </div>
+  const isActive = (href: string) => pathname === href;
 
-      {/* 네비게이션 */}
-      <nav className="flex-1 px-3 py-4" aria-label="관리자 메뉴">
-        <ul className="space-y-0.5">
+  return (
+    <>
+      {/* 데스크탑: 좌측 사이드바 */}
+      <aside className="hidden w-52 shrink-0 md:block">
+        <nav aria-label="관리자 메뉴">
+          <ul className="space-y-0.5">
+            {ADMIN_NAV_ITEMS.map((item) => {
+              const active = isActive(item.href);
+              return (
+                <li key={item.label}>
+                  <Link
+                    href={item.href}
+                    aria-current={active ? 'page' : undefined}
+                    className={cn(
+                      'flex min-h-[48px] items-center rounded-lg px-4 text-[15px] font-medium transition-colors',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B4332]',
+                      active
+                        ? 'text-[#1A1A1A] underline decoration-[#1B4332] decoration-2 underline-offset-4'
+                        : 'text-[#6B6B6B] hover:bg-[#F5F5F5] hover:text-[#1A1A1A]',
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      </aside>
+
+      {/* 모바일: 하단 네비게이션 바 */}
+      <nav
+        aria-label="관리자 하단 메뉴"
+        className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#E8E8E8] bg-white md:hidden"
+      >
+        <ul className="flex">
           {ADMIN_NAV_ITEMS.map((item) => {
-            const isActive = pathname === item.href;
+            const active = isActive(item.href);
             return (
-              <li key={item.href}>
+              <li key={item.label} className="flex-1">
                 <Link
                   href={item.href}
+                  aria-current={active ? 'page' : undefined}
                   className={cn(
-                    'flex min-h-[44px] items-center gap-3 rounded-lg px-3 text-[14px] transition-colors',
-                    isActive
-                      ? 'bg-[#E8F5EE] font-semibold text-[#1B4332]'
-                      : 'text-[#6B6B6B] hover:bg-[#F5F5F5] hover:text-[#1A1A1A]',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B4332]',
+                    'flex min-h-[56px] flex-col items-center justify-center gap-1 text-xs font-medium transition-colors',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#1B4332]',
+                    active
+                      ? 'text-[#1A1A1A] underline decoration-[#1B4332] decoration-2 underline-offset-4'
+                      : 'text-[#6B6B6B]',
                   )}
                 >
-                  {item.icon}
                   {item.label}
                 </Link>
               </li>
@@ -79,6 +72,6 @@ export function AdminSidebar() {
           })}
         </ul>
       </nav>
-    </aside>
+    </>
   );
 }

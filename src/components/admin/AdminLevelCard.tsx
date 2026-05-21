@@ -6,22 +6,25 @@ interface AdminLevelCardProps {
 
 export function AdminLevelCard({ nickname }: AdminLevelCardProps) {
   return (
-    <div className="flex items-center gap-4 rounded-2xl border border-[#E8E8E8] bg-white px-6 py-5 shadow-sm">
-      <Image
-        src="/images/admin.png"
-        alt="관리자 마스코트"
-        width={56}
-        height={56}
-        className="shrink-0 object-contain"
+    <div className="relative overflow-hidden rounded-2xl" style={{ minHeight: '160px' }}>
+      {/* 배경 이미지 */}
+      <Image src="/images/admin.png" alt="관리자 배경" fill className="object-cover" priority />
+
+      {/* 반투명 오버레이 */}
+      <div
+        className="absolute inset-0"
+        style={{ background: 'rgba(0, 0, 0, 0.35)' }}
+        aria-hidden="true"
       />
-      <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-2">
-          <span className="text-base font-semibold text-[#1A1A1A]">{nickname}</span>
-          <span className="rounded-full bg-[#1B4332] px-2.5 py-0.5 text-[11px] font-bold text-white tracking-wide">
-            ADMIN
-          </span>
-        </div>
-        <span className="text-xs text-gray-400">관리자 계정으로 로그인 중입니다.</span>
+
+      {/* 콘텐츠 */}
+      <div className="relative z-10 flex h-full min-h-[160px] flex-col justify-between p-6">
+        <p className="font-bold text-white" style={{ fontSize: '28px', lineHeight: 1.3 }}>
+          Hi {nickname}!
+        </p>
+        <span className="self-start rounded-full bg-white/20 px-3 py-1 text-sm font-medium text-white backdrop-blur-sm">
+          ADMIN
+        </span>
       </div>
     </div>
   );
