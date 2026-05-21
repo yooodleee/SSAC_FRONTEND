@@ -280,28 +280,28 @@ export interface ContentDetail {
 // api-contract/generated/api-types.ts에 없음 — BE 팀 확인 필요
 // ============================================================
 
-// ⚠️ API type: api-types.ts에 없음 — BE 팀 확인 필요
-export interface SearchResult {
-  id: number;
-  title: string;
-  summary: string;
-  category: string;
-  relevanceScore: number;
-}
+/** Migrated: components['schemas']['SearchItem'] */
+export type SearchItem = components['schemas']['SearchItem'];
 
-// ⚠️ API type: api-types.ts에 없음 — BE 팀 확인 필요
-export interface SearchSuggestion {
-  keyword: string;
-  count: number;
-}
+/** @deprecated SuggestionItem으로 이전 */
+export type SearchSuggestion = components['schemas']['SuggestionItem'];
 
-// ⚠️ API type: api-types.ts에 없음 — BE 팀 확인 필요
+/** @deprecated SearchResultResponse으로 이전 */
 export interface SearchResponse {
-  results: SearchResult[];
+  results: SearchItem[];
   total: number;
   query: string;
   popularKeywords: SearchSuggestion[];
 }
+
+/** Migrated: components['schemas']['SearchResultResponse'] */
+export type SearchResultResponse = components['schemas']['SearchResultResponse'];
+
+/** Migrated: components['schemas']['SuggestionItem'] */
+export type SuggestionItem = components['schemas']['SuggestionItem'];
+
+/** Migrated: components['schemas']['SearchSuggestionResponse'] */
+export type SearchSuggestionResponse = components['schemas']['SearchSuggestionResponse'];
 
 // ============================================================
 // ⚠️ Home V1 Domain Types

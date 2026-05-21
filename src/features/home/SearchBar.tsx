@@ -164,7 +164,7 @@ export function SearchBar() {
               key={s.keyword}
               role="option"
               aria-selected={i === activeSuggestionIdx}
-              onMouseDown={() => handleSuggestionClick(s.keyword)}
+              onMouseDown={() => handleSuggestionClick(s.keyword ?? '')}
               onMouseEnter={() => setActiveSuggestionIdx(i)}
               className={`flex cursor-pointer items-center gap-2 px-4 py-2.5 text-sm transition-colors ${
                 i === activeSuggestionIdx
@@ -188,9 +188,9 @@ export function SearchBar() {
                 />
               </svg>
               <span>{s.keyword}</span>
-              {s.count > 0 && (
+              {(s.popularity ?? 0) > 0 && (
                 <span className="ml-auto text-xs text-gray-400 dark:text-slate-500">
-                  {s.count}회
+                  {s.popularity}회
                 </span>
               )}
             </li>

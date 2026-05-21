@@ -136,3 +136,8 @@ errors:
     message: '관리자 계정을 찾을 수 없습니다.'
     httpStatus: 404
     description: '존재하지 않는 관리자 계정 ID'
+
+  SEARCH-001:
+    message: '검색어를 입력해주세요.'
+    httpStatus: 400
+    description: 'GET /api/v1/search 요청 시 q 파라미터 누락 또는 빈 문자열'
