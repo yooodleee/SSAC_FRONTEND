@@ -26,4 +26,7 @@ export const ERROR_MESSAGES: Record<string, string> = {
   'ONBOARDING-003': '모든 문제에 응답해주세요.',
   'ONBOARDING-004': '유효하지 않은 문제입니다.',
   'ONBOARDING-005': '사용자 유형과 맞지 않는 문제입니다.',
+  'ADMIN-001': '관리자 코드가 올바르지 않습니다.',
+  'ADMIN-002': '관리자 권한이 필요합니다.',
+  'ADMIN-003': '관리자 계정을 찾을 수 없습니다.',
 };

@@ -8,7 +8,7 @@
  * - 외부 클릭 / Escape 키로 닫기
  */
 
-import { useEffect, useRef, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -26,9 +26,22 @@ const PANEL_NAV_ITEMS = [
   { label: '계정', href: '/home/account-settings' },
 ] as const;
 
+const ADMIN_NAV_ITEMS = [
+  { label: '관리자 홈', href: '/admin' },
+  { label: '피드백 관리', href: '/admin/feedbacks' },
+] as const;
+
 export function UserSidePanel({ isOpen, onClose, nickname }: UserSidePanelProps) {
   const router = useRouter();
   const panelRef = useRef<HTMLDivElement>(null);
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch('/api/v1/auth/status')
+      .then((r) => r.json())
+      .then((d: { role?: string }) => setRole(d.role ?? null))
+      .catch(() => {});
+  }, []);
 
   const mounted = useSyncExternalStore(
     () => () => {},
@@ -89,9 +102,16 @@ export function UserSidePanel({ isOpen, onClose, nickname }: UserSidePanelProps)
       >
         {/* 패널 상단 */}
         <div className="flex min-h-[64px] items-center justify-between border-b border-[#E8E8E8] px-6 py-4 dark:border-slate-700">
-          <span className="text-[16px] font-medium text-[#1A1A1A] dark:text-slate-100">
-            Hi {nickname}!
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-[16px] font-medium text-[#1A1A1A] dark:text-slate-100">
+              Hi {nickname}!
+            </span>
+            {role === 'ADMIN' && (
+              <span className="rounded-full bg-[#1B4332] px-2 py-0.5 text-[10px] font-bold text-white tracking-wide">
+                ADMIN
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -141,6 +161,28 @@ export function UserSidePanel({ isOpen, onClose, nickname }: UserSidePanelProps)
               </li>
             ))}
           </ul>
+
+          {role === 'ADMIN' && (
+            <>
+              <div className="my-3 border-t border-[#E8E8E8]" />
+              <p className="mb-1 px-4 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                관리자
+              </p>
+              <ul className="space-y-0.5">
+                {ADMIN_NAV_ITEMS.map((item) => (
+                  <li key={item.label}>
+                    <Link
+                      href={item.href}
+                      onClick={onClose}
+                      className="flex min-h-[48px] items-center rounded-lg px-4 text-[15px] text-[#1B4332] transition-colors hover:bg-[#E8F5EE] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4CAF82]"
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </nav>
       </div>
     </>,
