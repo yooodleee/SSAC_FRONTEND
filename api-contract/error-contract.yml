@@ -121,3 +121,18 @@ errors:
     message: '사용자 유형과 맞지 않는 문제입니다.'
     httpStatus: 400
     description: 'POST /api/v1/onboarding/submit 요청 시 userType 불일치'
+
+  ADMIN-001:
+    message: '관리자 코드가 올바르지 않습니다.'
+    httpStatus: 401
+    description: 'POST /api/v1/auth/admin/login 요청 시 관리자 코드 불일치'
+
+  ADMIN-002:
+    message: '관리자 권한이 필요합니다.'
+    httpStatus: 403
+    description: '관리자 전용 API에 일반 사용자가 접근'
+
+  ADMIN-003:
+    message: '관리자 계정을 찾을 수 없습니다.'
+    httpStatus: 404
+    description: '존재하지 않는 관리자 계정 ID'

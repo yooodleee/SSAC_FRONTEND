@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 /** 인증 쿠키가 없을 때 로그인 페이지로 리다이렉트하는 보호 경로 목록 */
-const PROTECTED_PREFIXES = ['/my'];
+const PROTECTED_PREFIXES = ['/my', '/admin'];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -24,5 +24,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/my/:path*'],
+  matcher: ['/my/:path*', '/admin/:path*', '/admin'],
 };

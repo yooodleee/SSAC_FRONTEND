@@ -2,7 +2,7 @@
 // ⚠️  이 파일은 자동 생성됩니다 — 절대 수동으로 편집하지 마세요.
 // 생성 명령: npm run sync:api
 // 소스: http://172.17.96.1:8080/api-docs/swagger.json
-// 생성 시각: 2026-05-20 17:48:49
+// 생성 시각: 2026-05-20 20:34:02
 // ============================================================
 
 /**
@@ -383,6 +383,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/admin/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 관리자 코드 로그인
+         * @description 사전 발급된 관리자 코드로 로그인한다. 코드는 1회 사용 후 재사용 불가. 성공 시 Refresh Token은 HttpOnly Cookie로 설정된다.
+         */
+        post: operations["login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/events/menu-click": {
         parameters: {
             query?: never;
@@ -548,11 +568,29 @@ export interface paths {
         head?: never;
         /**
          * 사용자 권한 변경
-         * @description [호출 화면] 관리자 대시보드 > 사용자 상세 정보 > 권한 수정 팝업
-         *     [권한 조건] ADMIN 역할 전용.
-         *     [특이 동작] 변경된 권한은 해당 사용자의 다음 API 요청부터 즉시 반영된다. GUEST 역할 부여 불가.
+         * @description [권한 조건] ADMIN 역할 전용. GUEST 역할 부여 불가.
          */
         patch: operations["updateUserRole"];
+        trace?: never;
+    };
+    "/api/v1/admin/feedbacks/{feedbackId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * 피드백 상태 변경
+         * @description [권한 조건] ADMIN 역할 전용. 변경 성공 시 204 No Content.
+         */
+        patch: operations["updateFeedbackStatus"];
         trace?: never;
     };
     "/api/notification/{id}/read": {
@@ -606,7 +644,7 @@ export interface paths {
          * 카카오 로그인 시작
          * @description 카카오 OAuth 인증 페이지로 리다이렉트한다. redirectTo 파라미터를 전달하면 인증 후 해당 경로로 돌아간다(상대 경로만 허용). 실제 요청은 Spring Security OAuth2 필터가 처리한다.
          */
-        get: operations["login"];
+        get: operations["login_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -893,6 +931,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 인증 상태 확인
+         * @description 현재 요청의 인증 상태를 반환한다. 비로그인 시 isAuthenticated: false.
+         */
+        get: operations["getStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/naver/login": {
         parameters: {
             query?: never;
@@ -904,7 +962,7 @@ export interface paths {
          * 네이버 로그인 시작
          * @description 네이버 OAuth 인증 페이지로 리다이렉트한다. state 파라미터로 CSRF를 방어한다.
          */
-        get: operations["login_1"];
+        get: operations["login_2"];
         put?: never;
         post?: never;
         delete?: never;
@@ -964,9 +1022,7 @@ export interface paths {
         };
         /**
          * 전체 사용자 목록 조회
-         * @description [호출 화면] 관리자 대시보드 > 사용자 관리 탭
-         *     [권한 조건] ADMIN 역할 전용.
-         *     [특이 동작] 페이지네이션 지원. 가입일시 내림차순 정렬. 비회원(GUEST)은 목록에 포함되지 않음.
+         * @description [권한 조건] ADMIN 역할 전용. 가입일시 내림차순 정렬. GUEST 제외.
          */
         get: operations["listUsers"];
         put?: never;
@@ -1012,6 +1068,46 @@ export interface paths {
          * @description 특정 traceId의 전체 에러 로그를 시간 순으로 반환한다. ADMIN 권한 필요.
          */
         get: operations["getErrorsByTraceId"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/home": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 관리자 홈 화면
+         * @description [권한 조건] ADMIN 역할 전용.
+         */
+        get: operations["getHome_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/feedbacks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 피드백 목록 조회
+         * @description [권한 조건] ADMIN 역할 전용. createdAt 내림차순 정렬. 상태 필터링 지원.
+         */
+        get: operations["getFeedbacks"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1470,6 +1566,22 @@ export interface components {
              */
             tokenType?: string;
         };
+        AdminLoginRequest: {
+            adminCode?: string;
+        };
+        AdminLoginResponse: {
+            accessToken?: string;
+            tokenType?: string;
+            /** Format: int64 */
+            accessTokenExpiresIn?: number;
+            user?: components["schemas"]["UserInfo"];
+        };
+        ApiResponseAdminLoginResponse: {
+            success?: boolean;
+            data?: components["schemas"]["AdminLoginResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
         MenuClickRequest: {
             eventType: string;
             menuId: string;
@@ -1577,6 +1689,10 @@ export interface components {
              * @description 가입일시
              */
             createdAt?: string;
+        };
+        FeedbackStatusUpdateRequest: {
+            /** @enum {string} */
+            status?: "PENDING" | "IN_PROGRESS" | "DONE";
         };
         ApiResponseMyPageResponse: {
             success?: boolean;
@@ -1717,11 +1833,11 @@ export interface components {
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
-            paged?: boolean;
             /** Format: int32 */
             pageNumber?: number;
             /** Format: int32 */
             pageSize?: number;
+            paged?: boolean;
             unpaged?: boolean;
         };
         QuizAttemptSummaryResponse: {
@@ -2039,6 +2155,17 @@ export interface components {
             totalCount?: number;
             contents?: components["schemas"]["ContentItemDto"][];
         };
+        ApiResponseAuthStatusResponse: {
+            success?: boolean;
+            data?: components["schemas"]["AuthStatusResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
+        AuthStatusResponse: {
+            isAuthenticated?: boolean;
+            role?: string;
+            redirectTo?: string;
+        };
         ApiResponseEmailCheckResponse: {
             success?: boolean;
             data?: components["schemas"]["EmailCheckResponse"];
@@ -2095,6 +2222,48 @@ export interface components {
         TraceLogResponse: {
             traceId?: string;
             logs?: components["schemas"]["ErrorLogEntry"][];
+        };
+        AdminHomeResponse: {
+            admin?: components["schemas"]["AdminInfo"];
+            stats?: components["schemas"]["Stats"];
+        };
+        AdminInfo: {
+            nickname?: string;
+            role?: string;
+        };
+        ApiResponseAdminHomeResponse: {
+            success?: boolean;
+            data?: components["schemas"]["AdminHomeResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
+        Stats: {
+            /** Format: int64 */
+            totalUsers?: number;
+            /** Format: int64 */
+            totalFeedbacks?: number;
+            /** Format: int64 */
+            pendingFeedbacks?: number;
+        };
+        ApiResponseFeedbackListResponse: {
+            success?: boolean;
+            data?: components["schemas"]["FeedbackListResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
+        FeedbackItem: {
+            id?: string;
+            status?: string;
+            message?: string;
+            maskedNickname?: string;
+            pageUrl?: string;
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        FeedbackListResponse: {
+            /** Format: int64 */
+            totalCount?: number;
+            feedbacks?: components["schemas"]["FeedbackItem"][];
         };
         ApiResponseUserSegmentResponse: {
             success?: boolean;
@@ -3071,6 +3240,48 @@ export interface operations {
             };
         };
     };
+    login: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminLoginRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminLoginResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
     recordMenuClick: {
         parameters: {
             query?: never;
@@ -3464,17 +3675,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description 권한 변경 성공 */
+            /** @description OK */
             200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ApiResponseUserSummaryResponse"];
-                };
-            };
-            /** @description 잘못된 역할 또는 유효성 검사 실패 */
-            400: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3491,23 +3693,54 @@ export interface operations {
                     "application/json": components["schemas"]["ApiResponseError"];
                 };
             };
-            /** @description 접근 권한 없음 (ADMIN 전용) */
-            403: {
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ApiResponseUserSummaryResponse"];
+                    "application/json": components["schemas"]["ApiResponseError"];
                 };
             };
-            /** @description 사용자를 찾을 수 없음 */
+        };
+    };
+    updateFeedbackStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                feedbackId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FeedbackStatusUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description 상태 변경 성공 */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description FEEDBACK-003: 존재하지 않는 피드백 */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "*/*": components["schemas"]["ApiResponseUserSummaryResponse"];
-                };
+                content?: never;
             };
             /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
             500: {
@@ -3598,7 +3831,7 @@ export interface operations {
             };
         };
     };
-    login: {
+    login_1: {
         parameters: {
             query?: {
                 /** @description 인증 후 돌아갈 경로 (예: /my-page). 생략 시 /로 이동. */
@@ -4292,7 +4525,45 @@ export interface operations {
             };
         };
     };
-    login_1: {
+    getStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAuthStatusResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    login_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -4445,7 +4716,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description 목록 조회 성공 */
+            /** @description OK */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -4461,15 +4732,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ApiResponseError"];
-                };
-            };
-            /** @description 접근 권한 없음 (ADMIN 전용) */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ApiResponsePageUserSummaryResponse"];
                 };
             };
             /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
@@ -4549,6 +4811,95 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["TraceLogResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    getHome_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminHomeResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    getFeedbacks: {
+        parameters: {
+            query?: {
+                /** @description 상태 필터 (PENDING | IN_PROGRESS | DONE), 미입력 시 전체 */
+                status?: "PENDING" | "IN_PROGRESS" | "DONE";
+                /**
+                 * @description 페이지 번호 (1부터 시작)
+                 * @example 1
+                 */
+                page?: number;
+                /**
+                 * @description 페이지 크기
+                 * @example 20
+                 */
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseFeedbackListResponse"];
                 };
             };
             /** @description 인증 토큰이 없거나 만료되었습니다. */

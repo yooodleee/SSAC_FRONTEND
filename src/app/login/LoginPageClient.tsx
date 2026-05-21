@@ -19,6 +19,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { env } from '@/lib/env';
 import { cn } from '@/lib/utils';
+import { AdminCodeModal } from '@/components/admin/AdminCodeModal';
 
 const ERROR_MESSAGES: Record<string, string> = {
   KAKAO_AUTH_FAILED: '카카오 인증에 실패했습니다. 다시 시도해주세요.',
@@ -45,6 +46,7 @@ export function LoginPageClient() {
 
   const [isKakaoLoading, setIsKakaoLoading] = useState(false);
   const [isNaverLoading, setIsNaverLoading] = useState(false);
+  const [showAdminModal, setShowAdminModal] = useState(false);
 
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
@@ -306,9 +308,20 @@ export function LoginPageClient() {
             >
               회원가입
             </Link>
+
+            {/* 관리자 로그인 */}
+            <button
+              type="button"
+              onClick={() => setShowAdminModal(true)}
+              className="mt-2 text-xs text-gray-300 transition-colors hover:text-gray-500 focus-visible:outline-none"
+            >
+              관리자 로그인
+            </button>
           </div>
         </div>
       </div>
+
+      {showAdminModal && <AdminCodeModal onClose={() => setShowAdminModal(false)} />}
     </div>
   );
 }
