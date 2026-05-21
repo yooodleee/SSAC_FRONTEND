@@ -309,11 +309,19 @@ export function LoginPageClient() {
               회원가입
             </Link>
 
-            {/* 관리자 로그인 */}
+            {/* 관리자 로그인 안내 + 버튼 */}
+            <p
+              className="whitespace-nowrap pt-2 text-center text-gray-400"
+              style={{ fontSize: '12px' }}
+            >
+              SSAC 관리자이신가요? 관리자 코드를 통해 바로 로그인하세요.
+            </p>
             <button
               type="button"
               onClick={() => setShowAdminModal(true)}
-              className="mt-2 text-xs text-gray-300 transition-colors hover:text-gray-500 focus-visible:outline-none"
+              disabled={isLoading}
+              className="flex h-[52px] w-full items-center justify-center rounded-full text-[15px] font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B4332] focus-visible:ring-offset-2"
+              style={{ backgroundColor: '#1B4332' }}
             >
               관리자 로그인
             </button>

@@ -26,11 +26,6 @@ const PANEL_NAV_ITEMS = [
   { label: '계정', href: '/home/account-settings' },
 ] as const;
 
-const ADMIN_NAV_ITEMS = [
-  { label: '관리자 홈', href: '/admin' },
-  { label: '피드백 관리', href: '/admin/feedbacks' },
-] as const;
-
 export function UserSidePanel({ isOpen, onClose, nickname }: UserSidePanelProps) {
   const router = useRouter();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -39,7 +34,7 @@ export function UserSidePanel({ isOpen, onClose, nickname }: UserSidePanelProps)
   useEffect(() => {
     fetch('/api/v1/auth/status')
       .then((r) => r.json())
-      .then((d: { role?: string }) => setRole(d.role ?? null))
+      .then((d: { data?: { role?: string } }) => setRole(d.data?.role ?? null))
       .catch(() => {});
   }, []);
 
@@ -160,29 +155,18 @@ export function UserSidePanel({ isOpen, onClose, nickname }: UserSidePanelProps)
                 </Link>
               </li>
             ))}
+            {role === 'ADMIN' && (
+              <li>
+                <Link
+                  href="/admin"
+                  onClick={onClose}
+                  className="flex min-h-[48px] items-center rounded-lg px-4 text-[15px] text-[#1A1A1A] transition-colors hover:bg-[#E8F5EE] hover:text-[#4CAF82] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4CAF82] dark:text-slate-300 dark:hover:bg-slate-800"
+                >
+                  관리자 홈
+                </Link>
+              </li>
+            )}
           </ul>
-
-          {role === 'ADMIN' && (
-            <>
-              <div className="my-3 border-t border-[#E8E8E8]" />
-              <p className="mb-1 px-4 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
-                관리자
-              </p>
-              <ul className="space-y-0.5">
-                {ADMIN_NAV_ITEMS.map((item) => (
-                  <li key={item.label}>
-                    <Link
-                      href={item.href}
-                      onClick={onClose}
-                      className="flex min-h-[48px] items-center rounded-lg px-4 text-[15px] text-[#1B4332] transition-colors hover:bg-[#E8F5EE] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4CAF82]"
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
         </nav>
       </div>
     </>,

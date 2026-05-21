@@ -3,13 +3,16 @@ import { FeedbackList } from '@/components/admin/FeedbackList';
 
 export default function AdminFeedbacksPage() {
   return (
-    <div className="flex min-h-screen bg-[#F9F9F9]">
-      <AdminSidebar />
+    <div className="min-h-screen bg-white">
+      <div className="mx-auto max-w-6xl px-4 pt-20 pb-6 sm:px-6 md:pt-28">
+        <div className="flex gap-6">
+          <AdminSidebar />
 
-      <main className="flex-1 px-8 py-8">
-        <h1 className="mb-6 text-xl font-bold text-[#1A1A1A]">피드백 관리</h1>
-        <FeedbackList />
-      </main>
+          <main className="min-w-0 flex-1 pb-20 md:pb-0">
+            <FeedbackList />
+          </main>
+        </div>
+      </div>
     </div>
   );
 }

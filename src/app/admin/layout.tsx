@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { LandingHeader } from '@/components/layout/LandingHeader';
 
 /**
  * /admin 레이아웃 — ADMIN 권한 가드
@@ -22,14 +23,20 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         cache: 'no-store',
       });
       if (res.ok) {
-        const data = (await res.json()) as { isAuthenticated?: boolean; role?: string };
-        if (!data.isAuthenticated) redirect('/login?redirectTo=/admin');
-        if (data.role !== 'ADMIN') redirect('/home');
+        const body = (await res.json()) as { data?: { isAuthenticated?: boolean; role?: string } };
+        const statusData = body.data;
+        if (!statusData?.isAuthenticated) redirect('/login?redirectTo=/admin');
+        if (statusData?.role !== 'ADMIN') redirect('/home');
       }
     } catch {
       // 네트워크 오류 시 통과 (빌드타임 등)
     }
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <LandingHeader isLoggedIn={true} />
+      {children}
+    </>
+  );
 }
