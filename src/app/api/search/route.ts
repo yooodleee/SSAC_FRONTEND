@@ -62,7 +62,7 @@ export async function GET(request: Request): Promise<Response> {
 
   const scored = posts
     .map((p) => ({
-      id: p.id,
+      id: String(p.id),
       title: p.title,
       summary: p.body.slice(0, 100).replace(/\n/g, ' '),
       category: getCategory(p.userId),

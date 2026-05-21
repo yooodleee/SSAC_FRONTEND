@@ -190,7 +190,11 @@
       "Bash(/api/v1/auth/admin/login)",
       "Bash(/api/v1/auth/status)",
       "Bash(/api/v1/admin/home)",
-      "Bash(/api/v1/admin/feedbacks)"
+      "Bash(/api/v1/admin/feedbacks)",
+      "Bash(SearchPanel.tsx)",
+      "Bash(::-webkit-search-cancel-button]:hidden)",
+      "Bash(isOpen/onOpen/onClose)",
+      "Bash(searchOpen)"
     ]
   }
 }

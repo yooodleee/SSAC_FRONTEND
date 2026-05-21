@@ -16,42 +16,23 @@
 import { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { UserSidePanel } from './UserSidePanel';
 import { MegaMenu, NAV_MENU_ITEMS } from '@/components/shared/MegaMenu';
 import type { NavMenuId } from '@/components/shared/MegaMenu';
+import { SearchPanel } from '@/components/shared/SearchPanel';
 
 interface LandingHeaderProps {
   isLoggedIn: boolean;
 }
 
-function SearchIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className="h-4 w-4 flex-shrink-0 text-white/50"
-    >
-      <circle cx="11" cy="11" r="8" />
-      <path d="M21 21l-4.35-4.35" />
-    </svg>
-  );
-}
-
 export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sidePanelOpen, setSidePanelOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
   const [openTab, setOpenTab] = useState<NavMenuId | null>(null);
-  const router = useRouter();
+  const [searchOpen, setSearchOpen] = useState(false);
   const pathname = usePathname();
   const { nickname } = useCurrentUser(isLoggedIn);
 
@@ -66,18 +47,12 @@ export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
 
   const handleTabToggle = useCallback((tabId: NavMenuId) => {
     setOpenTab((prev) => (prev === tabId ? null : tabId));
+    setSearchOpen(false);
   }, []);
 
   const closePanel = useCallback(() => {
     setOpenTab(null);
   }, []);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchValue.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchValue.trim())}`);
-    }
-  };
 
   return (
     <>
@@ -141,24 +116,16 @@ export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
             {/* 검색창 + 인증 버튼 — 중앙(left-1/2)부터 우측 끝까지 */}
             <div className="absolute left-1/2 right-0 hidden items-center gap-3 pl-3 md:flex">
               {/* 검색창 — 남은 공간 채움 */}
-              <form onSubmit={handleSearch} className="flex-1">
-                <label htmlFor="global-search" className="sr-only">
-                  검색어 입력
-                </label>
-                <div className="relative flex w-full items-center">
-                  <span className="pointer-events-none absolute left-3">
-                    <SearchIcon />
-                  </span>
-                  <input
-                    id="global-search"
-                    type="search"
-                    placeholder="검색어 입력"
-                    value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
-                    className="w-full rounded-full bg-white/10 py-2.5 pl-9 pr-4 text-sm text-white placeholder-white/50 outline-none transition-colors focus:bg-white/20"
-                  />
-                </div>
-              </form>
+              <div className="flex-1">
+                <SearchPanel
+                  isOpen={searchOpen}
+                  onOpen={() => {
+                    setSearchOpen(true);
+                    setOpenTab(null);
+                  }}
+                  onClose={() => setSearchOpen(false)}
+                />
+              </div>
 
               {/* 인증 버튼 */}
               {isLoggedIn ? (
@@ -229,24 +196,9 @@ export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
             className="border-t border-white/10 bg-black px-4 py-4 md:hidden"
           >
             {/* 검색 (모바일) */}
-            <form onSubmit={handleSearch} className="mb-4">
-              <label htmlFor="global-search-mobile" className="sr-only">
-                검색어 입력
-              </label>
-              <div className="relative flex items-center">
-                <span className="pointer-events-none absolute left-3">
-                  <SearchIcon />
-                </span>
-                <input
-                  id="global-search-mobile"
-                  type="search"
-                  placeholder="검색어 입력"
-                  value={searchValue}
-                  onChange={(e) => setSearchValue(e.target.value)}
-                  className="w-full rounded-full bg-white/10 py-2.5 pl-9 pr-4 text-sm text-white placeholder-white/50 outline-none"
-                />
-              </div>
-            </form>
+            <div className="mb-4">
+              <SearchPanel />
+            </div>
 
             {/* 메뉴 */}
             <nav className="flex flex-col gap-1">

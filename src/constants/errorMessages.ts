@@ -29,4 +29,5 @@ export const ERROR_MESSAGES: Record<string, string> = {
   'ADMIN-001': '관리자 코드가 올바르지 않습니다.',
   'ADMIN-002': '관리자 권한이 필요합니다.',
   'ADMIN-003': '관리자 계정을 찾을 수 없습니다.',
+  'SEARCH-001': '검색어를 입력해주세요.',
 };

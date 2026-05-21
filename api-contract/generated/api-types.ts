@@ -2,7 +2,7 @@
 // ⚠️  이 파일은 자동 생성됩니다 — 절대 수동으로 편집하지 마세요.
 // 생성 명령: npm run sync:api
 // 소스: http://172.17.96.1:8080/api-docs/swagger.json
-// 생성 시각: 2026-05-20 20:34:02
+// 생성 시각: 2026-05-21 15:55:46
 // ============================================================
 
 /**
@@ -403,6 +403,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/codes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 관리자 코드 발급
+         * @description [권한 조건] ADMIN 역할 전용. 발급된 rawCode는 이 응답에서 단 한 번만 노출된다. adminUserId는 ADMIN 역할을 가진 사용자여야 한다.
+         */
+        post: operations["createAdminCode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/events/menu-click": {
         parameters: {
             query?: never;
@@ -736,6 +756,52 @@ export interface paths {
          *     [권한 조건] 로그인 회원 전용 (USER, ADMIN).
          */
         get: operations["getViewedContents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 콘텐츠 검색
+         * @description [호출 화면] 검색 결과 화면.
+         *     [권한 조건] 공개 (로그인 불필요).
+         *     [특이 동작] 검색어 제출 시 인기 검색어 집계가 누적된다.
+         *                 빈 검색어 요청 시 400 / SEARCH-001.
+         */
+        get: operations["search"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/search/suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 검색어 자동완성
+         * @description [호출 화면] 검색 입력 중 실시간 자동완성.
+         *     [권한 조건] 공개 (로그인 불필요).
+         *     [특이 동작] q가 비어 있으면 인기 검색어 10개를 반환한다.
+         *                 초성 검색 지원 (예: ㄱ → ㄱ으로 시작하는 콘텐츠).
+         */
+        get: operations["getSuggestions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1582,6 +1648,28 @@ export interface components {
             message?: string;
             loginRequired?: boolean;
         };
+        AdminCodeCreateRequest: {
+            /** Format: int64 */
+            adminUserId?: number;
+            /** Format: date-time */
+            expiresAt?: string;
+        };
+        AdminCodeCreateResponse: {
+            codeId?: string;
+            rawCode?: string;
+            /** Format: int64 */
+            adminUserId?: number;
+            /** Format: date-time */
+            expiresAt?: string;
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        ApiResponseAdminCodeCreateResponse: {
+            success?: boolean;
+            data?: components["schemas"]["AdminCodeCreateResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
         MenuClickRequest: {
             eventType: string;
             menuId: string;
@@ -1752,6 +1840,53 @@ export interface components {
             totalCount?: number;
             contents?: components["schemas"]["ViewedContentDto"][];
         };
+        ApiResponseSearchResultResponse: {
+            success?: boolean;
+            data?: components["schemas"]["SearchResultResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
+        SearchItem: {
+            id?: string;
+            title?: string;
+            category?: string;
+            categoryEmoji?: string;
+            difficulty?: string;
+            difficultyLabel?: string;
+            /** Format: int32 */
+            estimatedMinutes?: number;
+            highlightedTitle?: string;
+        };
+        SearchResultResponse: {
+            query?: string;
+            /** Format: int64 */
+            totalCount?: number;
+            /** Format: int32 */
+            page?: number;
+            /** Format: int32 */
+            size?: number;
+            results?: components["schemas"]["SearchItem"][];
+        };
+        ApiResponseSearchSuggestionResponse: {
+            success?: boolean;
+            data?: components["schemas"]["SearchSuggestionResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
+        SearchSuggestionResponse: {
+            query?: string;
+            suggestions?: components["schemas"]["SuggestionItem"][];
+            /** Format: int32 */
+            totalCount?: number;
+        };
+        SuggestionItem: {
+            id?: string;
+            keyword?: string;
+            category?: string;
+            categoryEmoji?: string;
+            /** Format: int64 */
+            popularity?: number;
+        };
         ApiResponseRecommendationResponse: {
             success?: boolean;
             data?: components["schemas"]["RecommendationResponse"];
@@ -1835,9 +1970,9 @@ export interface components {
             sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
             pageNumber?: number;
+            paged?: boolean;
             /** Format: int32 */
             pageSize?: number;
-            paged?: boolean;
             unpaged?: boolean;
         };
         QuizAttemptSummaryResponse: {
@@ -3282,6 +3417,66 @@ export interface operations {
             };
         };
     };
+    createAdminCode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminCodeCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description 코드 발급 성공 (rawCode 1회 노출) */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminCodeCreateResponse"];
+                };
+            };
+            /** @description 대상 사용자가 ADMIN 역할이 아님 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminCodeCreateResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 존재하지 않는 사용자 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminCodeCreateResponse"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
     recordMenuClick: {
         parameters: {
             query?: never;
@@ -4057,6 +4252,107 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ApiResponseViewedContentsResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    search: {
+        parameters: {
+            query: {
+                /** @description 검색어 */
+                q: string;
+                /**
+                 * @description 페이지 번호 (1부터 시작)
+                 * @example 1
+                 */
+                page?: number;
+                /**
+                 * @description 페이지 크기
+                 * @example 20
+                 */
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 검색 결과 반환 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseSearchResultResponse"];
+                };
+            };
+            /** @description SEARCH-001: 검색어 미입력 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseSearchResultResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    getSuggestions: {
+        parameters: {
+            query?: {
+                /** @description 검색어 (비어있으면 인기 검색어 반환) */
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 자동완성 결과 반환 (결과 없으면 빈 배열) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseSearchSuggestionResponse"];
                 };
             };
             /** @description 인증 토큰이 없거나 만료되었습니다. */
