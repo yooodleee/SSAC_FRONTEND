@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
-import { OnboardingTest } from '@/features/onboarding/OnboardingTest';
+import { cookies } from 'next/headers';
+import { OnboardingTestFlow } from '@/features/onboarding/OnboardingTestFlow';
 
 export const metadata: Metadata = { title: '온보딩 테스트' };
 
-export default function OnboardingTestPage() {
-  return (
-    <div className="mx-auto max-w-[390px] px-5 py-8">
-      <OnboardingTest />
-    </div>
-  );
+export default async function OnboardingTestPage() {
+  const cookieStore = await cookies();
+  const isLoggedIn = cookieStore.has('accessToken');
+
+  return <OnboardingTestFlow isLoggedIn={isLoggedIn} />;
 }
