@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { components } from '@/../api-contract/generated/api-types';
 import { onboardingService } from '@/services/onboarding';
+import { LandingHeader } from '@/components/layout/LandingHeader';
 import { cn } from '@/lib/utils';
 
 type QuestionDto = components['schemas']['QuestionDto'];
@@ -127,8 +128,8 @@ function TypeStep({ userType, onSelect }: TypeStepProps) {
       <p className="text-center font-bold text-white" style={{ fontSize: '22px' }}>
         사용자 유형을 선택해주세요
       </p>
-      {/* 버튼 폭 약 1/3로 제한, 화면 중앙 배치 */}
-      <div className="flex w-full max-w-[260px] flex-col gap-3">
+      {/* 버튼 폭 2.5배 확장, 화면 중앙 배치 */}
+      <div className="flex w-full max-w-[650px] flex-col gap-3">
         <OptionButton
           label="수능이 끝난 고등학교 3학년이에요"
           selected={userType === 'HIGH_SCHOOL'}
@@ -242,7 +243,7 @@ function CompleteStep({ onLogin }: { onLogin: () => void }) {
 
 // ─── Main OnboardingFlow ──────────────────────────────────────────────────────
 
-export function OnboardingFlow() {
+export function OnboardingFlow({ isLoggedIn }: { isLoggedIn: boolean }) {
   const router = useRouter();
 
   // Lazy-initialize state from sessionStorage to avoid setState-in-effect
@@ -398,102 +399,112 @@ export function OnboardingFlow() {
   // ─── Render ───────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex min-h-full flex-col">
-      {/* Image section — 25vh with dark overlay */}
-      <div className="relative flex-shrink-0" style={{ height: '25vh' }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/onboarding.png"
-          alt=""
-          aria-hidden="true"
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-        />
-        {/* Overlay */}
-        <div
-          className="absolute inset-0"
-          aria-hidden="true"
-          style={{ background: 'rgba(0, 0, 0, 0.4)' }}
-        />
+    <>
+      {/* LandingHeader: fixed bg-black, z-50, h-16(64px) */}
+      <LandingHeader isLoggedIn={isLoggedIn} />
 
-        {/* Chevron navigation bar (overlaid at top of image) */}
-        <div className="absolute left-0 right-0 top-0 flex items-center justify-between px-4 py-3 text-white">
-          {/* Left chevron — prev */}
-          <button
-            type="button"
-            onClick={handlePrev}
-            aria-label="이전"
-            className="rounded p-1 transition-colors duration-200 hover:bg-white/10 active:bg-white/20 motion-reduce:transition-none"
-          >
-            <ChevronLeft />
-          </button>
+      {/* pt-16: 고정 헤더(64px) 아래부터 콘텐츠 시작
+          min-h-screen + bg #1A1A1A: 페이지 전체를 다크 배경으로 채움 */}
+      <div
+        className="flex flex-col"
+        style={{ minHeight: '100vh', paddingTop: '64px', backgroundColor: '#1A1A1A' }}
+      >
+        {/* Image section — 25vh with dark overlay */}
+        <div className="relative flex-shrink-0" style={{ height: '25vh' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/onboarding.png"
+            alt=""
+            aria-hidden="true"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+          {/* Overlay */}
+          <div
+            className="absolute inset-0"
+            aria-hidden="true"
+            style={{ background: 'rgba(0, 0, 0, 0.4)' }}
+          />
 
-          {/* Right: progress counter + next chevron or 완료 button */}
-          <div className="flex items-center gap-2">
-            {step === 'question' && (
-              <span className="text-sm font-medium" aria-hidden="true">
-                {currentQuestion} / {totalQuestions}
-              </span>
-            )}
+          {/* Chevron navigation bar (overlaid at top of image) */}
+          <div className="absolute left-0 right-0 top-0 flex items-center justify-between px-4 py-3 text-white">
+            {/* Left chevron — prev */}
+            <button
+              type="button"
+              onClick={handlePrev}
+              aria-label="이전"
+              className="rounded p-1 transition-colors duration-200 hover:bg-white/10 active:bg-white/20 motion-reduce:transition-none"
+            >
+              <ChevronLeft />
+            </button>
 
-            {step === 'question' && isLastQuestion ? (
-              <button
-                type="button"
-                onClick={handleNext}
-                className="font-semibold text-white transition-[filter] duration-200 hover:brightness-110 active:brightness-90 motion-reduce:transition-none"
-                style={{
-                  backgroundColor: '#1B4332',
-                  borderRadius: '6px',
-                  padding: '8px 16px',
-                  fontSize: '14px',
-                }}
-              >
-                완료
-              </button>
-            ) : step !== 'complete' ? (
-              <button
-                type="button"
-                onClick={handleNext}
-                aria-label="다음"
-                className="rounded p-1 transition-colors duration-200 hover:bg-white/10 active:bg-white/20 motion-reduce:transition-none"
-              >
-                <ChevronRight />
-              </button>
-            ) : null}
+            {/* Right: progress counter + next chevron or 완료 button */}
+            <div className="flex items-center gap-2">
+              {step === 'question' && (
+                <span className="text-sm font-medium" aria-hidden="true">
+                  {currentQuestion} / {totalQuestions}
+                </span>
+              )}
+
+              {step === 'question' && isLastQuestion ? (
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="font-semibold text-white transition-[filter] duration-200 hover:brightness-110 active:brightness-90 motion-reduce:transition-none"
+                  style={{
+                    backgroundColor: '#1B4332',
+                    borderRadius: '6px',
+                    padding: '8px 16px',
+                    fontSize: '14px',
+                  }}
+                >
+                  완료
+                </button>
+              ) : step !== 'complete' ? (
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  aria-label="다음"
+                  className="rounded p-1 transition-colors duration-200 hover:bg-white/10 active:bg-white/20 motion-reduce:transition-none"
+                >
+                  <ChevronRight />
+                </button>
+              ) : null}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Dark content section */}
-      <div
-        className="flex flex-1 flex-col px-5 py-8"
-        style={{ backgroundColor: '#1A1A1A', color: '#FFFFFF' }}
-      >
-        {step === 'type' && (
-          <TypeStep userType={userType} onSelect={(t) => updateFlow({ userType: t })} />
-        )}
-        {step === 'question' && (
-          <QuestionStep
-            question={currentQ}
-            currentQuestion={currentQuestion}
-            totalQuestions={totalQuestions}
-            selectedOptionIndex={currentAnswer?.optionIndex ?? null}
-            onSelect={handleSelectOption}
-            isLoading={isLoadingQuestions}
-          />
-        )}
-        {step === 'complete' && <CompleteStep onLogin={() => router.push('/login')} />}
-      </div>
-
-      {/* Toast */}
-      {toastMessage && (
+        {/* Dark content section */}
         <div
-          role="alert"
-          aria-live="assertive"
-          className="fixed bottom-24 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-black/80 px-4 py-2 text-sm text-white backdrop-blur-sm"
+          className="flex flex-1 flex-col px-5 py-8"
+          style={{ backgroundColor: '#1A1A1A', color: '#FFFFFF' }}
         >
-          {toastMessage}
+          {step === 'type' && (
+            <TypeStep userType={userType} onSelect={(t) => updateFlow({ userType: t })} />
+          )}
+          {step === 'question' && (
+            <QuestionStep
+              question={currentQ}
+              currentQuestion={currentQuestion}
+              totalQuestions={totalQuestions}
+              selectedOptionIndex={currentAnswer?.optionIndex ?? null}
+              onSelect={handleSelectOption}
+              isLoading={isLoadingQuestions}
+            />
+          )}
+          {step === 'complete' && <CompleteStep onLogin={() => router.push('/login')} />}
         </div>
-      )}
-    </div>
+
+        {/* Toast */}
+        {toastMessage && (
+          <div
+            role="alert"
+            aria-live="assertive"
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-black/80 px-4 py-2 text-sm text-white backdrop-blur-sm"
+          >
+            {toastMessage}
+          </div>
+        )}
+      </div>
+    </>
   );
 }
