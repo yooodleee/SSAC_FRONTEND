@@ -42,8 +42,11 @@ async function onboardingFetch<T>(path: string, init?: RequestInit): Promise<T> 
 }
 
 export const onboardingService = {
-  getQuestions(): Promise<OnboardingQuestionsResponse> {
-    return onboardingFetch<OnboardingQuestionsResponse>('/api/v1/onboarding/questions');
+  getQuestions(userType?: 'HIGH_SCHOOL' | 'EARLY_CAREER'): Promise<OnboardingQuestionsResponse> {
+    const url = userType
+      ? `/api/v1/onboarding/questions?userType=${userType}`
+      : '/api/v1/onboarding/questions';
+    return onboardingFetch<OnboardingQuestionsResponse>(url);
   },
 
   submitAnswers(body: OnboardingSubmitRequest): Promise<OnboardingSubmitResponse> {
