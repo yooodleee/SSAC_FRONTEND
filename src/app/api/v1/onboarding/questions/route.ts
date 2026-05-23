@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server';
  * accessToken 쿠키를 읽어 BE로 프록시한다.
  * BE 응답(성공/에러)을 그대로 전달하여 클라이언트가 errorCode를 처리할 수 있게 한다.
  */
-export async function GET(): Promise<Response> {
+export async function GET(request: Request): Promise<Response> {
   const cookieStore = await cookies();
   const token = cookieStore.get('accessToken')?.value;
   const apiBaseUrl = process.env.API_BASE_URL;
@@ -15,8 +15,15 @@ export async function GET(): Promise<Response> {
     return NextResponse.json({ errorCode: 'SERVER_ERROR' }, { status: 500 });
   }
 
+  // Forward userType query param for unauthenticated onboarding flow
+  const { searchParams } = new URL(request.url);
+  const userType = searchParams.get('userType');
+  const upstreamUrl = userType
+    ? `${apiBaseUrl}/api/v1/onboarding/questions?userType=${userType}`
+    : `${apiBaseUrl}/api/v1/onboarding/questions`;
+
   try {
-    const upstream = await fetch(`${apiBaseUrl}/api/v1/onboarding/questions`, {
+    const upstream = await fetch(upstreamUrl, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
       cache: 'no-store',
     });

@@ -2,7 +2,7 @@
 // ⚠️  이 파일은 자동 생성됩니다 — 절대 수동으로 편집하지 마세요.
 // 생성 명령: npm run sync:api
 // 소스: http://172.17.96.1:8080/api-docs/swagger.json
-// 생성 시각: 2026-05-21 15:55:46
+// 생성 시각: 2026-05-23 15:49:57
 // ============================================================
 
 /**
@@ -941,8 +941,10 @@ export interface paths {
         /**
          * 온보딩 문제 조회
          * @description [호출 화면] 온보딩 테스트 시작 시 호출.
-         *     [권한 조건] 로그인 회원 전용 (USER, ADMIN).
-         *     [특이 동작] userType 미설정 시 400, 이미 완료한 경우 409 반환.
+         *     [권한 조건] 비로그인 허용 (userType 쿼리 파라미터 필수) / 로그인 시 계정 userType 자동 적용.
+         *     [특이 동작]
+         *     - 비로그인: userType 쿼리 파라미터 필수. 없으면 400, 유효하지 않으면 400.
+         *     - 로그인: 계정의 userType 기반 조회. userType 미설정 시 400, 이미 완료 시 409.
          */
         get: operations["getQuestions"];
         put?: never;
@@ -1970,9 +1972,9 @@ export interface components {
             sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
             pageNumber?: number;
-            paged?: boolean;
             /** Format: int32 */
             pageSize?: number;
+            paged?: boolean;
             unpaged?: boolean;
         };
         QuizAttemptSummaryResponse: {
@@ -4686,7 +4688,9 @@ export interface operations {
     };
     getQuestions: {
         parameters: {
-            query?: never;
+            query?: {
+                userType?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -4702,7 +4706,7 @@ export interface operations {
                     "*/*": components["schemas"]["ApiResponseOnboardingQuestionsResponse"];
                 };
             };
-            /** @description ONBOARDING-001: userType 미설정 */
+            /** @description ONBOARDING-001: userType 미설정 / USER-TYPE-002: 유효하지 않은 userType */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -4720,7 +4724,7 @@ export interface operations {
                     "application/json": components["schemas"]["ApiResponseError"];
                 };
             };
-            /** @description ONBOARDING-002: 이미 온보딩 완료 */
+            /** @description ONBOARDING-002: 이미 온보딩 완료 (로그인 사용자) */
             409: {
                 headers: {
                     [name: string]: unknown;

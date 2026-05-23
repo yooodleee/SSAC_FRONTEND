@@ -194,7 +194,17 @@
       "Bash(SearchPanel.tsx)",
       "Bash(::-webkit-search-cancel-button]:hidden)",
       "Bash(isOpen/onOpen/onClose)",
-      "Bash(searchOpen)"
+      "Bash(searchOpen)",
+      "Bash(/onboarding)",
+      "Bash(])",
+      "Bash(/onboarding/submit)",
+      "Bash(onboarding_answers)",
+      "Bash(OnboardingTest)",
+      "Bash(OnboardingFlow.tsx)",
+      "Bash(sessionStorage)",
+      "Bash(userType)",
+      "Bash(OnboardingTestFlow.tsx)",
+      "Bash(/onboarding/test/page.tsx)"
     ]
   }
 }

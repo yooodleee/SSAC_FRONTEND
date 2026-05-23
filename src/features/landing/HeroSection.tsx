@@ -12,15 +12,11 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-interface HeroSectionProps {
-  isLoggedIn: boolean;
-}
-
-export function HeroSection({ isLoggedIn }: HeroSectionProps) {
+export function HeroSection() {
   const router = useRouter();
 
   const handleCTA = () => {
-    router.push(isLoggedIn ? '/home' : '/login');
+    router.push('/onboarding');
   };
 
   return (

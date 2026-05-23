@@ -69,7 +69,8 @@ export function OnboardingTest() {
     } catch (err) {
       const error = err as { code?: string; loginRequired?: boolean; status?: number };
       if (error.loginRequired || error.status === 401) {
-        router.replace('/login');
+        // 비로그인 사용자 → 새 온보딩 플로우로 이동
+        router.replace('/onboarding');
         return;
       }
       if (error.code === 'ONBOARDING-001') {

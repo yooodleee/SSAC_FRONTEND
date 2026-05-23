@@ -104,8 +104,13 @@ function NaverCallbackContent() {
           return;
         }
 
-        // 기존 회원: 로그인 전 페이지로 이동
+        // 기존 회원: 온보딩 미제출 답변 확인 후 자동 제출 또는 원래 페이지로 이동
         // window.location.replace 사용 — Header(Server Component)가 새 accessToken 쿠키를 반드시 읽도록 강제
+        const pendingAnswers = sessionStorage.getItem('onboarding_answers');
+        if (pendingAnswers) {
+          window.location.replace('/onboarding/submit');
+          return;
+        }
         const redirectTo = getSafeRedirectTo(sessionStorage.getItem('naverRedirectTo'));
         sessionStorage.removeItem('naverRedirectTo');
         window.location.replace(redirectTo);

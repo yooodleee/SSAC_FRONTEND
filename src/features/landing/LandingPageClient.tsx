@@ -85,7 +85,7 @@ export function LandingPageClient({ isLoggedIn }: LandingPageClientProps) {
       <LandingHeader isLoggedIn={isLoggedIn} />
 
       {/* 섹션 1: 브랜딩 히어로 */}
-      <HeroSection isLoggedIn={isLoggedIn} />
+      <HeroSection />
 
       {/* 섹션 2: 콘텐츠 갤러리 */}
       <ContentGallery />
