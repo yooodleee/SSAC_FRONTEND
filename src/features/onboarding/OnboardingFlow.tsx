@@ -90,17 +90,19 @@ interface OptionButtonProps {
   label: string;
   selected: boolean;
   onClick: () => void;
+  centered?: boolean;
 }
 
-function OptionButton({ label, selected, onClick }: OptionButtonProps) {
+function OptionButton({ label, selected, onClick, centered = false }: OptionButtonProps) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        'w-full min-h-[48px] rounded-lg border px-4 py-3 text-left text-sm font-medium text-white',
+        'w-full min-h-[48px] rounded-lg border px-4 py-3 text-sm font-medium text-white',
         'transition-colors [transition-duration:200ms]',
         'motion-reduce:transition-none',
+        centered ? 'text-center' : 'text-left',
         selected
           ? 'border-[#1B4332] bg-[#1B4332]'
           : 'border-white/20 bg-white/10 hover:bg-white/15',
@@ -121,20 +123,23 @@ interface TypeStepProps {
 
 function TypeStep({ userType, onSelect }: TypeStepProps) {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col items-center gap-6">
       <p className="text-center font-bold text-white" style={{ fontSize: '22px' }}>
         사용자 유형을 선택해주세요
       </p>
-      <div className="flex flex-col gap-3">
+      {/* 버튼 폭 약 1/3로 제한, 화면 중앙 배치 */}
+      <div className="flex w-full max-w-[260px] flex-col gap-3">
         <OptionButton
           label="수능이 끝난 고등학교 3학년이에요"
           selected={userType === 'HIGH_SCHOOL'}
           onClick={() => onSelect('HIGH_SCHOOL')}
+          centered
         />
         <OptionButton
           label="사회초년생이에요"
           selected={userType === 'EARLY_CAREER'}
           onClick={() => onSelect('EARLY_CAREER')}
+          centered
         />
       </div>
     </div>
@@ -273,7 +278,18 @@ export function OnboardingFlow() {
       onboardingService
         .getQuestions(userType)
         .then((data) => setQuestions(data.questions ?? []))
-        .catch(() => setToastMessage('문제를 불러오지 못했어요.'))
+        .catch((err: unknown) => {
+          const error = err as { code?: string };
+          if (error.code === 'ONBOARDING-001') {
+            router.replace('/signup/type');
+            return;
+          }
+          if (error.code === 'ONBOARDING-002') {
+            router.replace('/home');
+            return;
+          }
+          setToastMessage('문제를 불러오지 못했어요.');
+        })
         .finally(() => setIsLoadingQuestions(false));
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -319,7 +335,20 @@ export function OnboardingFlow() {
           setQuestions(data.questions ?? []);
           updateFlow({ step: 'question', currentQuestion: 1 });
         })
-        .catch(() => setToastMessage('문제를 불러오지 못했어요. 잠시 후 다시 시도해주세요.'))
+        .catch((err: unknown) => {
+          const error = err as { code?: string; status?: number };
+          if (error.code === 'ONBOARDING-001') {
+            // 로그인 유저 userType 미설정 → 회원가입 유형 선택 페이지로
+            router.replace('/signup/type');
+            return;
+          }
+          if (error.code === 'ONBOARDING-002') {
+            // 이미 온보딩 완료 → 홈으로
+            router.replace('/home');
+            return;
+          }
+          setToastMessage('문제를 불러오지 못했어요. 잠시 후 다시 시도해주세요.');
+        })
         .finally(() => setIsLoadingQuestions(false));
       return;
     }
@@ -374,7 +403,7 @@ export function OnboardingFlow() {
       <div className="relative flex-shrink-0" style={{ height: '25vh' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/hero-bg.png"
+          src="/images/onboarding.png"
           alt=""
           aria-hidden="true"
           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
