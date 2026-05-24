@@ -204,7 +204,12 @@
       "Bash(sessionStorage)",
       "Bash(userType)",
       "Bash(OnboardingTestFlow.tsx)",
-      "Bash(/onboarding/test/page.tsx)"
+      "Bash(/onboarding/test/page.tsx)",
+      "Bash(src/app/onboarding/result/page.tsx)",
+      "Bash(src/features/onboarding/OnboardingResult.tsx)",
+      "Bash(src/features/onboarding/OnboardingTestFlow.tsx)",
+      "Bash(?redirectTo=/onboarding/submit)",
+      "Bash(services/onboarding.ts)"
     ]
   }
 }
