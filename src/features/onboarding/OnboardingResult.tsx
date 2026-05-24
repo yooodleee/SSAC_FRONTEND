@@ -1,37 +1,160 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import type { components } from '@/../api-contract/generated/api-types';
+import { cn } from '@/lib/utils';
 import { onboardingService, type OnboardingResultBffResponse } from '@/services/onboarding';
-import { getErrorMessage } from '@/lib/errorMessages';
-import { toastStore } from '@/lib/toastStore';
-import { Button } from '@/components/ui/Button';
-import { LevelMascot } from './LevelMascot';
-import { DomainCard } from './DomainCard';
-import { OnboardingResultSkeleton } from './OnboardingResultSkeleton';
+import { LandingHeader } from '@/components/layout/LandingHeader';
 
 type Level = 'SEED' | 'SPROUT' | 'TREE';
-type RecommendedDomainDto = components['schemas']['RecommendedDomainDto'];
 
-const MAX_DOMAINS = 3;
-
-const LEVEL_INFO: Record<Level, { titleSuffix: string; fallbackDesc: string }> = {
+const LEVEL_CONFIG: Record<Level, { label: string; desc: string; image: string }> = {
   SEED: {
-    titleSuffix: '금융 씨앗이에요!',
-    fallbackDesc: '금융이 완전 처음이어도 괜찮아요.\nSSAC이 처음부터 차근차근 알려드릴게요',
+    label: '씨앗',
+    desc: '금융이 완전 처음이어도 괜찮아요',
+    image: '/images/level-seed.png',
   },
   SPROUT: {
-    titleSuffix: '금융 새싹이에요!',
-    fallbackDesc: '조금은 알고 있어요.\nSSAC과 함께 더 깊이 알아봐요',
+    label: '새싹',
+    desc: '조금은 알고 있어요',
+    image: '/images/level-sprout.png',
   },
   TREE: {
-    titleSuffix: '금융 나무예요!',
-    fallbackDesc: '어느 정도 알고 있어요.\nSSAC과 함께 전문가로 성장해봐요',
+    label: '나무',
+    desc: '어느 정도 알고 있어요',
+    image: '/images/level-tree.png',
   },
 };
 
-const SKIPPED_DESC = '기본 레벨(씨앗)로 시작할게요.\n마이페이지에서 언제든 테스트할 수 있어요 😊';
+const FALLBACK_IMAGE = '/images/hello.png';
+
+// ─── 로딩 스켈레톤 ───────────────────────────────────────────────────────────
+
+function LoadingSkeleton() {
+  return (
+    <>
+      {/* 이미지 영역 스켈레톤 */}
+      <div
+        className="animate-pulse motion-reduce:animate-none flex-shrink-0"
+        style={{ height: '25vh', backgroundColor: '#2A2A2A' }}
+        aria-hidden="true"
+      />
+
+      {/* 텍스트 + 버튼 스켈레톤 */}
+      <div
+        className="flex flex-1 flex-col items-center justify-center gap-6 px-5 py-10"
+        aria-busy="true"
+        aria-label="결과 로딩 중"
+      >
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-64 animate-pulse rounded-lg bg-[#2A2A2A] motion-reduce:animate-none" />
+          <div className="h-5 w-48 animate-pulse rounded bg-[#2A2A2A] motion-reduce:animate-none" />
+          <div className="h-5 w-56 animate-pulse rounded bg-[#2A2A2A] motion-reduce:animate-none" />
+        </div>
+        <div className="h-12 w-64 animate-pulse rounded-xl bg-[#2A2A2A] motion-reduce:animate-none" />
+      </div>
+    </>
+  );
+}
+
+// ─── 에러 뷰 ─────────────────────────────────────────────────────────────────
+
+interface ErrorViewProps {
+  message: string;
+  onRetry: () => void;
+}
+
+function ErrorView({ message, onRetry }: ErrorViewProps) {
+  return (
+    <div
+      className="flex flex-1 flex-col items-center justify-center gap-4 px-5 py-10 text-center"
+      role="alert"
+    >
+      <p className="whitespace-pre-line text-base leading-relaxed text-white">{message}</p>
+      <button
+        type="button"
+        onClick={onRetry}
+        className={cn(
+          'min-h-[48px] rounded-xl px-6 py-3 text-base font-medium text-white',
+          'bg-[#1B4332] hover:bg-[#145229]',
+          'transition-[background] duration-200 ease-in-out motion-reduce:transition-none',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50',
+        )}
+      >
+        재시도
+      </button>
+    </div>
+  );
+}
+
+// ─── 결과 뷰 ─────────────────────────────────────────────────────────────────
+
+interface ResultViewProps {
+  result: OnboardingResultBffResponse;
+  onCta: () => void;
+}
+
+function ResultView({ result, onCta }: ResultViewProps) {
+  const [imgFailed, setImgFailed] = useState(false);
+
+  const level = (result.level as Level) ?? 'SEED';
+  const cfg = LEVEL_CONFIG[level] ?? LEVEL_CONFIG.SEED;
+  const levelLabel = result.levelLabel ?? cfg.label;
+  const levelDesc = result.levelDescription ?? cfg.desc;
+  const nickname = result.nickname ?? '';
+  const bgSrc = imgFailed ? FALLBACK_IMAGE : cfg.image;
+
+  return (
+    <>
+      {/* 배경 이미지 영역 — /onboarding 페이지와 동일 */}
+      <div className="relative flex-shrink-0" style={{ height: '25vh' }}>
+        <img
+          src={bgSrc}
+          alt=""
+          aria-hidden="true"
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          onError={() => setImgFailed(true)}
+        />
+        <div
+          className="absolute inset-0"
+          aria-hidden="true"
+          style={{ background: 'rgba(0, 0, 0, 0.4)' }}
+        />
+      </div>
+
+      {/* 텍스트 + CTA 영역 */}
+      <div className="flex flex-1 flex-col items-center justify-center gap-6 px-5 py-10 text-center">
+        <div className="flex flex-col gap-3">
+          <p style={{ fontSize: '22px', fontWeight: 700, lineHeight: 1.3, color: '#FFFFFF' }}>
+            <span style={{ color: '#1B4332' }}>{nickname}</span>
+            님은 금융 <span style={{ color: '#1B4332' }}>{levelLabel}</span>
+            이에요!
+          </p>
+          <p style={{ fontSize: '16px', lineHeight: 1.6, color: '#FFFFFF' }}>{levelDesc}</p>
+          <p style={{ fontSize: '16px', lineHeight: 1.6, color: '#FFFFFF' }}>
+            걱정 마세요, SSAC이 차근차근 도와드릴게요
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={onCta}
+          className={cn(
+            'min-h-[48px] rounded-xl px-8 py-4 text-base font-medium text-white',
+            'bg-[#1B4332] hover:bg-[#145229]',
+            'transition-[background] duration-200 ease-in-out motion-reduce:transition-none',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50',
+          )}
+        >
+          나의 학습 공간으로 이동하기 →
+        </button>
+      </div>
+    </>
+  );
+}
+
+// ─── 메인 컴포넌트 ────────────────────────────────────────────────────────────
 
 export function OnboardingResult() {
   const router = useRouter();
@@ -39,10 +162,6 @@ export function OnboardingResult() {
   const [result, setResult] = useState<OnboardingResultBffResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
-
   const fetchedRef = useRef(false);
 
   const loadResult = useCallback(async () => {
@@ -50,6 +169,10 @@ export function OnboardingResult() {
     setFetchError(null);
     try {
       const data = await onboardingService.getResult();
+      if (!data.onboardingCompleted) {
+        router.replace('/onboarding');
+        return;
+      }
       setResult(data);
     } catch (err) {
       const error = err as { code?: string; loginRequired?: boolean; status?: number };
@@ -58,17 +181,15 @@ export function OnboardingResult() {
         router.replace('/login');
         return;
       }
-      // 온보딩 미완료 → 테스트 페이지로
       if (error.status === 404 || error.code === 'ONBOARDING-006') {
-        router.replace('/onboarding/test');
+        router.replace('/onboarding');
         return;
       }
-      // 이미 관심 도메인까지 완료 → 홈으로
       if (error.code === 'ONBOARDING-002') {
         router.replace('/home');
         return;
       }
-      setFetchError('결과를 불러오지 못했어요. 잠시 후 다시 시도해주세요.');
+      setFetchError('결과를 불러오지 못했어요.\n잠시 후 다시 시도해주세요.');
     } finally {
       setIsLoading(false);
     }
@@ -80,135 +201,38 @@ export function OnboardingResult() {
     loadResult();
   }, [loadResult]);
 
-  function handleDomainToggle(domainId: string) {
-    setSelectedIds((prev) => {
-      if (prev.includes(domainId)) {
-        return prev.filter((id) => id !== domainId);
-      }
-      if (prev.length >= MAX_DOMAINS) {
-        toastStore.show(`최대 ${MAX_DOMAINS}개까지 선택할 수 있어요`);
-        return prev;
-      }
-      return [...prev, domainId];
-    });
+  function handleCta() {
+    router.replace('/home');
   }
-
-  async function handleSubmit() {
-    if (selectedIds.length === 0 || isSubmitting) return;
-
-    setIsSubmitting(true);
-    setSubmitError(null);
-    try {
-      await onboardingService.saveInterests({ domainIds: selectedIds });
-      // 히스토리 스택에서 결과 페이지를 제거하며 홈으로 이동
-      router.replace('/home');
-    } catch (err) {
-      const error = err as { code?: string };
-      setSubmitError(getErrorMessage(error.code));
-      setIsSubmitting(false);
-    }
-  }
-
-  // ─── 로딩 / 에러 상태 ────────────────────────────────────────────────────
-
-  if (isLoading) return <OnboardingResultSkeleton />;
-
-  if (fetchError) {
-    return (
-      <div className="flex flex-col items-center gap-4 py-12 text-center">
-        <p className="text-[var(--color-text-secondary)]">{fetchError}</p>
-        <Button
-          variant="secondary"
-          onClick={() => {
-            fetchedRef.current = false;
-            loadResult();
-          }}
-        >
-          다시 시도
-        </Button>
-      </div>
-    );
-  }
-
-  if (!result) return null;
-
-  // ─── 레벨 정보 계산 ──────────────────────────────────────────────────────
-
-  const level = (result.level as Level) ?? 'SEED';
-  const levelCfg = LEVEL_INFO[level] ?? LEVEL_INFO.SEED;
-  const nickname = result.nickname;
-  const title = nickname ? `${nickname}님은 ${levelCfg.titleSuffix}` : levelCfg.titleSuffix;
-  const description = result.skipped
-    ? SKIPPED_DESC
-    : (result.levelDescription ?? levelCfg.fallbackDesc);
-
-  const domains: RecommendedDomainDto[] = (result.recommendedDomains ?? []).slice(0, MAX_DOMAINS);
-
-  // ─── 메인 UI ─────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* 마스코트 영역 */}
-      <div className="flex flex-col items-center gap-4 py-4">
-        <LevelMascot level={level} />
+    <>
+      <LandingHeader isLoggedIn={true} />
 
-        <div className="flex flex-col items-center gap-1 text-center">
-          <p className="text-xl font-bold text-[var(--color-text-primary)]">{title}</p>
-          <p className="whitespace-pre-line text-sm leading-relaxed text-[var(--color-text-secondary)]">
-            {description}
-          </p>
-        </div>
-      </div>
-
-      <hr className="border-[var(--color-border)]" />
-
-      {/* 관심 도메인 선택 */}
-      <div className="flex flex-col gap-4">
-        <div>
-          <p className="font-semibold text-[var(--color-text-primary)]">
-            지금 가장 궁금한 게 뭔가요?
-          </p>
-          <p className="mt-0.5 text-xs text-[var(--color-text-secondary)]">
-            1~{MAX_DOMAINS}개 선택 가능
-          </p>
-        </div>
-
-        <div className="grid grid-cols-3 gap-3">
-          {domains.map((domain) => {
-            const id = domain.id ?? '';
-            return (
-              <DomainCard
-                key={id}
-                id={id}
-                emoji={domain.emoji ?? ''}
-                name={domain.name ?? ''}
-                reason={domain.reason ?? ''}
-                selected={selectedIds.includes(id)}
-                disabled={selectedIds.length >= MAX_DOMAINS}
-                onClick={() => handleDomainToggle(id)}
-              />
-            );
-          })}
-        </div>
-      </div>
-
-      {/* 제출 에러 */}
-      {submitError && (
-        <p role="alert" className="text-center text-sm text-[var(--color-danger)]">
-          {submitError}
-        </p>
-      )}
-
-      {/* 시작하기 버튼 */}
-      <Button
-        size="lg"
-        className="w-full rounded-xl bg-[#4CAF82] text-white hover:bg-[#388E60]"
-        disabled={selectedIds.length === 0 || isSubmitting}
-        isLoading={isSubmitting}
-        onClick={handleSubmit}
+      <div
+        style={{
+          minHeight: '100vh',
+          paddingTop: '64px',
+          backgroundColor: '#1A1A1A',
+          color: '#FFFFFF',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
       >
-        시작하기 →
-      </Button>
-    </div>
+        {isLoading ? (
+          <LoadingSkeleton />
+        ) : fetchError ? (
+          <ErrorView
+            message={fetchError}
+            onRetry={() => {
+              fetchedRef.current = false;
+              loadResult();
+            }}
+          />
+        ) : result ? (
+          <ResultView result={result} onCta={handleCta} />
+        ) : null}
+      </div>
+    </>
   );
 }

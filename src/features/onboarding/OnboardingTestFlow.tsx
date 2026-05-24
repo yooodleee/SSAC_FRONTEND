@@ -253,26 +253,32 @@ export function OnboardingTestFlow({ isLoggedIn }: { isLoggedIn: boolean }) {
       return;
     }
 
-    onboardingService
-      .getQuestions(userType)
-      .then((data) => setQuestions(data.questions ?? []))
-      .catch((err: unknown) => {
+    async function fetchQuestions() {
+      try {
+        const data = await onboardingService.getQuestions(userType!);
+        setQuestions(data.questions ?? []);
+      } catch (err) {
         const error = err as { code?: string; status?: number };
         if (error.code === 'ONBOARDING-001') {
           router.replace('/signup/type');
           return;
         }
         if (error.code === 'ONBOARDING-002') {
-          router.replace('/home');
+          // 이미 온보딩 완료 — 결과 페이지로 이동
+          router.replace('/onboarding/result');
           return;
         }
-        if ((error as { status?: number }).status === 401) {
+        if (error.status === 401) {
           router.replace('/onboarding');
           return;
         }
         setToastMessage('문제를 불러오지 못했어요. 잠시 후 다시 시도해주세요.');
-      })
-      .finally(() => setIsLoadingQuestions(false));
+      } finally {
+        setIsLoadingQuestions(false);
+      }
+    }
+
+    void fetchQuestions();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-dismiss toast
@@ -358,7 +364,7 @@ export function OnboardingTestFlow({ isLoggedIn }: { isLoggedIn: boolean }) {
       .catch((err: unknown) => {
         const error = err as { code?: string };
         if (error.code === 'ONBOARDING-002') {
-          router.replace('/home');
+          router.replace('/onboarding/result');
           return;
         }
         setToastMessage('제출에 실패했어요. 잠시 후 다시 시도해주세요.');
@@ -481,7 +487,9 @@ export function OnboardingTestFlow({ isLoggedIn }: { isLoggedIn: boolean }) {
               isLoading={isLoadingQuestions}
             />
           )}
-          {step === 'complete' && <CompleteStep onLogin={() => router.push('/login')} />}
+          {step === 'complete' && (
+            <CompleteStep onLogin={() => router.push('/login?redirectTo=/onboarding/submit')} />
+          )}
         </div>
 
         {/* Toast */}
