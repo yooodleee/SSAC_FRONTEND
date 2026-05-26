@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 const ADMIN_NAV_ITEMS = [
   { label: '관리자 홈', href: '/admin' },
   { label: '피드백 관리', href: '/admin/feedbacks' },
+  { label: '콘텐츠 관리', href: '/admin/contents' },
 ] as const;
 
 export function AdminSidebar() {

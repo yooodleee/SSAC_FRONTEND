@@ -2,7 +2,7 @@
 // ⚠️  이 파일은 자동 생성됩니다 — 절대 수동으로 편집하지 마세요.
 // 생성 명령: npm run sync:api
 // 소스: http://172.17.96.1:8080/api-docs/swagger.json
-// 생성 시각: 2026-05-23 15:49:57
+// 생성 시각: 2026-05-25 15:05:38
 // ============================================================
 
 /**
@@ -403,6 +403,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/contents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 콘텐츠 목록 조회
+         * @description [권한 조건] ADMIN 역할 전용. 생성일시 내림차순 정렬.
+         */
+        get: operations["getContents"];
+        put?: never;
+        /**
+         * 콘텐츠 생성
+         * @description [권한 조건] ADMIN 역할 전용. 빈 값으로 즉시 생성하며 authorId는 현재 관리자로 자동 설정된다.
+         */
+        post: operations["createContent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/contents/{id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 콘텐츠 게시
+         * @description [권한 조건] ADMIN 역할 전용. 게시 시 status=DONE, publishedAt 자동 설정.
+         */
+        post: operations["publishContent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/contents/upload-image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 이미지 업로드
+         * @description [권한 조건] ADMIN 역할 전용. 허용 형식: jpg/jpeg/png/webp/gif, 최대 10MB.
+         */
+        post: operations["uploadImage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/codes": {
         parameters: {
             query?: never;
@@ -611,6 +675,30 @@ export interface paths {
          * @description [권한 조건] ADMIN 역할 전용. 변경 성공 시 204 No Content.
          */
         patch: operations["updateFeedbackStatus"];
+        trace?: never;
+    };
+    "/api/v1/admin/contents/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 콘텐츠 단건 조회
+         * @description [권한 조건] ADMIN 역할 전용.
+         */
+        get: operations["getContent"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * 콘텐츠 수정
+         * @description [권한 조건] ADMIN 역할 전용. 요청에 포함된 필드만 수정된다 (Partial Update).
+         */
+        patch: operations["updateContent"];
         trace?: never;
     };
     "/api/notification/{id}/read": {
@@ -990,7 +1078,7 @@ export interface paths {
          *     [권한 조건] 로그인 회원 전용 (USER, ADMIN).
          *     [특이 동작] level 미지정 시 사용자의 현재 레벨 기준으로 필터링.
          */
-        get: operations["getContents"];
+        get: operations["getContents_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1650,6 +1738,50 @@ export interface components {
             message?: string;
             loginRequired?: boolean;
         };
+        AdminContentCreateResponse: {
+            id?: string;
+            title?: string;
+            categories?: string[];
+            status?: string;
+            isCompleted?: boolean;
+            authorId?: string;
+            authorNickname?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            publishedAt?: string;
+        };
+        ApiResponseAdminContentCreateResponse: {
+            success?: boolean;
+            data?: components["schemas"]["AdminContentCreateResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
+        PublishContentRequest: {
+            domains?: string[];
+        };
+        AdminContentPublishResponse: {
+            id?: string;
+            /** Format: date-time */
+            publishedAt?: string;
+            status?: string;
+            domains?: string[];
+        };
+        ApiResponseAdminContentPublishResponse: {
+            success?: boolean;
+            data?: components["schemas"]["AdminContentPublishResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
+        AdminImageUploadResponse: {
+            imageUrl?: string;
+        };
+        ApiResponseAdminImageUploadResponse: {
+            success?: boolean;
+            data?: components["schemas"]["AdminImageUploadResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
         AdminCodeCreateRequest: {
             /** Format: int64 */
             adminUserId?: number;
@@ -1783,6 +1915,38 @@ export interface components {
         FeedbackStatusUpdateRequest: {
             /** @enum {string} */
             status?: "PENDING" | "IN_PROGRESS" | "DONE";
+        };
+        UpdateContentRequest: {
+            title?: string;
+            categories?: string[];
+            /** @enum {string} */
+            status?: "NOT_STARTED" | "IN_PROGRESS" | "DONE";
+            isCompleted?: boolean;
+            thumbnailUrl?: string;
+            body?: string;
+        };
+        AdminContentDetailResponse: {
+            id?: string;
+            title?: string;
+            categories?: string[];
+            status?: string;
+            isCompleted?: boolean;
+            thumbnailUrl?: string;
+            body?: string;
+            domains?: string[];
+            authorNickname?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            publishedAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
+        };
+        ApiResponseAdminContentDetailResponse: {
+            success?: boolean;
+            data?: components["schemas"]["AdminContentDetailResponse"];
+            message?: string;
+            loginRequired?: boolean;
         };
         ApiResponseMyPageResponse: {
             success?: boolean;
@@ -2401,6 +2565,30 @@ export interface components {
             /** Format: int64 */
             totalCount?: number;
             feedbacks?: components["schemas"]["FeedbackItem"][];
+        };
+        AdminContentListResponse: {
+            /** Format: int64 */
+            totalCount?: number;
+            contents?: components["schemas"]["ContentSummary"][];
+        };
+        ApiResponseAdminContentListResponse: {
+            success?: boolean;
+            data?: components["schemas"]["AdminContentListResponse"];
+            message?: string;
+            loginRequired?: boolean;
+        };
+        ContentSummary: {
+            id?: string;
+            title?: string;
+            categories?: string[];
+            status?: string;
+            isCompleted?: boolean;
+            thumbnailUrl?: string;
+            authorNickname?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            publishedAt?: string;
         };
         ApiResponseUserSegmentResponse: {
             success?: boolean;
@@ -3419,6 +3607,249 @@ export interface operations {
             };
         };
     };
+    getContents: {
+        parameters: {
+            query?: {
+                /**
+                 * @description 페이지 번호 (1부터 시작)
+                 * @example 1
+                 */
+                page?: number;
+                /**
+                 * @description 페이지 크기
+                 * @example 20
+                 */
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 목록 조회 성공 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminContentListResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description ADMIN 권한 없음 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminContentListResponse"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    createContent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 생성 성공 */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminContentCreateResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description ADMIN 권한 없음 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminContentCreateResponse"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    publishContent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 콘텐츠 ID
+                 * @example 1
+                 */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublishContentRequest"];
+            };
+        };
+        responses: {
+            /** @description 게시 성공 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminContentPublishResponse"];
+                };
+            };
+            /** @description CONTENT-003: 게시 도메인 미선택 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminContentPublishResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description ADMIN 권한 없음 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminContentPublishResponse"];
+                };
+            };
+            /** @description CONTENT-001: 존재하지 않는 콘텐츠 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminContentPublishResponse"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    uploadImage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description 업로드 성공 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminImageUploadResponse"];
+                };
+            };
+            /** @description CONTENT-002: 허용되지 않는 파일 형식 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminImageUploadResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description ADMIN 권한 없음 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminImageUploadResponse"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
     createAdminCode: {
         parameters: {
             query?: never;
@@ -3938,6 +4369,134 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    getContent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 콘텐츠 ID
+                 * @example 1
+                 */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 조회 성공 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminContentDetailResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description ADMIN 권한 없음 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminContentDetailResponse"];
+                };
+            };
+            /** @description CONTENT-001: 존재하지 않는 콘텐츠 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminContentDetailResponse"];
+                };
+            };
+            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+        };
+    };
+    updateContent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description 콘텐츠 ID
+                 * @example 1
+                 */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateContentRequest"];
+            };
+        };
+        responses: {
+            /** @description 수정 성공 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminContentDetailResponse"];
+                };
+            };
+            /** @description 인증 토큰이 없거나 만료되었습니다. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiResponseError"];
+                };
+            };
+            /** @description ADMIN 권한 없음 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminContentDetailResponse"];
+                };
+            };
+            /** @description CONTENT-001: 존재하지 않는 콘텐츠 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiResponseAdminContentDetailResponse"];
+                };
             };
             /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
             500: {
@@ -4782,7 +5341,7 @@ export interface operations {
             };
         };
     };
-    getContents: {
+    getContents_1: {
         parameters: {
             query?: {
                 /** @description 레벨 필터 (SEED/SPROUT/TREE). 미지정 시 사용자 레벨 적용. */

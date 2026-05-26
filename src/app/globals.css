@@ -98,3 +98,17 @@
     animation: none;
   }
 }
+
+/* Admin content panel slide-in from right */
+@keyframes panel-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.panel-slide-in {
+  animation: panel-slide-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}

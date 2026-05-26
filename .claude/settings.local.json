@@ -209,7 +209,20 @@
       "Bash(src/features/onboarding/OnboardingResult.tsx)",
       "Bash(src/features/onboarding/OnboardingTestFlow.tsx)",
       "Bash(?redirectTo=/onboarding/submit)",
-      "Bash(services/onboarding.ts)"
+      "Bash(services/onboarding.ts)",
+      "Bash(cat .eslintrc* eslint.config*)",
+      "Bash(AdminSidebar.tsx)",
+      "Bash(/admin/contents)",
+      "Bash(src/features/admin/contents/)",
+      "Bash(src/services/adminContent.ts)",
+      "Bash(src/app/admin/contents/page.tsx)",
+      "Bash(ContentEditPanel.tsx)",
+      "Bash(TiptapEditor.tsx)",
+      "Bash(text-[#1A1A1A])",
+      "Bash(src/constants/domains.ts)",
+      "Bash(MegaMenu/constants.ts)",
+      "Bash(ContentsPanel.tsx)",
+      "Bash(del _slack_notify.py)"
     ]
   }
 }
