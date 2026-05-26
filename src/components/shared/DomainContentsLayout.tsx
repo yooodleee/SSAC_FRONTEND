@@ -39,7 +39,7 @@ export function DomainContentsLayout({ domain, contents }: DomainContentsLayoutP
         ) : (
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4 lg:gap-6">
             {contents.map((item) => (
-              <ContentCard key={item.id} item={item} />
+              <ContentCard key={item.id} item={item} currentDomain={domain} />
             ))}
           </div>
         )}
