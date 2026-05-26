@@ -218,7 +218,11 @@
       "Bash(src/app/admin/contents/page.tsx)",
       "Bash(ContentEditPanel.tsx)",
       "Bash(TiptapEditor.tsx)",
-      "Bash(text-[#1A1A1A])"
+      "Bash(text-[#1A1A1A])",
+      "Bash(src/constants/domains.ts)",
+      "Bash(MegaMenu/constants.ts)",
+      "Bash(ContentsPanel.tsx)",
+      "Bash(del _slack_notify.py)"
     ]
   }
 }
