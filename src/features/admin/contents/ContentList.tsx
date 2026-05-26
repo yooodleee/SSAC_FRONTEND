@@ -11,10 +11,11 @@ import { adminContentService } from '@/services/adminContent';
 import { CategoryTag, CategoryPicker } from './CategoryTag';
 import { ContentEditPanel } from './ContentEditPanel';
 import type { PanelChanges } from './ContentEditPanel';
-import type { components } from '@/api-contract/generated/api-types';
+import type { AdminContentItem } from '@/services/adminContent';
 
 type ContentStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'DONE';
-type UpdateContentRequest = components['schemas']['UpdateContentRequest'];
+// UI-only type: UpdateContentRequest removed from BE contract
+type UpdateContentRequest = { [key: string]: unknown };
 
 // UI-only type: enriched row for the content list
 interface ContentRow {
@@ -141,7 +142,7 @@ export function ContentList() {
         .then((data) => {
           if (cancelled) return;
           setRows(
-            (data.contents ?? []).map((c) => ({
+            (data.contents ?? []).map((c: AdminContentItem) => ({
               id: c.id ?? '',
               title: c.title ?? '',
               categories: c.categories ?? [],

@@ -25,7 +25,8 @@ export function Header({ isLoggedIn }: { isLoggedIn: boolean }) {
     pathname.startsWith('/signup') ||
     pathname === '/home' ||
     pathname.startsWith('/home/') ||
-    pathname.startsWith('/onboarding')
+    pathname.startsWith('/onboarding') ||
+    pathname.startsWith('/contents')
   )
     return null;
 

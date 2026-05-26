@@ -23,21 +23,11 @@ type ContentItemDto = components['schemas']['ContentItemDto'];
 
 // 정적 플레이스홀더 — API 실패 시 사용
 const PLACEHOLDER_CONTENTS: ContentItemDto[] = [
-  { id: 'p1', title: '전세 계약 시 꼭 확인해야 할 5가지', difficulty: 'SEED', estimatedMinutes: 3 },
-  { id: 'p2', title: '연말정산 환급금 극대화하는 방법', difficulty: 'SPROUT', estimatedMinutes: 5 },
-  {
-    id: 'p3',
-    title: '주식 투자 전 꼭 알아야 할 기본 용어',
-    difficulty: 'SPROUT',
-    estimatedMinutes: 4,
-  },
-  { id: 'p4', title: '실업급여 신청 방법 완전 정복', difficulty: 'SEED', estimatedMinutes: 3 },
-  {
-    id: 'p5',
-    title: '청년도약계좌 가입 자격과 혜택 총정리',
-    difficulty: 'TREE',
-    estimatedMinutes: 6,
-  },
+  { id: 'p1', title: '전세 계약 시 꼭 확인해야 할 5가지', difficulty: 'SEED' },
+  { id: 'p2', title: '연말정산 환급금 극대화하는 방법', difficulty: 'SPROUT' },
+  { id: 'p3', title: '주식 투자 전 꼭 알아야 할 기본 용어', difficulty: 'SPROUT' },
+  { id: 'p4', title: '실업급여 신청 방법 완전 정복', difficulty: 'SEED' },
+  { id: 'p5', title: '청년도약계좌 가입 자격과 혜택 총정리', difficulty: 'TREE' },
 ];
 
 async function fetchContents(): Promise<ContentItemDto[]> {

@@ -40,7 +40,7 @@ export function RecommendedContentCard({ item, onClick }: RecommendedContentCard
       )}
     >
       {/* 완료 배지 (일반 콘텐츠) */}
-      {!isPreview && item.isCompleted && (
+      {!isPreview && item.completed && (
         <span className="absolute right-3 top-3 text-xs font-semibold text-[#4CAF82]">✅ 완료</span>
       )}
 
@@ -79,13 +79,7 @@ export function RecommendedContentCard({ item, onClick }: RecommendedContentCard
       {/* 하단 행: 소요 시간(일반) / 미리 보기 CTA(미리보기) */}
       {isPreview ? (
         <p className="mt-2 text-right text-xs font-medium text-[var(--color-info)]">미리 보기 →</p>
-      ) : (
-        item.estimatedMinutes > 0 && (
-          <p className="mt-2 text-right text-xs text-[var(--color-text-secondary)]">
-            {item.estimatedMinutes}분이면 충분
-          </p>
-        )
-      )}
+      ) : null}
     </button>
   );
 }
