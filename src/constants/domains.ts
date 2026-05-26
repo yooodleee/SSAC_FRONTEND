@@ -42,6 +42,28 @@ export const DOMAIN_EMOJIS = {
   series: '📚',
 } as const;
 
+export const DOMAIN_IMAGE_MAP: Record<string, string> = {
+  realestate: '/domains/부동산_자취_카드_뉴스.png',
+  tax: '/domains/세금_연말정산_카드_뉴스.png',
+  investment: '/domains/재테크_신용_카드_뉴스.png',
+  work: '/domains/근로_급여_카드_뉴스.png',
+  scholarship: '/domains/학자금_장학금_카드_뉴스.png',
+  welfare: '/domains/사회보험_복지_카드_뉴스.png',
+  budget: '/domains/소비_예산관리_카드_뉴스.png',
+  series: '/domains/series.png',
+};
+
+export const DOMAIN_CATEGORY_MAP: Record<string, string> = {
+  realestate: 'realestate',
+  tax: 'tax',
+  investment: 'investment',
+  work: 'work',
+  scholarship: 'scholarship',
+  welfare: 'welfare',
+  budget: 'budget',
+  series: 'series',
+};
+
 export const DOMAIN_TABS: DomainTab[] = [
   {
     key: 'realestate',

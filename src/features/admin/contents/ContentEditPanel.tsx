@@ -6,10 +6,9 @@ import { CategoryTag, CategoryPicker } from './CategoryTag';
 import { PublishModal } from './PublishModal';
 import { adminContentService } from '@/services/adminContent';
 import { toastStore } from '@/lib/toastStore';
-import type { components } from '@/api-contract/generated/api-types';
-
 type ContentStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'DONE';
-type UpdateContentRequest = components['schemas']['UpdateContentRequest'];
+// UI-only type: UpdateContentRequest removed from BE contract
+type UpdateContentRequest = { [key: string]: unknown };
 
 const STATUS_OPTIONS: { value: ContentStatus; label: string; color: string }[] = [
   { value: 'NOT_STARTED', label: '시작 전', color: 'text-gray-500 bg-gray-100' },

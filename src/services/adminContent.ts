@@ -1,21 +1,58 @@
-import type { components } from '@/api-contract/generated/api-types';
 import { toastStore } from '@/lib/toastStore';
 
-type AdminContentListResponse = components['schemas']['AdminContentListResponse'];
-type AdminContentCreateResponse = components['schemas']['AdminContentCreateResponse'];
-type AdminContentDetailResponse = components['schemas']['AdminContentDetailResponse'];
-type ApiResponseAdminContentCreateResponse =
-  components['schemas']['ApiResponseAdminContentCreateResponse'];
-type ApiResponseAdminContentDetailResponse =
-  components['schemas']['ApiResponseAdminContentDetailResponse'];
-type ApiResponseAdminContentListResponse =
-  components['schemas']['ApiResponseAdminContentListResponse'];
-type ApiResponseAdminContentPublishResponse =
-  components['schemas']['ApiResponseAdminContentPublishResponse'];
-type ApiResponseAdminImageUploadResponse =
-  components['schemas']['ApiResponseAdminImageUploadResponse'];
-type UpdateContentRequest = components['schemas']['UpdateContentRequest'];
-type AdminContentPublishResponse = components['schemas']['AdminContentPublishResponse'];
+// UI-only types: admin content management types removed from BE contract
+export interface AdminContentItem {
+  id?: string;
+  title?: string;
+  categories?: string[];
+  status?: string;
+  isCompleted?: boolean;
+  authorNickname?: string;
+  createdAt?: string;
+  publishedAt?: string;
+}
+interface AdminContentListResponse {
+  totalCount?: number;
+  contents?: AdminContentItem[];
+}
+interface AdminContentCreateResponse {
+  id?: string;
+  title?: string;
+  categories?: string[];
+  status?: string;
+  isCompleted?: boolean;
+  authorNickname?: string;
+  createdAt?: string;
+  publishedAt?: string;
+}
+interface AdminContentDetailResponse {
+  id?: string;
+  title?: string;
+  categories?: string[];
+  status?: string;
+  isCompleted?: boolean;
+  body?: string;
+  thumbnailUrl?: string;
+  publishedAt?: string;
+  domains?: string[];
+  difficulty?: string;
+}
+interface AdminContentPublishResponse {
+  publishedAt?: string;
+}
+interface UpdateContentRequest {
+  [key: string]: unknown;
+}
+interface ApiResponse<T> {
+  success?: boolean;
+  data?: T;
+  message?: string;
+}
+type ApiResponseAdminContentCreateResponse = ApiResponse<AdminContentCreateResponse>;
+type ApiResponseAdminContentDetailResponse = ApiResponse<AdminContentDetailResponse>;
+type ApiResponseAdminContentListResponse = ApiResponse<AdminContentListResponse>;
+type ApiResponseAdminContentPublishResponse = ApiResponse<AdminContentPublishResponse>;
+type ApiResponseAdminImageUploadResponse = ApiResponse<{ imageUrl?: string }>;
 
 /**
  * BFF 패턴: 클라이언트 → Next.js Route Handler → BE(API_BASE_URL)

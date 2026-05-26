@@ -76,13 +76,6 @@ export function ContentGalleryCard({ item, large = false }: ContentGalleryCardPr
         >
           {item.title ?? '콘텐츠 제목'}
         </p>
-
-        {/* 예상 소요 시간 */}
-        {item.estimatedMinutes != null && (
-          <p className="text-xs" style={{ color: '#6B6B6B' }}>
-            {item.estimatedMinutes}분이면 충분합니다
-          </p>
-        )}
       </div>
     </a>
   );
