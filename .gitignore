@@ -26,6 +26,10 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*.local
 .env
+.env.e2e
+
+# e2e diagnose output
+scripts/e2e-diagnose/output
 
 # vercel
 .vercel
