@@ -222,7 +222,12 @@
       "Bash(src/constants/domains.ts)",
       "Bash(MegaMenu/constants.ts)",
       "Bash(ContentsPanel.tsx)",
-      "Bash(del _slack_notify.py)"
+      "Bash(del _slack_notify.py)",
+      "Bash(@playwright/test ^1.44.0)",
+      "Bash(tsx ^4.19.2)",
+      "Bash(e2e:diagnose)",
+      "Bash(playwright.config.ts)",
+      "Bash(.env.e2e)"
     ]
   }
 }

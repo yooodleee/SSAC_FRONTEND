@@ -28,7 +28,10 @@
     "lint:type-contract": "node scripts/lintTypeContract.mjs",
     "logs:vercel": "bash scripts/check-vercel-logs.sh",
     "logs:vercel:live": "vercel logs --follow",
-    "pre-deploy": "bash scripts/pre-deploy-check.sh"
+    "pre-deploy": "bash scripts/pre-deploy-check.sh",
+    "e2e:diagnose": "tsx scripts/e2e-diagnose/runner.ts",
+    "e2e:diagnose:auth": "E2E_SCENARIO=auth tsx scripts/e2e-diagnose/runner.ts",
+    "e2e:diagnose:api": "E2E_SCENARIO=api tsx scripts/e2e-diagnose/runner.ts"
   },
   "lint-staged": {
     "*.{ts,tsx,js,mjs,cjs}": [
@@ -51,6 +54,7 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.44.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^22",
     "@types/react": "^19",
@@ -63,6 +67,7 @@
     "lint-staged": "^16.4.0",
     "openapi-typescript": "^7.13.0",
     "prettier": "^3.5.3",
+    "tsx": "^4.19.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
