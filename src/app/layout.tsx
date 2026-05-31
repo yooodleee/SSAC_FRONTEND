@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { PostLoginToast } from '@/components/auth/PostLoginToast';
+import { SessionRestoreProvider } from '@/components/auth/SessionRestoreProvider';
 import { ErrorToast } from '@/components/ui/ErrorToast';
 import { LevelUpModal } from '@/features/mypage/LevelUpModal';
 import { ThemeProvider } from '@/lib/theme';
@@ -59,6 +60,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       </head>
       <body className="flex min-h-screen flex-col font-sans antialiased">
         <ThemeProvider>
+          <SessionRestoreProvider />
           <Header isLoggedIn={isLoggedIn} />
           <main className="flex-1">{children}</main>
           <Footer />

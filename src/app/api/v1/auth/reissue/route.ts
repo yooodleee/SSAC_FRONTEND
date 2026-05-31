@@ -30,8 +30,21 @@ export async function POST(request: NextRequest) {
   const beBody = (await beResponse.json()) as { data?: Record<string, unknown> };
   const userData = beBody.data ?? {};
 
-  // BE의 Set-Cookie 헤더(새 accessToken, refreshToken)를 클라이언트에 전달
   const res = NextResponse.json(userData);
+
+  // accessToken을 httpOnly 쿠키로 설정 (서버 컴포넌트의 인증 확인에 사용됨)
+  const accessToken = (userData as { accessToken?: string }).accessToken;
+  if (accessToken) {
+    res.cookies.set('accessToken', accessToken, {
+      httpOnly: true,
+      path: '/',
+      maxAge: 60 * 30, // 30분
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    });
+  }
+
+  // BE의 Set-Cookie 헤더(refreshToken rotation)를 클라이언트에 전달
   const setCookies = beResponse.headers.getSetCookie();
   setCookies.forEach((cookie) => {
     res.headers.append('Set-Cookie', cookie);
