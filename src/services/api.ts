@@ -12,13 +12,21 @@ interface RequestOptions extends Omit<RequestInit, 'body'> {
   params?: Record<string, string | number | boolean>;
 }
 
+// 동시 다중 reissue 호출 방지 뮤텍스
+// 진행 중인 재발급 요청이 있으면 동일 Promise를 공유하고, 완료 후 초기화
+let _reissueInflight: Promise<boolean> | null = null;
+
 async function tryRefreshToken(): Promise<boolean> {
-  try {
-    const res = await fetch('/api/v1/auth/reissue', { method: 'POST' });
-    return res.ok;
-  } catch {
-    return false;
-  }
+  if (_reissueInflight) return _reissueInflight;
+
+  _reissueInflight = fetch('/api/v1/auth/reissue', { method: 'POST' })
+    .then((res) => res.ok)
+    .catch(() => false)
+    .finally(() => {
+      _reissueInflight = null;
+    });
+
+  return _reissueInflight;
 }
 
 function redirectToLogin(currentPath: string): void {
