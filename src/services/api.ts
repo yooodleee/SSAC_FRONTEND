@@ -1,6 +1,8 @@
 import { env } from '@/lib/env';
 import { getErrorMessage } from '@/lib/errorMessages';
 import { toastStore } from '@/lib/toastStore';
+import { authStore } from '@/lib/authStore';
+import type { UserContext } from '@/lib/authStore';
 import type { ApiError, ErrorResponse } from '@/types';
 
 // ============================================================
@@ -20,7 +22,20 @@ async function tryRefreshToken(): Promise<boolean> {
   if (_reissueInflight) return _reissueInflight;
 
   _reissueInflight = fetch('/api/v1/auth/reissue', { method: 'POST' })
-    .then((res) => res.ok)
+    .then(async (res) => {
+      if (!res.ok) return false;
+      try {
+        // BFF가 ReissueResponse를 unwrap해서 반환 → { accessToken, userId, nickname, ... }
+        // authStore를 갱신해 useCurrentUser 등이 최신 컨텍스트를 즉시 참조하도록 함
+        const data = (await res.json()) as UserContext;
+        if (data?.userId) {
+          authStore.set(data);
+        }
+      } catch {
+        // 파싱 실패해도 BFF가 이미 accessToken 쿠키를 갱신했으므로 true 반환
+      }
+      return true;
+    })
     .catch(() => false)
     .finally(() => {
       _reissueInflight = null;

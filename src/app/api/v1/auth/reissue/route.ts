@@ -30,19 +30,22 @@ export async function POST(request: NextRequest) {
   const beBody = (await beResponse.json()) as { data?: Record<string, unknown> };
   const userData = beBody.data ?? {};
 
+  // accessToken이 없으면 재발급 실패로 처리 (200이지만 토큰 없음 케이스 방어)
+  const accessToken = (userData as { accessToken?: string }).accessToken;
+  if (!accessToken) {
+    return NextResponse.json({ error: 'Session expired' }, { status: 401 });
+  }
+
   const res = NextResponse.json(userData);
 
   // accessToken을 httpOnly 쿠키로 설정 (서버 컴포넌트의 인증 확인에 사용됨)
-  const accessToken = (userData as { accessToken?: string }).accessToken;
-  if (accessToken) {
-    res.cookies.set('accessToken', accessToken, {
-      httpOnly: true,
-      path: '/',
-      maxAge: 60 * 30, // 30분
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-    });
-  }
+  res.cookies.set('accessToken', accessToken, {
+    httpOnly: true,
+    path: '/',
+    maxAge: 60 * 30, // 30분
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+  });
 
   // BE의 Set-Cookie 헤더(refreshToken rotation)를 클라이언트에 전달
   const setCookies = beResponse.headers.getSetCookie();
