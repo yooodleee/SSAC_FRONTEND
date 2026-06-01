@@ -77,9 +77,9 @@ function OnboardingSubmitContent() {
       return;
     }
 
-    // Fetch questions (authenticated — uses account's userType)
+    // Fetch questions using the userType saved with the pending answers
     onboardingService
-      .getQuestions()
+      .getQuestions(stored.userType)
       .then((data) => {
         const questions = data.questions ?? [];
         if (!questions.length) {
