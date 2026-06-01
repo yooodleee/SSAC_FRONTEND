@@ -1,61 +1,68 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { cookies } from 'next/headers';
 
 /**
  * POST /api/v1/auth/reissue
  *
- * refreshToken 쿠키(path: /api/v1/auth)를 BE에 전달해 새 토큰을 발급받는 BFF 엔드포인트.
- * 이 경로(/api/v1/auth/*)가 refreshToken 쿠키 path와 일치하므로 브라우저가 자동으로 쿠키를 포함한다.
+ * BFF가 refreshToken 쿠키를 BE에 전달해 새 토큰을 발급받는다.
+ * BE는 새 accessToken/refreshToken을 응답 body(data 필드)에 포함한다.
+ * BFF가 cookies().set()으로 직접 쿠키를 설정한다 (Set-Cookie 포워딩 방식 미사용).
  *
- * ⚠️ Set-Cookie 포워딩 주의
- * NextResponse 생성 후 res.headers.append('Set-Cookie', ...)는 Next.js에서 신뢰할 수 없음.
- * 모든 Set-Cookie 헤더를 응답 생성 시 한 번에 주입하기 위해 new NextResponse(body, { headers }) 패턴 사용.
+ * refreshToken 속성:
+ *   Path=/api/v1/auth, HttpOnly, Secure, SameSite=None, 14일 (BE JwtProperties 동일)
  */
-export async function POST(request: NextRequest) {
+export async function POST() {
   const backendUrl = process.env.API_BASE_URL;
   if (!backendUrl) {
     return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
   }
 
-  // 브라우저의 Cookie 헤더를 BE에 전달 (refreshToken 쿠키 포함)
-  const cookieHeader = request.headers.get('cookie') ?? '';
+  // refreshToken 쿠키만 BE에 전달 (accessToken은 BFF 전용)
+  const cookieStore = await cookies();
+  const refreshToken = cookieStore.get('refreshToken')?.value;
 
   const beResponse = await fetch(`${backendUrl}/api/v1/auth/reissue`, {
     method: 'POST',
-    headers: { Cookie: cookieHeader },
+    headers: { Cookie: `refreshToken=${refreshToken ?? ''}` },
   });
+
+  const json = (await beResponse.json()) as { data?: Record<string, unknown> };
 
   if (!beResponse.ok) {
+    return NextResponse.json(json, { status: beResponse.status });
+  }
+
+  const userData = json.data ?? {};
+  const newAccessToken = (userData as { accessToken?: string }).accessToken;
+  const newRefreshToken = (userData as { refreshToken?: string }).refreshToken;
+
+  // accessToken이 없으면 재발급 실패로 처리
+  if (!newAccessToken) {
     return NextResponse.json({ error: 'Session expired' }, { status: 401 });
   }
 
-  // BE 응답 body에서 사용자 컨텍스트를 추출해 클라이언트에 전달
-  const beBody = (await beResponse.json()) as { data?: Record<string, unknown> };
-  const userData = beBody.data ?? {};
-
-  // accessToken이 없으면 재발급 실패로 처리 (200이지만 토큰 없음 케이스 방어)
-  const accessToken = (userData as { accessToken?: string }).accessToken;
-  if (!accessToken) {
-    return NextResponse.json({ error: 'Session expired' }, { status: 401 });
-  }
-
-  // 응답 헤더를 생성 시점에 한 번에 주입 (헤더 변이 방식 미사용)
   const isProduction = process.env.NODE_ENV === 'production';
-  const responseHeaders = new Headers({ 'Content-Type': 'application/json' });
 
-  // accessToken: BFF가 응답 body에서 추출해 httpOnly 쿠키로 설정 (30분)
-  responseHeaders.append(
-    'Set-Cookie',
-    `accessToken=${accessToken}; Path=/; HttpOnly; Max-Age=1800; SameSite=Lax${isProduction ? '; Secure' : ''}`,
-  );
-
-  // BE의 Set-Cookie(refreshToken rotation)를 브라우저로 그대로 전달
-  beResponse.headers.getSetCookie().forEach((cookie) => {
-    responseHeaders.append('Set-Cookie', cookie);
+  // accessToken: 30분, Path=/ (서버 컴포넌트 인증 확인용)
+  cookieStore.set('accessToken', newAccessToken, {
+    path: '/',
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: 'lax',
+    maxAge: 60 * 30,
   });
 
-  return new NextResponse(JSON.stringify(userData), {
-    status: 200,
-    headers: responseHeaders,
-  });
+  // refreshToken: 14일, BE JwtProperties와 동일한 속성으로 설정
+  if (newRefreshToken) {
+    cookieStore.set('refreshToken', newRefreshToken, {
+      path: '/api/v1/auth',
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 60 * 60 * 24 * 14,
+    });
+  }
+
+  // 기존 FE 파싱 호환성 유지: userData (unwrapped ReissueResponse) 반환
+  return NextResponse.json(userData);
 }
