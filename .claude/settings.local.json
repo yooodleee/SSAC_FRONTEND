@@ -227,7 +227,9 @@
       "Bash(tsx ^4.19.2)",
       "Bash(e2e:diagnose)",
       "Bash(playwright.config.ts)",
-      "Bash(.env.e2e)"
+      "Bash(.env.e2e)",
+      "Bash(loginSource)",
+      "Bash(accessToken + loginSource)"
     ]
   }
 }
