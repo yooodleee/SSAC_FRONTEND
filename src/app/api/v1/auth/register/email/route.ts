@@ -14,11 +14,15 @@ export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as Record<string, unknown>;
 
+    // guestId 쿠키가 있으면 body에 포함하여 비회원 데이터 병합 지원
+    const guestId = request.cookies.get('guestId')?.value ?? null;
+    const beBody = { ...body, guestId };
+
     // ── 1. 회원가입 요청 ──────────────────────────────────────────
     const beResponse = await fetch(new URL('/api/v1/auth/register/email', backendUrl).toString(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify(beBody),
     });
 
     if (!beResponse.ok) {
