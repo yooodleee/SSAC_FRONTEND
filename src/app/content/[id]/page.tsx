@@ -44,7 +44,8 @@ function toContentKey(type: string): string {
 function extractRichText(block: Record<string, unknown>, type: string): RichTextItem[] {
   const contentKey = toContentKey(type);
   const data = block[contentKey] as Record<string, unknown> | undefined;
-  const rt = data?.richText ?? data?.rich_text;
+  // BE 필드명 후보: richText(camelCase) · rich_text(snake) · text · texts
+  const rt = data?.richText ?? data?.rich_text ?? data?.text ?? data?.texts;
   return Array.isArray(rt) ? (rt as RichTextItem[]) : [];
 }
 
@@ -101,19 +102,20 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }) {
   const blockData = block[contentKey] as Record<string, unknown> | undefined;
 
   switch (type) {
-    case 'Heading1':
+    // Notion Java SDK enum: HeadingOne / HeadingTwo / HeadingThree
+    case 'HeadingOne':
       return (
         <h2 className="mb-4 mt-8 text-[22px] font-bold leading-[1.3] text-[#1A1A1A]">
           {renderRichText(richTexts)}
         </h2>
       );
-    case 'Heading2':
+    case 'HeadingTwo':
       return (
         <h3 className="mb-3 mt-6 text-[18px] font-semibold leading-[1.3] text-[#1A1A1A]">
           {renderRichText(richTexts)}
         </h3>
       );
-    case 'Heading3':
+    case 'HeadingThree':
       return (
         <h4 className="mb-2 mt-5 text-[16px] font-semibold leading-[1.3] text-[#1A1A1A]">
           {renderRichText(richTexts)}
@@ -146,12 +148,21 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }) {
     case 'Divider':
       return <hr className="my-6 border-[#E8E8E8]" />;
     case 'Callout': {
+      // richText가 비어 있고 hasChildren: true이면 children 블록을 대신 렌더링.
+      // BE가 hasChildren: true 블록의 자식을 children 필드로 내려준다 (2 depth 지원).
       const icon = blockData?.icon as Record<string, unknown> | undefined;
       const emoji = (icon?.emoji as string | undefined) ?? '💡';
+      const children = Array.isArray(block.children) ? (block.children as NotionBlock[]) : [];
       return (
         <div className="my-4 flex gap-3 rounded-xl bg-[#E8F5EE] p-4">
-          <span className="text-xl leading-[1.6]">{emoji}</span>
-          <p className="text-[15px] leading-[1.6] text-[#1A1A1A]">{renderRichText(richTexts)}</p>
+          <span className="shrink-0 text-xl leading-[1.6]">{emoji}</span>
+          <div className="min-w-0 flex-1 text-[15px] leading-[1.6] text-[#1A1A1A]">
+            {richTexts.length > 0
+              ? renderRichText(richTexts)
+              : children.map((child, i) => (
+                  <NotionBlockRenderer key={(child?.id as string | undefined) ?? i} block={child} />
+                ))}
+          </div>
         </div>
       );
     }
