@@ -33,6 +33,12 @@ export async function POST(request: NextRequest) {
     `accessToken=; Path=/; HttpOnly; Max-Age=0; SameSite=Lax${secure}`,
   );
 
+  // loginSource 삭제 (명시적 로그인 마커)
+  responseHeaders.append(
+    'Set-Cookie',
+    `loginSource=; Path=/; HttpOnly; Max-Age=0; SameSite=Lax${secure}`,
+  );
+
   // refreshToken 삭제 — BE 발급 Path와 동일하게 /api/v1/auth 지정
   responseHeaders.append(
     'Set-Cookie',

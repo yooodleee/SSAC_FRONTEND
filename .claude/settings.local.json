@@ -227,7 +227,11 @@
       "Bash(tsx ^4.19.2)",
       "Bash(e2e:diagnose)",
       "Bash(playwright.config.ts)",
-      "Bash(.env.e2e)"
+      "Bash(.env.e2e)",
+      "Bash(loginSource)",
+      "Bash(accessToken + loginSource)",
+      "Bash(src/app/api/v1/contents/[id]/route.ts)",
+      "Bash(C:/Users/LEGION/.pyenv/pyenv-win/shims/python3:*)"
     ]
   }
 }
