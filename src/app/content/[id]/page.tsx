@@ -17,8 +17,15 @@ interface ContentDetailPageProps {
 
 // ─── Notion 블록 렌더러 ───────────────────────────────────────────────────────
 
+/**
+ * BE(Java/Spring)는 camelCase로 변환해서 내려준다.
+ * - type: "Image", "Paragraph", "Heading1", "BulletedListItem" 등 PascalCase
+ * - 콘텐츠 키: type 첫 글자만 소문자로 → "image", "paragraph", "heading1", "bulletedListItem"
+ * - richText: Java camelCase. plain_text → plainText
+ */
 type RichTextItem = {
-  plain_text?: string;
+  plainText?: string; // BE camelCase
+  plain_text?: string; // Notion 원본 snake_case (fallback)
   annotations?: {
     bold?: boolean;
     italic?: boolean;
@@ -28,23 +35,33 @@ type RichTextItem = {
   href?: string | null;
 };
 
+/** type → 콘텐츠 키 ("Image" → "image", "BulletedListItem" → "bulletedListItem") */
+function toContentKey(type: string): string {
+  return type.charAt(0).toLowerCase() + type.slice(1);
+}
+
+/** 블록에서 richText 배열 추출 (camelCase · snake_case 모두 탐색) */
+function extractRichText(block: Record<string, unknown>, type: string): RichTextItem[] {
+  const contentKey = toContentKey(type);
+  const data = block[contentKey] as Record<string, unknown> | undefined;
+  const rt = data?.richText ?? data?.rich_text;
+  return Array.isArray(rt) ? (rt as RichTextItem[]) : [];
+}
+
 function renderRichText(richTexts: RichTextItem[]): React.ReactNode {
-  if (!richTexts?.length) return null;
+  if (!richTexts.length) return null;
   return richTexts.map((rt, i) => {
-    const text = rt.plain_text ?? '';
+    const text = rt.plainText ?? rt.plain_text ?? '';
     const { bold, italic, strikethrough, code } = rt.annotations ?? {};
 
     let node: React.ReactNode = text;
-    if (code)
+    if (code) {
       node = (
-        <code
-          key={i}
-          className="rounded bg-gray-100 px-1 py-0.5 font-mono text-[13px] text-[#1A1A1A]"
-        >
+        <code key={i} className="rounded bg-gray-100 px-1 py-0.5 font-mono text-[13px]">
           {text}
         </code>
       );
-    else {
+    } else {
       if (bold)
         node = (
           <strong key={i} className="font-semibold">
@@ -53,18 +70,19 @@ function renderRichText(richTexts: RichTextItem[]): React.ReactNode {
         );
       if (italic) node = <em key={i}>{node}</em>;
       if (strikethrough) node = <s key={i}>{node}</s>;
-      if (rt.href)
+      if (rt.href) {
         node = (
           <a
             key={i}
             href={rt.href}
-            className="underline decoration-[#4CAF82] text-[#4CAF82]"
+            className="text-[#4CAF82] underline decoration-[#4CAF82]"
             target="_blank"
             rel="noopener noreferrer"
           >
             {node}
           </a>
         );
+      }
     }
     return <span key={i}>{node}</span>;
   });
@@ -73,59 +91,62 @@ function renderRichText(richTexts: RichTextItem[]): React.ReactNode {
 type NotionBlock = Record<string, unknown>;
 
 function NotionBlockRenderer({ block }: { block: NotionBlock }) {
+  if (!block || typeof block !== 'object') return null;
+
   const type = block.type as string | undefined;
   if (!type) return null;
 
-  const data = block[type] as Record<string, unknown> | undefined;
-  const richTexts = (data?.rich_text as RichTextItem[] | undefined) ?? [];
+  const richTexts = extractRichText(block, type);
+  const contentKey = toContentKey(type);
+  const blockData = block[contentKey] as Record<string, unknown> | undefined;
 
   switch (type) {
-    case 'heading_1':
+    case 'Heading1':
       return (
         <h2 className="mb-4 mt-8 text-[22px] font-bold leading-[1.3] text-[#1A1A1A]">
           {renderRichText(richTexts)}
         </h2>
       );
-    case 'heading_2':
+    case 'Heading2':
       return (
         <h3 className="mb-3 mt-6 text-[18px] font-semibold leading-[1.3] text-[#1A1A1A]">
           {renderRichText(richTexts)}
         </h3>
       );
-    case 'heading_3':
+    case 'Heading3':
       return (
         <h4 className="mb-2 mt-5 text-[16px] font-semibold leading-[1.3] text-[#1A1A1A]">
           {renderRichText(richTexts)}
         </h4>
       );
-    case 'paragraph':
+    case 'Paragraph':
       return richTexts.length === 0 ? (
         <div className="h-3" />
       ) : (
         <p className="mb-3 text-[15px] leading-[1.6] text-[#1A1A1A]">{renderRichText(richTexts)}</p>
       );
-    case 'bulleted_list_item':
+    case 'BulletedListItem':
       return (
         <li className="mb-1 ml-5 list-disc text-[15px] leading-[1.6] text-[#1A1A1A]">
           {renderRichText(richTexts)}
         </li>
       );
-    case 'numbered_list_item':
+    case 'NumberedListItem':
       return (
         <li className="mb-1 ml-5 list-decimal text-[15px] leading-[1.6] text-[#1A1A1A]">
           {renderRichText(richTexts)}
         </li>
       );
-    case 'quote':
+    case 'Quote':
       return (
         <blockquote className="my-4 border-l-4 border-[#4CAF82] pl-4 text-[15px] italic leading-[1.6] text-[#6B6B6B]">
           {renderRichText(richTexts)}
         </blockquote>
       );
-    case 'divider':
+    case 'Divider':
       return <hr className="my-6 border-[#E8E8E8]" />;
-    case 'callout': {
-      const icon = data?.icon as Record<string, unknown> | undefined;
+    case 'Callout': {
+      const icon = blockData?.icon as Record<string, unknown> | undefined;
       const emoji = (icon?.emoji as string | undefined) ?? '💡';
       return (
         <div className="my-4 flex gap-3 rounded-xl bg-[#E8F5EE] p-4">
@@ -134,18 +155,21 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }) {
         </div>
       );
     }
-    case 'image': {
-      const file = data?.file as Record<string, unknown> | undefined;
-      const external = data?.external as Record<string, unknown> | undefined;
+    case 'Image': {
+      // image.file.url: Cloudinary 영구 URL (expiryTime 무시)
+      const file = blockData?.file as Record<string, unknown> | undefined;
+      const external = blockData?.external as Record<string, unknown> | undefined;
       const src = (file?.url as string | undefined) ?? (external?.url as string | undefined);
-      const caption = (data?.caption as RichTextItem[] | undefined) ?? [];
+      const caption = Array.isArray(blockData?.caption)
+        ? (blockData.caption as RichTextItem[])
+        : [];
       if (!src) return null;
       return (
         <figure className="my-6">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={src}
-            alt={caption.map((c) => c.plain_text).join('') || '이미지'}
+            alt={caption.map((c) => c.plainText ?? c.plain_text).join('') || '이미지'}
             className="w-full rounded-xl"
           />
           {caption.length > 0 && (
@@ -156,8 +180,8 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }) {
         </figure>
       );
     }
-    case 'code': {
-      const lang = data?.language as string | undefined;
+    case 'Code': {
+      const lang = blockData?.language as string | undefined;
       return (
         <pre className="my-4 overflow-x-auto rounded-xl bg-gray-900 p-4 text-[13px] leading-[1.6] text-green-400">
           <code data-language={lang}>{renderRichText(richTexts)}</code>
@@ -177,21 +201,37 @@ const DIFFICULTY_STYLE: Record<string, { bg: string; text: string; label: string
   TREE: { bg: '#E3F2FD', text: '#1976D2', label: '🌳 나무' },
 };
 
+// ─── 데이터 페치 ──────────────────────────────────────────────────────────────
+
+async function fetchContentDetail(
+  numericId: number,
+  token: string | undefined,
+): Promise<{ detail: ContentDetailResponse | null; status: number }> {
+  const apiBase = process.env.API_BASE_URL ?? '';
+  const authHeader: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+
+  try {
+    const res = await fetch(`${apiBase}/api/v1/contents/${numericId}`, {
+      headers: authHeader,
+      cache: 'no-store',
+    });
+    if (res.status === 404) return { detail: null, status: 404 };
+    if (!res.ok) return { detail: null, status: res.status };
+    const json = (await res.json()) as ApiResponse;
+    return { detail: json.data ?? null, status: 200 };
+  } catch {
+    return { detail: null, status: 500 };
+  }
+}
+
 // ─── 페이지 ──────────────────────────────────────────────────────────────────
 
 export async function generateMetadata({ params }: ContentDetailPageProps): Promise<Metadata> {
   const { id } = await params;
-  const apiBase = process.env.API_BASE_URL ?? '';
-  try {
-    const res = await fetch(`${apiBase}/api/v1/contents/${id}`, { cache: 'no-store' });
-    if (res.ok) {
-      const json = (await res.json()) as ApiResponse;
-      return { title: json.data?.title ?? '콘텐츠' };
-    }
-  } catch {
-    // fallback
-  }
-  return { title: '콘텐츠' };
+  const numericId = Number(id);
+  if (isNaN(numericId)) return { title: '콘텐츠' };
+  const { detail } = await fetchContentDetail(numericId, undefined);
+  return { title: detail?.title ?? '콘텐츠' };
 }
 
 export default async function ContentDetailPage({ params }: ContentDetailPageProps) {
@@ -199,33 +239,14 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
   const numericId = Number(id);
   if (isNaN(numericId)) notFound();
 
-  const apiBase = process.env.API_BASE_URL ?? '';
   const cookieStore = await cookies();
   const token = cookieStore.get('accessToken')?.value;
-  const authHeader: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 
-  let detail: ContentDetailResponse | null = null;
-  let fetchError = false;
+  const { detail, status } = await fetchContentDetail(numericId, token);
 
-  try {
-    const res = await fetch(`${apiBase}/api/v1/contents/${numericId}`, {
-      headers: authHeader,
-      cache: 'no-store',
-    });
+  if (status === 404) notFound();
 
-    if (res.status === 404) notFound();
-
-    if (res.ok) {
-      const json = (await res.json()) as ApiResponse;
-      detail = json.data ?? null;
-    } else {
-      fetchError = true;
-    }
-  } catch {
-    fetchError = true;
-  }
-
-  if (fetchError) {
+  if (status !== 200 || !detail) {
     return (
       <div className="container-page py-12">
         <Link href="/content">
@@ -234,17 +255,13 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
           </Button>
         </Link>
         <div className="flex flex-col items-center gap-3 py-20 text-center">
-          <p className="text-[15px] text-[#6B6B6B]">
-            연결이 불안정해요. 잠시 후 다시 시도해주세요.
-          </p>
+          <p className="text-[15px] text-gray-500">연결이 불안정해요. 잠시 후 다시 시도해주세요.</p>
         </div>
       </div>
     );
   }
 
-  if (!detail) notFound();
-
-  const blocks = (detail.blocks ?? []) as NotionBlock[];
+  const blocks = Array.isArray(detail.blocks) ? (detail.blocks as NotionBlock[]) : [];
   const difficultyStyle = DIFFICULTY_STYLE[detail.difficulty ?? ''] ?? null;
 
   const editedAt = detail.notionLastEditedAt
@@ -269,7 +286,6 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
       <article className="mx-auto max-w-3xl">
         {/* 메타 정보 */}
         <div className="mb-4 flex flex-wrap items-center gap-2">
-          {/* 카테고리 태그 */}
           {(detail.categories ?? []).map((cat) => {
             const domain = DOMAIN_TABS.find((d) => d.key === cat);
             if (!domain) return null;
@@ -284,7 +300,6 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
             );
           })}
 
-          {/* 난이도 */}
           {difficultyStyle && (
             <span
               className="rounded-full px-2 py-0.5 text-[11px] font-medium"
@@ -294,7 +309,6 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
             </span>
           )}
 
-          {/* 최종 수정일 */}
           {editedAt && <span className="text-[13px] text-[#9E9E9E]">{editedAt}</span>}
         </div>
 
@@ -311,7 +325,7 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
         ) : (
           <div className="rounded-2xl border border-[#E8E8E8] bg-white p-6 shadow-sm sm:p-8">
             {blocks.map((block, i) => (
-              <NotionBlockRenderer key={(block.id as string | undefined) ?? i} block={block} />
+              <NotionBlockRenderer key={(block?.id as string | undefined) ?? i} block={block} />
             ))}
           </div>
         )}

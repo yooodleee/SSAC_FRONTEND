@@ -231,7 +231,8 @@
       "Bash(loginSource)",
       "Bash(accessToken + loginSource)",
       "Bash(src/app/api/v1/contents/[id]/route.ts)",
-      "Bash(C:/Users/LEGION/.pyenv/pyenv-win/shims/python3:*)"
+      "Bash(C:/Users/LEGION/.pyenv/pyenv-win/shims/python3:*)",
+      "Bash(grep -r \"container-page\" src/app/globals.css src/styles/ tailwind.config.*)"
     ]
   }
 }
