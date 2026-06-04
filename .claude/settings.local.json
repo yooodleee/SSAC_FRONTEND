@@ -237,7 +237,9 @@
       "Bash(heading_2)",
       "Bash(Heading2)",
       "Bash(callout)",
-      "Bash(HeadingTwo)"
+      "Bash(HeadingTwo)",
+      "Bash(grep -r \"cloudinary\\\\|CLOUDINARY\" .env*)",
+      "Bash(grep -v \"^$\")"
     ]
   }
 }
