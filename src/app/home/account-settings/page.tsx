@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: '계정 관리' };
 
 export default async function HomeAccountSettingsPage() {
   const cookieStore = await cookies();
-  if (!cookieStore.has('accessToken')) redirect('/login');
+  if (!cookieStore.has('accessToken')) redirect('/login?redirectTo=/home/account-settings');
 
   return (
     <div className="min-h-screen bg-white dark:bg-white">

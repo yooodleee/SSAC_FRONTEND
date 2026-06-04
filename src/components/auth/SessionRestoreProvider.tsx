@@ -49,9 +49,11 @@ export function SessionRestoreProvider() {
         const data = (await res.json()) as ReissueResponse;
         authStore.set(data);
 
-        // 로그인 페이지에서 세션이 복원된 경우 홈으로 이동
+        // 로그인 페이지에서 세션이 복원된 경우 원래 목적지로 이동.
+        // redirectTo 파라미터가 있으면 해당 페이지로, 없으면 /home으로 이동.
         if (pathname === '/login') {
-          router.replace('/home');
+          const redirectTo = new URLSearchParams(window.location.search).get('redirectTo');
+          router.replace(redirectTo ?? '/home');
         }
       } catch {
         // 네트워크 오류 → 비로그인 상태 유지
