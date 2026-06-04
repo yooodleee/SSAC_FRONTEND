@@ -54,6 +54,9 @@ const BLOCK_TYPE_ALIASES: Record<string, string> = {
   // List variants
   bulleted_list_item: 'BulletedListItem',
   numbered_list_item: 'NumberedListItem',
+  // To-do (checkbox) variants
+  to_do: 'ToDo',
+  ToDo: 'ToDo',
   // Other lowercase variants
   callout: 'Callout',
   paragraph: 'Paragraph',
@@ -201,11 +204,14 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }) {
     case 'Divider':
       return <hr className="my-6 border-[#E8E8E8]" />;
     case 'Callout': {
-      // richText가 비어 있고 hasChildren: true이면 children 블록을 대신 렌더링.
-      // BE가 hasChildren: true 블록의 자식을 children 필드로 내려준다 (2 depth 지원).
       const icon = blockData?.icon as Record<string, unknown> | undefined;
       const emoji = (icon?.emoji as string | undefined) ?? '💡';
-      const children = Array.isArray(block.children) ? (block.children as NotionBlock[]) : [];
+      // children: 최상위 block.children 또는 blockData.children 모두 탐색 (2 depth)
+      const children = Array.isArray(block.children)
+        ? (block.children as NotionBlock[])
+        : Array.isArray(blockData?.children)
+          ? (blockData.children as NotionBlock[])
+          : [];
       return (
         <div className="my-4 flex gap-3 rounded-xl bg-[#E8F5EE] p-4">
           <span className="shrink-0 text-xl leading-[1.6]">{emoji}</span>
@@ -216,6 +222,24 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }) {
                   <NotionBlockRenderer key={(child?.id as string | undefined) ?? i} block={child} />
                 ))}
           </div>
+        </div>
+      );
+    }
+    case 'ToDo': {
+      const checked = blockData?.checked as boolean | undefined;
+      return (
+        <div className="mb-2 flex items-start gap-2">
+          <input
+            type="checkbox"
+            checked={checked ?? false}
+            readOnly
+            className="mt-[3px] h-4 w-4 shrink-0 accent-[#4CAF82]"
+          />
+          <span
+            className={`text-[15px] leading-[1.6] ${checked ? 'text-[#9E9E9E] line-through' : 'text-[#1A1A1A]'}`}
+          >
+            {renderRichText(richTexts)}
+          </span>
         </div>
       );
     }
