@@ -18,14 +18,15 @@ interface ContentDetailPageProps {
 // ─── Notion 블록 렌더러 ───────────────────────────────────────────────────────
 
 /**
- * BE(Java/Spring)는 camelCase로 변환해서 내려준다.
- * - type: "Image", "Paragraph", "Heading1", "BulletedListItem" 등 PascalCase
- * - 콘텐츠 키: type 첫 글자만 소문자로 → "image", "paragraph", "heading1", "bulletedListItem"
- * - richText: Java camelCase. plain_text → plainText
+ * BE는 Gson을 통해 Notion API 원본 형식으로 직렬화해서 내려준다.
+ * - type: "heading_2", "heading_3", "callout", "image" 등 Notion API snake_case
+ * - 콘텐츠 키: type명과 동일 → block["heading_2"], block["callout"]
+ * - richText 키: "rich_text" (snake_case)
+ * - plainText 키: "plain_text" (snake_case)
  */
 type RichTextItem = {
-  plainText?: string; // BE camelCase
-  plain_text?: string; // Notion 원본 snake_case (fallback)
+  plain_text?: string; // Notion 원본 snake_case (BE Gson 직렬화)
+  plainText?: string; // camelCase fallback
   annotations?: {
     bold?: boolean;
     italic?: boolean;
@@ -35,24 +36,69 @@ type RichTextItem = {
   href?: string | null;
 };
 
+/**
+ * BE 직렬화 방식에 따라 다양한 형식으로 올 수 있는 블록 타입을 정규화한다.
+ * - Notion Java SDK enum (HeadingOne/Two/Three)
+ * - 숫자형 PascalCase (Heading1/2/3)
+ * - Notion API 원본 snake_case (heading_1/2/3, bulleted_list_item 등)
+ * - 소문자 (callout, paragraph 등)
+ */
+const BLOCK_TYPE_ALIASES: Record<string, string> = {
+  // Heading variants
+  heading_1: 'HeadingOne',
+  Heading1: 'HeadingOne',
+  heading_2: 'HeadingTwo',
+  Heading2: 'HeadingTwo',
+  heading_3: 'HeadingThree',
+  Heading3: 'HeadingThree',
+  // List variants
+  bulleted_list_item: 'BulletedListItem',
+  numbered_list_item: 'NumberedListItem',
+  // Other lowercase variants
+  callout: 'Callout',
+  paragraph: 'Paragraph',
+  quote: 'Quote',
+  divider: 'Divider',
+  image: 'Image',
+  code: 'Code',
+};
+
 /** type → 콘텐츠 키 ("Image" → "image", "BulletedListItem" → "bulletedListItem") */
 function toContentKey(type: string): string {
   return type.charAt(0).toLowerCase() + type.slice(1);
 }
 
-/** 블록에서 richText 배열 추출 (camelCase · snake_case 모두 탐색) */
-function extractRichText(block: Record<string, unknown>, type: string): RichTextItem[] {
-  const contentKey = toContentKey(type);
-  const data = block[contentKey] as Record<string, unknown> | undefined;
-  // BE 필드명 후보: richText(camelCase) · rich_text(snake) · text · texts
-  const rt = data?.richText ?? data?.rich_text ?? data?.text ?? data?.texts;
-  return Array.isArray(rt) ? (rt as RichTextItem[]) : [];
+/**
+ * 블록에서 richText 배열 추출.
+ * rawType (BE 원본)과 normalizedType (정규화) 모두를 content key 후보로 시도한다.
+ */
+function extractRichText(
+  block: Record<string, unknown>,
+  rawType: string,
+  normalizedType: string,
+): RichTextItem[] {
+  // 시도할 content key 후보 목록 (우선순위 순)
+  const candidateKeys = [
+    toContentKey(normalizedType), // e.g., "headingTwo"
+    toContentKey(rawType), // e.g., "heading2", "heading_2"
+    rawType, // e.g., "heading_2" (snake_case 원본)
+  ];
+
+  for (const key of candidateKeys) {
+    const data = block[key] as Record<string, unknown> | undefined;
+    if (data && typeof data === 'object') {
+      // BE 필드명 후보: richText(camelCase) · rich_text(snake) · text · texts
+      const rt = data.richText ?? data.rich_text ?? data.text ?? data.texts;
+      if (Array.isArray(rt)) return rt as RichTextItem[];
+    }
+  }
+  return [];
 }
 
 function renderRichText(richTexts: RichTextItem[]): React.ReactNode {
   if (!richTexts.length) return null;
   return richTexts.map((rt, i) => {
-    const text = rt.plainText ?? rt.plain_text ?? '';
+    const text = rt.plain_text ?? rt.plainText ?? '';
     const { bold, italic, strikethrough, code } = rt.annotations ?? {};
 
     let node: React.ReactNode = text;
@@ -94,12 +140,19 @@ type NotionBlock = Record<string, unknown>;
 function NotionBlockRenderer({ block }: { block: NotionBlock }) {
   if (!block || typeof block !== 'object') return null;
 
-  const type = block.type as string | undefined;
-  if (!type) return null;
+  const rawType = block.type as string | undefined;
+  if (!rawType) return null;
 
-  const richTexts = extractRichText(block, type);
+  // BE 직렬화 형식에 무관하게 정규화된 타입으로 처리
+  const type = BLOCK_TYPE_ALIASES[rawType] ?? rawType;
+
+  const richTexts = extractRichText(block, rawType, type);
+  // blockData: 정규화 타입 키 → 원본 타입 키 순으로 시도
   const contentKey = toContentKey(type);
-  const blockData = block[contentKey] as Record<string, unknown> | undefined;
+  const rawContentKey = toContentKey(rawType);
+  const blockData = (block[contentKey] ?? block[rawContentKey] ?? block[rawType]) as
+    | Record<string, unknown>
+    | undefined;
 
   switch (type) {
     // Notion Java SDK enum: HeadingOne / HeadingTwo / HeadingThree
@@ -180,7 +233,7 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={src}
-            alt={caption.map((c) => c.plainText ?? c.plain_text).join('') || '이미지'}
+            alt={caption.map((c) => c.plain_text ?? c.plainText).join('') || '이미지'}
             className="w-full rounded-xl"
           />
           {caption.length > 0 && (
