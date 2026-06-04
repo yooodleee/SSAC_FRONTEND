@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: '내가 본 콘텐츠' };
 
 export default async function ContentHistoryPage() {
   const cookieStore = await cookies();
-  if (!cookieStore.has('accessToken')) redirect('/login');
+  if (!cookieStore.has('accessToken')) redirect('/login?redirectTo=/home/content-history');
 
   return (
     <div className="min-h-screen bg-white dark:bg-white">
