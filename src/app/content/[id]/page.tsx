@@ -1,11 +1,9 @@
 import { notFound } from 'next/navigation';
 import { cookies } from 'next/headers';
-import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 import type { components } from '@/../../api-contract/generated/api-types';
-import { DOMAIN_TABS } from '@/constants/domains';
-import { Button } from '@/components/ui/Button';
+import { DOMAIN_TABS, DOMAIN_IMAGE_MAP } from '@/constants/domains';
 
 type ContentDetailResponse = components['schemas']['ContentDetailResponse'];
 type ApiResponse = components['schemas']['ApiResponseContentDetailResponse'];
@@ -338,11 +336,6 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
   if (status !== 200 || !detail) {
     return (
       <div className="container-page pt-20 pb-12">
-        <Link href="/content">
-          <Button variant="ghost" size="sm" className="mb-6">
-            ← 콘텐츠 목록으로
-          </Button>
-        </Link>
         <div className="flex flex-col items-center gap-3 py-20 text-center">
           <p className="text-[15px] text-gray-500">연결이 불안정해요. 잠시 후 다시 시도해주세요.</p>
         </div>
@@ -364,14 +357,17 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
         .replace(/\.$/, '')
     : null;
 
+  const firstCategory = detail.categories?.[0] ?? '';
+  const bannerSrc = DOMAIN_IMAGE_MAP[firstCategory];
+
   return (
     <div className="min-h-screen bg-white">
-      {/* 배너 이미지 — /contents/realestate와 동일한 h-[25vh] w-full, pt-16으로 LandingHeader 해소 */}
+      {/* 배너 이미지 — /contents/realestate와 동일한 h-[25vh] w-full */}
       <div className="relative h-[25vh] w-full bg-[#F5F5F5] pt-16">
-        {detail.thumbnailUrl && (
+        {bannerSrc && (
           <Image
-            src={detail.thumbnailUrl}
-            alt={detail.title ?? '콘텐츠 썸네일'}
+            src={bannerSrc}
+            alt={firstCategory}
             fill
             className="object-cover"
             priority
@@ -382,12 +378,6 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
 
       {/* 본문 */}
       <div className="container-page pb-12 pt-8">
-        <Link href="/content">
-          <Button variant="ghost" size="sm" className="mb-6">
-            ← 콘텐츠 목록으로
-          </Button>
-        </Link>
-
         <article className="mx-auto max-w-3xl">
           {/* 제목 */}
           <h1 className="mb-4 text-[28px] font-bold leading-[1.3] text-[#1A1A1A]">
