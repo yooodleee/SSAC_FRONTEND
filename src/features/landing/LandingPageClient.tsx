@@ -13,8 +13,6 @@ import { LandingHeader } from '@/components/layout/LandingHeader';
 import { FeedbackWidget } from '@/components/shared/FeedbackWidget';
 import { HeroSection } from './HeroSection';
 import { ContentGallery } from './ContentGallery';
-import { NewsDomainScroller } from './NewsDomainScroller';
-import { TechSection } from './TechSection';
 
 /* eslint-disable @next/next/no-img-element */
 const prefersReducedMotion =
@@ -89,12 +87,6 @@ export function LandingPageClient({ isLoggedIn }: LandingPageClientProps) {
 
       {/* 섹션 2: 콘텐츠 갤러리 */}
       <ContentGallery />
-
-      {/* 섹션 3: 금융 도메인 뉴스 가로 스크롤 */}
-      <NewsDomainScroller />
-
-      {/* 섹션 4: TECH (Coming Soon) */}
-      <TechSection />
 
       {/* 개발팀 문의 플로팅 버튼 */}
       <FeedbackWidget />
