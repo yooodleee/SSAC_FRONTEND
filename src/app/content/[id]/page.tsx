@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Metadata } from 'next';
 import type { components } from '@/../../api-contract/generated/api-types';
 import { DOMAIN_TABS } from '@/constants/domains';
@@ -336,7 +337,7 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
 
   if (status !== 200 || !detail) {
     return (
-      <div className="container-page py-12">
+      <div className="container-page pt-20 pb-12">
         <Link href="/content">
           <Button variant="ghost" size="sm" className="mb-6">
             ← 콘텐츠 목록으로
@@ -364,60 +365,77 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
     : null;
 
   return (
-    <div className="container-page py-12">
-      <Link href="/content">
-        <Button variant="ghost" size="sm" className="mb-6">
-          ← 콘텐츠 목록으로
-        </Button>
-      </Link>
-
-      <article className="mx-auto max-w-3xl">
-        {/* 메타 정보 */}
-        <div className="mb-4 flex flex-wrap items-center gap-2">
-          {(detail.categories ?? []).map((cat) => {
-            const domain = DOMAIN_TABS.find((d) => d.key === cat);
-            if (!domain) return null;
-            return (
-              <span
-                key={cat}
-                className="inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[11px] font-medium"
-                style={{ backgroundColor: domain.tagColor, color: domain.tagTextColor }}
-              >
-                {domain.emoji} {domain.label}
-              </span>
-            );
-          })}
-
-          {difficultyStyle && (
-            <span
-              className="rounded-full px-2 py-0.5 text-[11px] font-medium"
-              style={{ backgroundColor: difficultyStyle.bg, color: difficultyStyle.text }}
-            >
-              {detail.difficultyLabel ?? difficultyStyle.label}
-            </span>
-          )}
-
-          {editedAt && <span className="text-[13px] text-[#9E9E9E]">{editedAt}</span>}
-        </div>
-
-        {/* 제목 */}
-        <h1 className="mb-8 text-[28px] font-bold leading-[1.3] text-[#1A1A1A]">
-          {detail.title ?? '제목 없음'}
-        </h1>
-
-        {/* Notion 본문 */}
-        {blocks.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 rounded-xl border border-[#E8E8E8] bg-[#F5F5F5] py-16 text-center">
-            <p className="text-[15px] text-[#6B6B6B]">아직 본문이 준비되지 않았어요.</p>
-          </div>
-        ) : (
-          <div className="rounded-2xl border border-[#E8E8E8] bg-white p-6 shadow-sm sm:p-8">
-            {blocks.map((block, i) => (
-              <NotionBlockRenderer key={(block?.id as string | undefined) ?? i} block={block} />
-            ))}
-          </div>
+    <div className="min-h-screen bg-white">
+      {/* 배너 이미지 — /contents/realestate와 동일한 h-[25vh] w-full, pt-16으로 LandingHeader 해소 */}
+      <div className="relative h-[25vh] w-full bg-[#F5F5F5] pt-16">
+        {detail.thumbnailUrl && (
+          <Image
+            src={detail.thumbnailUrl}
+            alt={detail.title ?? '콘텐츠 썸네일'}
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+          />
         )}
-      </article>
+      </div>
+
+      {/* 본문 */}
+      <div className="container-page pb-12 pt-8">
+        <Link href="/content">
+          <Button variant="ghost" size="sm" className="mb-6">
+            ← 콘텐츠 목록으로
+          </Button>
+        </Link>
+
+        <article className="mx-auto max-w-3xl">
+          {/* 제목 */}
+          <h1 className="mb-4 text-[28px] font-bold leading-[1.3] text-[#1A1A1A]">
+            {detail.title ?? '제목 없음'}
+          </h1>
+
+          {/* 메타 정보 — 제목 아래에 배치 */}
+          <div className="mb-8 flex flex-wrap items-center gap-2">
+            {(detail.categories ?? []).map((cat) => {
+              const domain = DOMAIN_TABS.find((d) => d.key === cat);
+              if (!domain) return null;
+              return (
+                <span
+                  key={cat}
+                  className="inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[11px] font-medium"
+                  style={{ backgroundColor: domain.tagColor, color: domain.tagTextColor }}
+                >
+                  {domain.emoji} {domain.label}
+                </span>
+              );
+            })}
+
+            {difficultyStyle && (
+              <span
+                className="rounded-full px-2 py-0.5 text-[11px] font-medium"
+                style={{ backgroundColor: difficultyStyle.bg, color: difficultyStyle.text }}
+              >
+                {detail.difficultyLabel ?? difficultyStyle.label}
+              </span>
+            )}
+
+            {editedAt && <span className="text-[13px] text-[#9E9E9E]">{editedAt}</span>}
+          </div>
+
+          {/* Notion 본문 */}
+          {blocks.length === 0 ? (
+            <div className="flex flex-col items-center gap-2 rounded-xl border border-[#E8E8E8] bg-[#F5F5F5] py-16 text-center">
+              <p className="text-[15px] text-[#6B6B6B]">아직 본문이 준비되지 않았어요.</p>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-[#E8E8E8] bg-white p-6 shadow-sm sm:p-8">
+              {blocks.map((block, i) => (
+                <NotionBlockRenderer key={(block?.id as string | undefined) ?? i} block={block} />
+              ))}
+            </div>
+          )}
+        </article>
+      </div>
     </div>
   );
 }
