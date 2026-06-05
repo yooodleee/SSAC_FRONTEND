@@ -239,7 +239,8 @@
       "Bash(callout)",
       "Bash(HeadingTwo)",
       "Bash(grep -r \"cloudinary\\\\|CLOUDINARY\" .env*)",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")"
     ]
   }
 }
