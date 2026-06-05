@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { cookies } from 'next/headers';
 import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
 import { PostLoginToast } from '@/components/auth/PostLoginToast';
 import { SessionRestoreProvider } from '@/components/auth/SessionRestoreProvider';
 import { ErrorToast } from '@/components/ui/ErrorToast';
@@ -63,7 +62,6 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           <SessionRestoreProvider />
           <Header isLoggedIn={isLoggedIn} />
           <main className="flex-1">{children}</main>
-          <Footer />
           <PostLoginToast />
           <ErrorToast />
           <LevelUpModal />
