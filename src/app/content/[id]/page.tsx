@@ -203,8 +203,6 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }) {
     case 'Divider':
       return <hr className="my-6 border-[#E8E8E8]" />;
     case 'Callout': {
-      const icon = blockData?.icon as Record<string, unknown> | undefined;
-      const emoji = (icon?.emoji as string | undefined) ?? '💡';
       // children: 최상위 block.children 또는 blockData.children 모두 탐색 (2 depth)
       const children = Array.isArray(block.children)
         ? (block.children as NotionBlock[])
@@ -213,7 +211,13 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }) {
           : [];
       return (
         <div className="my-4 flex gap-3 rounded-xl bg-[#E8F5EE] p-4">
-          <span className="shrink-0 text-xl leading-[1.6]">{emoji}</span>
+          <Image
+            src="/gress.png"
+            alt="SSAC"
+            width={22}
+            height={22}
+            className="mt-[2px] shrink-0 object-contain"
+          />
           <div className="min-w-0 flex-1 text-[15px] leading-[1.6] text-[#1A1A1A]">
             {richTexts.length > 0
               ? renderRichText(richTexts)
@@ -405,7 +409,7 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
                 className="rounded-full px-2 py-0.5 text-[11px] font-medium"
                 style={{ backgroundColor: difficultyStyle.bg, color: difficultyStyle.text }}
               >
-                {detail.difficultyLabel ?? difficultyStyle.label}
+                {detail.difficulty}
               </span>
             )}
 
