@@ -241,7 +241,11 @@
       "Bash(grep -r \"cloudinary\\\\|CLOUDINARY\" .env*)",
       "Bash(grep -v \"^$\")",
       "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(font-semibold)",
+      "Bash(font-bold)",
+      "Bash(items-start)",
+      "Bash(mt-[2px])"
     ]
   }
 }
