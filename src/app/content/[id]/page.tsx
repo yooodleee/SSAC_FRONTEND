@@ -166,13 +166,13 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }) {
       );
     case 'HeadingTwo':
       return (
-        <h3 className="mb-3 mt-6 text-[18px] font-semibold leading-[1.3] text-[#1A1A1A]">
+        <h3 className="mb-3 mt-6 text-[18px] font-bold leading-[1.3] text-[#1A1A1A]">
           {renderRichText(richTexts)}
         </h3>
       );
     case 'HeadingThree':
       return (
-        <h4 className="mb-2 mt-5 text-[16px] font-semibold leading-[1.3] text-[#1A1A1A]">
+        <h4 className="mb-2 mt-5 text-[16px] font-bold leading-[1.3] text-[#1A1A1A]">
           {renderRichText(richTexts)}
         </h4>
       );
@@ -210,13 +210,13 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }) {
           ? (blockData.children as NotionBlock[])
           : [];
       return (
-        <div className="my-4 flex gap-3 rounded-xl bg-[#E8F5EE] p-4">
+        <div className="my-4 flex items-start gap-3 rounded-xl bg-[#E8F5EE] p-4">
           <Image
             src="/gress.png"
             alt="SSAC"
             width={22}
             height={22}
-            className="mt-[2px] shrink-0 object-contain"
+            className="shrink-0 object-contain"
           />
           <div className="min-w-0 flex-1 text-[15px] leading-[1.6] text-[#1A1A1A]">
             {richTexts.length > 0
