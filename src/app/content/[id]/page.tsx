@@ -60,6 +60,7 @@ const BLOCK_TYPE_ALIASES: Record<string, string> = {
   callout: 'Callout',
   paragraph: 'Paragraph',
   quote: 'Quote',
+  toggle: 'Toggle',
   divider: 'Divider',
   image: 'Image',
   code: 'Code',
@@ -139,6 +140,13 @@ function renderRichText(richTexts: RichTextItem[]): React.ReactNode {
 
 type NotionBlock = Record<string, unknown>;
 
+function renderChildBlocks(children: NotionBlock[]) {
+  if (!children.length) return null;
+  return children.map((child, i) => (
+    <NotionBlockRenderer key={(child?.id as string | undefined) ?? i} block={child} />
+  ));
+}
+
 function NotionBlockRenderer({ block }: { block: NotionBlock }) {
   if (!block || typeof block !== 'object') return null;
 
@@ -155,6 +163,9 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }) {
   const blockData = (block[contentKey] ?? block[rawContentKey] ?? block[rawType]) as
     | Record<string, unknown>
     | undefined;
+
+  // has_children: true인 블록은 children 배열이 항상 포함됨 (BE 변경 사항)
+  const children = Array.isArray(block.children) ? (block.children as NotionBlock[]) : [];
 
   switch (type) {
     // Notion Java SDK enum: HeadingOne / HeadingTwo / HeadingThree
@@ -186,29 +197,37 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }) {
       return (
         <li className="mb-1 ml-5 list-disc text-[15px] leading-[1.6] text-[#1A1A1A]">
           {renderRichText(richTexts)}
+          {children.length > 0 && <ul className="mt-1">{renderChildBlocks(children)}</ul>}
         </li>
       );
     case 'NumberedListItem':
       return (
         <li className="mb-1 ml-5 list-decimal text-[15px] leading-[1.6] text-[#1A1A1A]">
           {renderRichText(richTexts)}
+          {children.length > 0 && <ol className="mt-1">{renderChildBlocks(children)}</ol>}
         </li>
       );
     case 'Quote':
       return (
         <blockquote className="my-4 border-l-4 border-[#4CAF82] pl-4 text-[15px] italic leading-[1.6] text-[#6B6B6B]">
-          {renderRichText(richTexts)}
+          {richTexts.length > 0 && renderRichText(richTexts)}
+          {children.length > 0 && (
+            <div className={richTexts.length > 0 ? 'mt-2' : ''}>{renderChildBlocks(children)}</div>
+          )}
         </blockquote>
+      );
+    case 'Toggle':
+      return (
+        <details className="my-2 rounded-xl border border-[#E8E8E8] p-3">
+          <summary className="cursor-pointer text-[15px] font-medium leading-[1.6] text-[#1A1A1A]">
+            {renderRichText(richTexts)}
+          </summary>
+          {children.length > 0 && <div className="mt-2 pl-2">{renderChildBlocks(children)}</div>}
+        </details>
       );
     case 'Divider':
       return <hr className="my-6 border-[#E8E8E8]" />;
     case 'Callout': {
-      // children: 최상위 block.children 또는 blockData.children 모두 탐색 (2 depth)
-      const children = Array.isArray(block.children)
-        ? (block.children as NotionBlock[])
-        : Array.isArray(blockData?.children)
-          ? (blockData.children as NotionBlock[])
-          : [];
       return (
         <div className="my-4 flex items-start gap-3 rounded-xl bg-[#E8F5EE] p-4">
           <Image
@@ -219,11 +238,12 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }) {
             className="shrink-0 object-contain"
           />
           <div className="min-w-0 flex-1 text-[15px] leading-[1.6] text-[#1A1A1A]">
-            {richTexts.length > 0
-              ? renderRichText(richTexts)
-              : children.map((child, i) => (
-                  <NotionBlockRenderer key={(child?.id as string | undefined) ?? i} block={child} />
-                ))}
+            {richTexts.length > 0 && renderRichText(richTexts)}
+            {children.length > 0 && (
+              <div className={richTexts.length > 0 ? 'mt-2' : ''}>
+                {renderChildBlocks(children)}
+              </div>
+            )}
           </div>
         </div>
       );
