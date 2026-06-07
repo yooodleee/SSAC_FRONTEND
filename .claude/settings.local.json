@@ -245,7 +245,10 @@
       "Bash(font-semibold)",
       "Bash(font-bold)",
       "Bash(items-start)",
-      "Bash(mt-[2px])"
+      "Bash(mt-[2px])",
+      "Bash(has_children: true:*)",
+      "Bash(children)",
+      "Bash(toggle)"
     ]
   }
 }
