@@ -248,7 +248,21 @@
       "Bash(mt-[2px])",
       "Bash(has_children: true:*)",
       "Bash(children)",
-      "Bash(toggle)"
+      "Bash(toggle)",
+      "Bash(default)",
+      "Bash(console.warn)",
+      "Bash(RichTextItem)",
+      "Bash(text.content)",
+      "Bash(plain_text)",
+      "Bash(vercel ls:*)",
+      "Bash(vercel logs:*)",
+      "Bash(vercel whoami:*)",
+      "Bash(vercel project:*)",
+      "Bash(vercel env:*)",
+      "Bash(vercel inspect:*)",
+      "Read(//c/Users/LEGION/AppData/Roaming/com.vercel.cli/**)",
+      "Read(//c/Users/dhals_zn0ga5j/AppData/Roaming/com.vercel.cli/**)",
+      "Read(//c/Users/**)"
     ]
   }
 }

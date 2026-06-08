@@ -10,15 +10,8 @@
  */
 
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 
 export function HeroSection() {
-  const router = useRouter();
-
-  const handleCTA = () => {
-    router.push('/onboarding');
-  };
-
   return (
     <section
       aria-label="SSAC 브랜딩 히어로"
@@ -55,23 +48,6 @@ export function HeroSection() {
           <br />
           어려운 금융 지식을 싹으로 쉽게
         </h1>
-
-        {/* CTA 버튼 */}
-        <button
-          type="button"
-          onClick={handleCTA}
-          className="font-semibold text-white transition-all duration-300 ease-in-out hover:brightness-110 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-          style={{
-            backgroundColor: '#1976D2',
-            padding: '16px 32px',
-            fontSize: '16px',
-            borderRadius: '4px',
-            minHeight: '52px',
-            marginTop: '8px',
-          }}
-        >
-          시작 하기 →
-        </button>
       </div>
     </section>
   );

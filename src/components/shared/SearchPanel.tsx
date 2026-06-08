@@ -19,7 +19,8 @@ import { useSearchService } from '@/hooks/useSearchService';
 import type { SuggestionItem } from '@/types';
 
 const PLACEHOLDER_KEYWORDS = ['연말정산', '전세 계약', '신용점수', '퇴직연금', '재테크', '금리'];
-const NAV_HEIGHT = 64;
+// Row1 h-14(56px) + border(1px) + Row2 tabs py-1.5+text-xs(28px) = 85px
+const NAV_HEIGHT = 85;
 
 // 검색어 일치 부분 굵게
 function HighlightedText({ text, query }: { text: string; query: string }) {

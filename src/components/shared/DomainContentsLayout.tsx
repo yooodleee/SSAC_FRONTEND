@@ -16,8 +16,8 @@ export function DomainContentsLayout({ domain, contents }: DomainContentsLayoutP
 
   return (
     <div className="min-h-screen bg-white">
-      {/* 배경 이미지 섹션 — LandingHeader가 fixed(h-16)이므로 pt-16으로 밀어냄 */}
-      <div className="relative h-[25vh] w-full bg-[#F5F5F5] pt-16">
+      {/* 배경 이미지 섹션 — 모바일 h-14(56px), 데스크톱 85px(row1+border+row2) */}
+      <div className="relative h-[25vh] w-full bg-[#F5F5F5] pt-14 md:pt-[85px]">
         {imageSrc && (
           <Image src={imageSrc} alt={label} fill className="object-cover" priority sizes="100vw" />
         )}

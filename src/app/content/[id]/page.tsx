@@ -399,7 +399,7 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
   return (
     <div className="min-h-screen bg-white">
       {/* 배너 이미지 — /contents/realestate와 동일한 h-[25vh] w-full */}
-      <div className="relative h-[25vh] w-full bg-[#F5F5F5] pt-16">
+      <div className="relative h-[25vh] w-full bg-[#F5F5F5] pt-14 md:pt-[85px]">
         {bannerSrc && (
           <Image
             src={bannerSrc}
