@@ -4,32 +4,10 @@
  * - hover: scale(1.02) / transition 300ms ease
  */
 
+import Image from 'next/image';
 import type { components } from '@/api-contract/generated/api-types';
 
 type ContentItemDto = components['schemas']['ContentItemDto'];
-
-// 난이도별 스타일 — DESIGN.md 토큰 기준
-const DIFFICULTY_CONFIG: Record<
-  string,
-  { emoji: string; bg: string; text: string; label: string }
-> = {
-  SEED: { emoji: '🌱', bg: '#E8F5EE', text: '#4CAF82', label: '씨앗' },
-  SPROUT: { emoji: '🌿', bg: '#FFF8E1', text: '#F9A825', label: '새싹' },
-  TREE: { emoji: '🌳', bg: '#E3F2FD', text: '#1976D2', label: '나무' },
-};
-
-function DifficultyBadge({ difficulty }: { difficulty?: string }) {
-  const conf = (difficulty && DIFFICULTY_CONFIG[difficulty]) ||
-    DIFFICULTY_CONFIG['SEED'] || { emoji: '🌱', bg: '#E8F5EE', text: '#4CAF82', label: '씨앗' };
-  return (
-    <span
-      className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium"
-      style={{ backgroundColor: conf.bg, color: conf.text }}
-    >
-      {conf.emoji} {conf.label}
-    </span>
-  );
-}
 
 interface ContentGalleryCardProps {
   item: ContentItemDto;
@@ -45,29 +23,43 @@ export function ContentGalleryCard({ item, large = false }: ContentGalleryCardPr
     >
       {/* 썸네일 — large 카드는 flex-1로 남은 공간 모두 차지 */}
       <div
-        className={`relative w-full overflow-hidden ${large ? 'flex-1' : 'h-32 sm:h-36'}`}
+        className={`relative w-full overflow-hidden ${large ? 'flex-1 min-h-[160px]' : 'h-32 sm:h-36'}`}
         style={{ background: 'linear-gradient(135deg, #e8f5ee 0%, #e3f2fd 100%)' }}
       >
-        <div
-          className="absolute inset-0 flex items-center justify-center text-5xl"
-          aria-hidden="true"
-        >
-          📚
-        </div>
+        {item.thumbnailUrl ? (
+          <Image
+            src={item.thumbnailUrl}
+            alt={item.title ?? '콘텐츠 썸네일'}
+            fill
+            className="object-cover"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
+        ) : (
+          <div
+            className="absolute inset-0 flex items-center justify-center text-5xl"
+            aria-hidden="true"
+          >
+            📚
+          </div>
+        )}
       </div>
 
-      {/* 카드 정보 — large/small 동일한 높이 */}
+      {/* 카드 정보 */}
       <div className="flex flex-col gap-1.5 p-3">
-        {/* 상단 메타 — 카테고리 + 난이도 */}
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span
-            className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
-            style={{ backgroundColor: '#E3F2FD', color: '#1976D2' }}
-          >
-            금융
-          </span>
-          <DifficultyBadge difficulty={item.difficulty} />
-        </div>
+        {/* 카테고리 */}
+        {item.categories && item.categories.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {item.categories.slice(0, 2).map((cat) => (
+              <span
+                key={cat}
+                className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+                style={{ backgroundColor: '#E3F2FD', color: '#1976D2' }}
+              >
+                {cat}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* 제목 */}
         <p

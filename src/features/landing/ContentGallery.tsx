@@ -99,7 +99,7 @@ export function ContentGallery() {
         {/* 섹션 헤더 */}
         <div className="mb-8">
           <h2 className="font-bold text-[#1A1A1A]" style={{ fontSize: '22px', lineHeight: '1.3' }}>
-            한 눈에 보는 금융 소식!
+            새로 추가된 금융 소식!
           </h2>
         </div>
 
