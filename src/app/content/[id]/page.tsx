@@ -26,6 +26,7 @@ interface ContentDetailPageProps {
 type RichTextItem = {
   plain_text?: string; // Notion 원본 snake_case (BE Gson 직렬화)
   plainText?: string; // camelCase fallback
+  text?: { content?: string }; // Notion API nested text.content fallback
   annotations?: {
     bold?: boolean;
     italic?: boolean;
@@ -101,7 +102,7 @@ function extractRichText(
 function renderRichText(richTexts: RichTextItem[]): React.ReactNode {
   if (!richTexts.length) return null;
   return richTexts.map((rt, i) => {
-    const text = rt.plain_text ?? rt.plainText ?? '';
+    const text = rt.plain_text ?? rt.plainText ?? rt.text?.content ?? '';
     const { bold, italic, strikethrough, code } = rt.annotations ?? {};
 
     let node: React.ReactNode = text;
@@ -293,6 +294,12 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }) {
     }
     case 'Code': {
       const lang = blockData?.language as string | undefined;
+      if (richTexts.length === 0) {
+        console.warn(
+          '[NotionBlockRenderer] Code 블록 richText 비어있음 — block["code"] 구조:',
+          JSON.stringify(blockData ?? block['code'] ?? block),
+        );
+      }
       return (
         <pre className="my-4 overflow-x-auto rounded-xl bg-gray-900 p-4 text-[13px] leading-[1.6] text-green-400">
           <code data-language={lang}>{renderRichText(richTexts)}</code>
@@ -300,6 +307,11 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }) {
       );
     }
     default:
+      console.warn('[NotionBlockRenderer] 처리되지 않은 블록 타입:', {
+        rawType,
+        normalizedType: type,
+        blockKeys: Object.keys(block),
+      });
       return null;
   }
 }
