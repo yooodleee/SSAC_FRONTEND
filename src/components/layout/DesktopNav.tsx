@@ -7,8 +7,10 @@ import { cn } from '@/lib/utils';
 import { NAV_ITEMS_BY_GROUP, SEGMENT_NAV_ITEMS } from '@/lib/navigation';
 import { useNavData } from '@/hooks/useNavData';
 import { useMenuTracking } from '@/hooks/useMenuTracking';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { NotificationDropdown } from '@/components/notification/NotificationDropdown';
 import { ThemeToggle } from './ThemeToggle';
+import { UserSidePanel } from './UserSidePanel';
 import type { NavItem } from '@/lib/navigation';
 
 // ── Inline SVG helpers ────────────────────────────────────────────────────────
@@ -263,8 +265,10 @@ function NotificationBell({
 export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
   const pathname = usePathname();
   const [openItem, setOpenItem] = useState<string | null>(null);
+  const [sidePanelOpen, setSidePanelOpen] = useState(false);
   const triggerRefs = useRef(new Map<string, HTMLButtonElement>());
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { nickname } = useCurrentUser(isLoggedIn);
 
   const {
     unreadCount,
@@ -522,10 +526,11 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
               </Link>
             )}
 
-            {/* 사용자 아이콘 — 내 홈(/home) 이동 */}
-            <Link
-              href="/home"
-              aria-label="내 홈으로 이동"
+            {/* 사용자 아이콘 — 사이드 패널 트리거 */}
+            <button
+              type="button"
+              aria-label="내 프로필 열기"
+              onClick={() => setSidePanelOpen(true)}
               className={cn(
                 'flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-700 transition-colors',
                 'hover:bg-gray-100',
@@ -545,7 +550,7 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                 <circle cx="12" cy="7" r="4" />
               </svg>
-            </Link>
+            </button>
           </>
         ) : (
           <>
@@ -598,6 +603,13 @@ export function DesktopNav({ isLoggedIn }: { isLoggedIn: boolean }) {
           </>
         )}
       </nav>
+      {isLoggedIn && (
+        <UserSidePanel
+          isOpen={sidePanelOpen}
+          onClose={() => setSidePanelOpen(false)}
+          nickname={nickname ?? ''}
+        />
+      )}
     </>
   );
 }
