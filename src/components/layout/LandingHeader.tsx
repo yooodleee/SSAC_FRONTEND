@@ -17,6 +17,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { UserSidePanel } from './UserSidePanel';
 import { DOMAIN_TABS } from '@/constants/domains';
 
 interface LandingHeaderProps {
@@ -25,7 +27,9 @@ interface LandingHeaderProps {
 
 export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [sidePanelOpen, setSidePanelOpen] = useState(false);
   const pathname = usePathname();
+  const { nickname } = useCurrentUser(isLoggedIn);
 
   return (
     <>
@@ -55,9 +59,10 @@ export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
             {/* 우 절반: 인증 버튼 (데스크톱) */}
             <div className="hidden flex-1 items-center justify-end gap-3 pl-3 md:flex">
               {isLoggedIn ? (
-                <Link
-                  href="/home"
-                  aria-label="내 홈으로 이동"
+                <button
+                  type="button"
+                  aria-label="내 프로필 열기"
+                  onClick={() => setSidePanelOpen(true)}
                   className="shrink-0 flex h-9 w-9 items-center justify-center rounded-full text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
                 >
                   <svg
@@ -73,7 +78,7 @@ export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                     <circle cx="12" cy="7" r="4" />
                   </svg>
-                </Link>
+                </button>
               ) : (
                 <Link
                   href="/login"
@@ -183,9 +188,12 @@ export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
             <div className="my-3 border-t border-white/10" />
 
             {isLoggedIn ? (
-              <Link
-                href="/home"
-                onClick={() => setMobileOpen(false)}
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileOpen(false);
+                  setSidePanelOpen(true);
+                }}
                 className="flex min-h-[48px] w-full items-center gap-3 rounded-lg px-3 text-sm font-medium text-white hover:bg-white/10"
               >
                 <svg
@@ -201,8 +209,8 @@ export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                   <circle cx="12" cy="7" r="4" />
                 </svg>
-                내 홈
-              </Link>
+                {nickname ?? '...'}
+              </button>
             ) : (
               <Link
                 href="/login"
@@ -215,6 +223,13 @@ export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
           </div>
         )}
       </header>
+      {isLoggedIn && (
+        <UserSidePanel
+          isOpen={sidePanelOpen}
+          onClose={() => setSidePanelOpen(false)}
+          nickname={nickname ?? ''}
+        />
+      )}
     </>
   );
 }
