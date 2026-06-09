@@ -262,7 +262,8 @@
       "Bash(vercel inspect:*)",
       "Read(//c/Users/LEGION/AppData/Roaming/com.vercel.cli/**)",
       "Read(//c/Users/dhals_zn0ga5j/AppData/Roaming/com.vercel.cli/**)",
-      "Read(//c/Users/**)"
+      "Read(//c/Users/**)",
+      "Bash(src/features/landing/ContentGallery.tsx)"
     ]
   }
 }
