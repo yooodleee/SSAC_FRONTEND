@@ -17,9 +17,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { UserSidePanel } from './UserSidePanel';
-import { SearchPanel } from '@/components/shared/SearchPanel';
 import { DOMAIN_TABS } from '@/constants/domains';
 
 interface LandingHeaderProps {
@@ -28,9 +25,7 @@ interface LandingHeaderProps {
 
 export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [sidePanelOpen, setSidePanelOpen] = useState(false);
   const pathname = usePathname();
-  const { nickname } = useCurrentUser(isLoggedIn);
 
   return (
     <>
@@ -57,21 +52,28 @@ export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
               </Link>
             </div>
 
-            {/* 우 절반: 검색창 + 인증 버튼 (데스크톱) */}
+            {/* 우 절반: 인증 버튼 (데스크톱) */}
             <div className="hidden flex-1 items-center justify-end gap-3 pl-3 md:flex">
-              {/* 검색창 — 남은 우측 공간 채움 */}
-              <div className="flex-1">
-                <SearchPanel />
-              </div>
-
               {isLoggedIn ? (
-                <button
-                  type="button"
-                  onClick={() => setSidePanelOpen(true)}
-                  className="shrink-0 rounded-full px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                <Link
+                  href="/home"
+                  aria-label="내 홈으로 이동"
+                  className="shrink-0 flex h-9 w-9 items-center justify-center rounded-full text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
                 >
-                  Hi {nickname ?? '...'}!
-                </button>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                    className="h-5 w-5"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </Link>
               ) : (
                 <Link
                   href="/login"
@@ -158,10 +160,6 @@ export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
             id="global-mobile-menu"
             className="border-t border-white/10 bg-black px-4 py-4 md:hidden"
           >
-            <div className="mb-4">
-              <SearchPanel />
-            </div>
-
             <nav className="flex flex-col gap-1">
               {DOMAIN_TABS.map((tab) => {
                 const isActive = pathname.startsWith(tab.route);
@@ -185,16 +183,26 @@ export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
             <div className="my-3 border-t border-white/10" />
 
             {isLoggedIn ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileOpen(false);
-                  setSidePanelOpen(true);
-                }}
-                className="flex min-h-[48px] w-full items-center rounded-lg px-3 text-sm font-medium text-white hover:bg-white/10"
+              <Link
+                href="/home"
+                onClick={() => setMobileOpen(false)}
+                className="flex min-h-[48px] w-full items-center gap-3 rounded-lg px-3 text-sm font-medium text-white hover:bg-white/10"
               >
-                Hi {nickname ?? '...'}!
-              </button>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                  className="h-5 w-5 shrink-0"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+                내 홈
+              </Link>
             ) : (
               <Link
                 href="/login"
@@ -207,14 +215,6 @@ export function LandingHeader({ isLoggedIn }: LandingHeaderProps) {
           </div>
         )}
       </header>
-
-      {isLoggedIn && (
-        <UserSidePanel
-          isOpen={sidePanelOpen}
-          onClose={() => setSidePanelOpen(false)}
-          nickname={nickname ?? ''}
-        />
-      )}
     </>
   );
 }
