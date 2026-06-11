@@ -265,7 +265,8 @@
       "Read(//c/Users/**)",
       "Bash(src/features/landing/ContentGallery.tsx)",
       "Bash(docs/decisions/harness-audit-2026-06-11.md)",
-      "Bash(hooks/)"
+      "Bash(hooks/)",
+      "Bash(npm test:*)"
     ]
   }
 }

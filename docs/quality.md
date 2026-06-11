@@ -19,30 +19,42 @@
 
 ## 영역별 현재 품질
 
-| 영역                | 등급      | 설명                                                |
-| ------------------- | --------- | --------------------------------------------------- |
-| 빌드 파이프라인     | 🟡 Yellow | 기본 `next build` 작동, CI 미구성                   |
-| 타입 안전성         | 🟢 Green  | strict mode, `any` 금지 규칙 적용                   |
-| 컴포넌트 구조       | 🟢 Green  | 초기 구조 클린, Button/Card 검증 완료               |
-| API / 서비스 레이어 | 🟡 Yellow | fetch 래퍼 존재, 에러 재시도 로직 없음              |
-| 테스트 커버리지     | 🔴 Red    | 테스트 없음. 최우선 기술 부채                       |
-| 스타일 일관성       | 🟡 Yellow | Tailwind 설정 완료, 디자인 토큰 일부만 정의         |
-| 접근성 (a11y)       | 🔴 Red    | aria 속성 검사 없음                                 |
-| 성능 모니터링       | ⚪ N/A    | 미구현                                              |
-| 에러 바운더리       | 🟡 Yellow | HTTP 에러 처리·토스트 UI 완료, ErrorBoundary 미완료 |
-| 보안 헤더           | 🔴 Red    | next.config.ts에 보안 헤더 미설정                   |
+| 영역                | 등급      | 설명                                                                   |
+| ------------------- | --------- | ---------------------------------------------------------------------- |
+| 빌드 파이프라인     | 🟡 Yellow | 기본 `next build` 작동, CI 미구성                                      |
+| 타입 안전성         | 🟢 Green  | strict mode, `any` 금지 규칙 적용                                      |
+| 컴포넌트 구조       | 🟢 Green  | 초기 구조 클린, Button/Card 검증 완료                                  |
+| API / 서비스 레이어 | 🟡 Yellow | fetch 래퍼 존재, 에러 재시도 로직 없음                                 |
+| 테스트 커버리지     | 🟡 Yellow | Jest 30+RTL 16+MSW 2 설치 완료 (2026-06-11). 커버리지 0%, 작성 진행 중 |
+| 스타일 일관성       | 🟡 Yellow | Tailwind 설정 완료, 디자인 토큰 일부만 정의                            |
+| 접근성 (a11y)       | 🔴 Red    | aria 속성 검사 없음                                                    |
+| 성능 모니터링       | ⚪ N/A    | 미구현                                                                 |
+| 에러 바운더리       | 🟡 Yellow | HTTP 에러 처리·토스트 UI 완료, ErrorBoundary 미완료                    |
+| 보안 헤더           | 🔴 Red    | next.config.ts에 보안 헤더 미설정                                      |
 
 ---
 
 ## 알려진 기술 부채
 
-### TD-001 | 테스트 없음
+### TD-001 | 테스트 커버리지 부족 (인프라 완료)
 
-- **영향도**: 🔴 높음
-- **설명**: 현재 프로젝트에 단위/통합 테스트가 전혀 없습니다. 리팩터링 시 회귀를 잡을 안전망이 없습니다.
-- **해결 방향**: Jest + React Testing Library + MSW(mock API) 도입
-- **예상 작업량**: 2 스프린트
+> 재평가 일자: 2026-06-11
+
+- **영향도**: 🟡 중간 (인프라 완료로 하향 조정)
+- **설명**: Jest 30 + RTL 16 + MSW 2 설치 완료. 신규 구현물부터 테스트 작성 적용. 기존 코드 커버리지 0%.
+- **해결 방향**: 신규 컴포넌트/훅/서비스부터 testing.md 기준 적용 (컴포넌트 70%, 훅 80%, 유틸 90%)
+- **예상 작업량**: 지속적 (스프린트별 신규 코드에 적용)
 - **담당**: 미정
+
+**완료된 항목 (2026-06-11)**
+
+- [x] ADR-002 작성 (docs/decisions/002-jest-rtl-msw-testing.md)
+- [x] Jest 30 + @testing-library/react 16 + MSW 2 + @types/jest 설치
+- [x] jest.config.js, jest.setup.ts 설정
+- [x] src/mocks/server.ts, src/mocks/handlers/index.ts 생성
+- [x] npm run test / test:coverage / test:watch 스크립트 추가
+- [x] testing.md BLOCKED 배너 제거
+- [x] utils.ts 유틸리티 함수 최초 테스트 6건 통과
 
 ### TD-002 | 에러 바운더리 없음 (일부 완료)
 

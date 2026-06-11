@@ -1,9 +1,7 @@
 # Testing Protocol (Jest + RTL + MSW)
 
-> **[BLOCKED: TD-001]** Jest + RTL + MSW 미설치 상태.
-> STEP 1~3 (테스트 코드 작성) 은 실행 가능하나, **STEP 4~5 (실행 및 검증) 는 실행 불가**.
-> 해제 조건: `docs/agent-protocols/adr-create.md` 절차로 ADR 작성 후 Jest 설치 완료 시.
-> → 설치 완료 후 이 배너를 삭제한다.
+> **[ACTIVE]** Jest 30 + @testing-library/react 16 + MSW 2 설치 완료 (2026-06-11, ADR-002).
+> 모든 STEP 실행 가능.
 
 ## 트리거 조건
 
@@ -17,8 +15,8 @@
 STEP 1. 테스트 대상 분류
 STEP 2. 테스트 파일 생성 위치 결정
 STEP 3. 테스트 작성 (유형별 규칙 준수)
-STEP 4. 테스트 실행 및 커버리지 확인 ← [BLOCKED: TD-001] Jest 미설치
-STEP 5. 자가 점검 ← [BLOCKED: TD-001] Jest 미설치
+STEP 4. 테스트 실행 및 커버리지 확인
+STEP 5. 자가 점검
 
 ---
 
@@ -119,6 +117,16 @@ MSW 핸들러 작성 규칙:
 - 핸들러는 반드시 api-contract 기준 응답 구조를 따른다
 - 성공/실패 핸들러를 분리하여 작성한다
 - 테스트별 핸들러 오버라이드는 `server.use()`를 활용한다
+- **MSW 서버는 전역 setup이 아닌 테스트 파일 단위로 설정한다** (jsdom 환경 호환성)
+
+```typescript
+// API 연동 테스트 파일 상단에 반드시 포함
+import { server } from '@/mocks/server';
+
+beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }));
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+```
 
 예시)
 
@@ -168,9 +176,7 @@ it('useNotification이 unreadCount를 올바르게 반환한다', async () => {
 
 ---
 
-## STEP 4. 테스트 실행 및 커버리지 확인 〔BLOCKED: TD-001〕
-
-> Jest 미설치로 이 단계는 실행 불가. Jest 설치 후 아래 절차를 진행한다.
+## STEP 4. 테스트 실행 및 커버리지 확인
 
 실행 명령어:
 
@@ -192,9 +198,7 @@ $ npm run test -- --watch         # 워치 모드
 
 ---
 
-## STEP 5. 테스트 자가 점검 〔BLOCKED: TD-001〕
-
-> Jest 미설치로 이 단계는 실행 불가. Jest 설치 후 아래 항목을 확인한다.
+## STEP 5. 테스트 자가 점검
 
 ```
 □ 모든 테스트가 통과하는가 (npm run test)
