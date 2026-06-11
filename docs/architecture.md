@@ -108,8 +108,14 @@
 
 ### 즉시 사용 가능한 방법
 
-ESLint `no-restricted-imports` 규칙으로 가장 흔한 위반을 잡습니다.
-현재 설정된 규칙: `eslint.config.mjs` 참고.
+ESLint `no-restricted-imports` 규칙으로 레이어 위반을 자동 차단합니다.
+
+| 규칙 ID  | 대상 파일           | 금지 방향                      |
+| -------- | ------------------- | ------------------------------ |
+| ARCH-001 | `src/app/**`        | → `@/services`                 |
+| ARCH-002 | `src/components/**` | → `@/services`                 |
+| ARCH-003 | `src/components/**` | → `@/features`                 |
+| ARCH-004 | `src/hooks/**`      | → `@/components`, `@/features` |
 
 ### 향후 추가 예정
 
