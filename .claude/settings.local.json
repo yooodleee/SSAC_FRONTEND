@@ -263,7 +263,10 @@
       "Read(//c/Users/LEGION/AppData/Roaming/com.vercel.cli/**)",
       "Read(//c/Users/dhals_zn0ga5j/AppData/Roaming/com.vercel.cli/**)",
       "Read(//c/Users/**)",
-      "Bash(src/features/landing/ContentGallery.tsx)"
+      "Bash(src/features/landing/ContentGallery.tsx)",
+      "Bash(docs/decisions/harness-audit-2026-06-11.md)",
+      "Bash(hooks/)",
+      "Bash(npm test:*)"
     ]
   }
 }

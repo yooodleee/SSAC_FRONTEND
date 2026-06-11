@@ -62,7 +62,37 @@ const eslintConfig = [
   },
 
   // ──────────────────────────────────────────────────────────
-  // RULE 4: components/ → services|features import 금지 [ARCH-002, ARCH-003]
+  // RULE 4: hooks/ → components|features import 금지 [ARCH-004]
+  // FIX: 훅은 순수 로직만 담아야 합니다. UI가 필요하면 컴포넌트로 분리하세요.
+  //      특정 도메인 전용 훅은 features/<domain>/ 폴더 내부로 이동하세요.
+  // ──────────────────────────────────────────────────────────
+  {
+    files: ['src/hooks/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/components', '@/components/*'],
+              message:
+                '[ARCH-004][FIX] hooks/ → components/ 금지. ' +
+                '훅은 UI에 의존하지 않아야 합니다. UI 로직은 컴포넌트로 분리하세요.',
+            },
+            {
+              group: ['@/features', '@/features/*'],
+              message:
+                '[ARCH-004][FIX] hooks/ → features/ 금지. ' +
+                '특정 도메인에 종속된 훅은 features/<domain>/ 폴더 내부로 이동하세요.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  // ──────────────────────────────────────────────────────────
+  // RULE 5: components/ → services|features import 금지 [ARCH-002, ARCH-003]
   // FIX: 데이터를 Props로 받도록 컴포넌트를 재설계하세요.
   // ──────────────────────────────────────────────────────────
   {

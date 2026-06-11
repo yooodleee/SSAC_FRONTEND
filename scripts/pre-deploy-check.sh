@@ -22,8 +22,18 @@ if [ $? -ne 0 ]; then
 fi
 echo "✅ ESLint 검사 통과"
 
+# 테스트 검사
+echo "3️⃣ 테스트 실행 중..."
+npm run test
+if [ $? -ne 0 ]; then
+  echo "❌ 테스트 실패"
+  echo "→ 실패한 테스트를 수정 후 다시 시도해주세요."
+  exit 1
+fi
+echo "✅ 테스트 통과"
+
 # 빌드 검사
-echo "3️⃣ 빌드 검사 중..."
+echo "4️⃣ 빌드 검사 중..."
 npm run build
 if [ $? -ne 0 ]; then
   echo "❌ 빌드 실패"
