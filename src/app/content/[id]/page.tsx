@@ -51,6 +51,8 @@ const BLOCK_TYPE_ALIASES: Record<string, string> = {
   Heading2: 'HeadingTwo',
   heading_3: 'HeadingThree',
   Heading3: 'HeadingThree',
+  heading_4: 'HeadingFour',
+  Heading4: 'HeadingFour',
   // List variants
   bulleted_list_item: 'BulletedListItem',
   numbered_list_item: 'NumberedListItem',
@@ -190,6 +192,12 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }) {
         <h4 className="mb-2 mt-5 text-[16px] font-bold leading-[1.3] text-[#1A1A1A]">
           {renderRichText(richTexts)}
         </h4>
+      );
+    case 'HeadingFour':
+      return (
+        <h5 className="mb-1 mt-4 text-[15px] font-semibold leading-[1.3] text-[#1A1A1A]">
+          {renderRichText(richTexts)}
+        </h5>
       );
     case 'Paragraph':
       return richTexts.length === 0 ? (
