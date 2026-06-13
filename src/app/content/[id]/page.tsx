@@ -54,6 +54,9 @@ const BLOCK_TYPE_ALIASES: Record<string, string> = {
   // List variants
   bulleted_list_item: 'BulletedListItem',
   numbered_list_item: 'NumberedListItem',
+  // Table variants
+  table: 'Table',
+  table_row: 'TableRow',
   // To-do (checkbox) variants
   to_do: 'ToDo',
   ToDo: 'ToDo',
@@ -201,13 +204,20 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }) {
           {children.length > 0 && <ul className="mt-1">{renderChildBlocks(children)}</ul>}
         </li>
       );
-    case 'NumberedListItem':
+    case 'NumberedListItem': {
+      // BE에서 number 필드를 주입하므로 이를 사용해 명시적 순번 표시
+      // (list-decimal CSS는 <ol> 없이 단독 <li>로는 번호가 표시되지 않음)
+      const num = blockData?.number as number | undefined;
       return (
-        <li className="mb-1 ml-5 list-decimal text-[15px] leading-[1.6] text-[#1A1A1A]">
-          {renderRichText(richTexts)}
-          {children.length > 0 && <ol className="mt-1">{renderChildBlocks(children)}</ol>}
-        </li>
+        <div className="mb-1 flex items-start gap-2 text-[15px] leading-[1.6] text-[#1A1A1A]">
+          <span className="shrink-0 font-medium">{num ?? '•'}.</span>
+          <div className="min-w-0 flex-1">
+            {renderRichText(richTexts)}
+            {children.length > 0 && <div className="mt-1">{renderChildBlocks(children)}</div>}
+          </div>
+        </div>
       );
+    }
     case 'Quote':
       return (
         <blockquote className="my-4 border-l-4 border-[#4CAF82] pl-4 text-[15px] italic leading-[1.6] text-[#6B6B6B]">
@@ -290,6 +300,59 @@ function NotionBlockRenderer({ block }: { block: NotionBlock }) {
             </figcaption>
           )}
         </figure>
+      );
+    }
+    case 'Table': {
+      const tableData = blockData as
+        | { table_width?: number; has_column_header?: boolean; has_row_header?: boolean }
+        | undefined;
+      const hasColumnHeader = tableData?.has_column_header ?? false;
+      const hasRowHeader = tableData?.has_row_header ?? false;
+
+      // children 내 table_row 블록만 추출
+      const rows = children.filter((c) => (c.type as string) === 'table_row');
+      if (rows.length === 0) return null;
+
+      const renderCells = (row: NotionBlock, isHeaderRow: boolean) => {
+        const rowData = (row.table_row ?? row.tableRow) as { cells?: RichTextItem[][] } | undefined;
+        const cells = rowData?.cells ?? [];
+        return cells.map((cell, colIdx) => {
+          const isHeader = isHeaderRow || (hasRowHeader && colIdx === 0);
+          const Tag = isHeader ? 'th' : 'td';
+          return (
+            <Tag
+              key={colIdx}
+              className={[
+                'border border-[#E8E8E8] px-3 py-2 text-left text-[14px] leading-[1.6]',
+                isHeader ? 'bg-[#F5F5F5] font-semibold text-[#1A1A1A]' : 'text-[#1A1A1A]',
+              ].join(' ')}
+            >
+              {renderRichText(cell)}
+            </Tag>
+          );
+        });
+      };
+
+      const headerRow = hasColumnHeader ? rows[0] : null;
+      const bodyRows = hasColumnHeader ? rows.slice(1) : rows;
+
+      return (
+        <div className="my-4 overflow-x-auto rounded-xl border border-[#E8E8E8]">
+          <table className="w-full border-collapse text-[14px]">
+            {headerRow && (
+              <thead>
+                <tr>{renderCells(headerRow, true)}</tr>
+              </thead>
+            )}
+            <tbody>
+              {bodyRows.map((row, i) => (
+                <tr key={(row?.id as string | undefined) ?? i} className="even:bg-[#F5F5F5]/40">
+                  {renderCells(row, false)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       );
     }
     case 'Code': {
