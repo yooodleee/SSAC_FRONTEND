@@ -1,4 +1,4 @@
-// Contract version: 1.2.0 / updatedAt: 2026-05-14
+// Contract version: 1.2.2 / updatedAt: 2026-06-14
 // 이 파일은 api-contract/error-contract.yml 기준으로 작성합니다.
 // ErrorCode 추가/변경/삭제 시 반드시 Contract 파일을 먼저 확인하세요.
 // 검증: npm run validate:error-mapping
@@ -26,6 +26,9 @@ export const ERROR_MESSAGES: Record<string, string> = {
   'ONBOARDING-003': '모든 문제에 응답해주세요.',
   'ONBOARDING-004': '유효하지 않은 문제입니다.',
   'ONBOARDING-005': '사용자 유형과 맞지 않는 문제입니다.',
+  'ONBOARDING-006': '온보딩 재응시 요청이 충돌합니다.',
+  'ONBOARDING-007': '관심사 선택 개수가 올바르지 않습니다.',
+  'ONBOARDING-008': '온보딩 테스트를 먼저 완료해주세요.',
   'ADMIN-001': '관리자 코드가 올바르지 않습니다.',
   'ADMIN-002': '관리자 권한이 필요합니다.',
   'ADMIN-003': '관리자 계정을 찾을 수 없습니다.',

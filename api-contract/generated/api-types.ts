@@ -1,8 +1,8 @@
 // ============================================================
 // ⚠️  이 파일은 자동 생성됩니다 — 절대 수동으로 편집하지 마세요.
 // 생성 명령: npm run sync:api
-// 소스: http://172.17.96.1:8080/api-docs/swagger.json
-// 생성 시각: 2026-05-26 15:55:15
+// 소스: https://api.ssac.io/api-docs/swagger.json
+// 생성 시각: 2026-06-14 22:37:35
 // ============================================================
 
 /**
@@ -1347,26 +1347,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/auth/dev/mock-new-user": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * [DEV] 신규 회원 가입 플로우 모의 시작
-         * @description 카카오·네이버 OAuth 없이 tempToken을 발급하고 신규 회원 가입 플로우를 시작한다. redirect=true(기본)이면 FE 콜백 URL로 리다이렉트, redirect=false이면 JSON으로 tempToken을 반환한다.
-         */
-        get: operations["mockNewUser"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/ab-test/menu": {
         parameters: {
             query?: never;
@@ -1385,26 +1365,6 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/auth/dev/users": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * [DEV] 테스트 사용자 삭제
-         * @description 이메일 기준으로 사용자 및 모든 연관 데이터를 삭제한다. 테스트 초기화 목적으로 사용한다.
-         */
-        delete: operations["deleteUser"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1602,6 +1562,8 @@ export interface components {
              * @example eyJhbGciOiJIUzI1NiJ9...
              */
             accessToken?: string;
+            /** @description 리프레시 토큰 (BFF cookies().set() 용도, HttpOnly 쿠키로도 병행 전달) */
+            refreshToken?: string;
             /**
              * @description 토큰 타입
              * @example Bearer
@@ -2030,29 +1992,29 @@ export interface components {
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            last?: boolean;
+            first?: boolean;
+            /** Format: int32 */
+            numberOfElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["QuizAttemptSummaryResponse"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
         PageableObject: {
+            paged?: boolean;
+            /** Format: int32 */
+            pageNumber?: number;
+            /** Format: int32 */
+            pageSize?: number;
+            unpaged?: boolean;
             /** Format: int64 */
             offset?: number;
             sort?: components["schemas"]["SortObject"];
-            unpaged?: boolean;
-            /** Format: int32 */
-            pageSize?: number;
-            /** Format: int32 */
-            pageNumber?: number;
-            paged?: boolean;
         };
         QuizAttemptSummaryResponse: {
             /**
@@ -2109,9 +2071,9 @@ export interface components {
             attemptedAt?: string;
         };
         SortObject: {
-            empty?: boolean;
-            unsorted?: boolean;
             sorted?: boolean;
+            unsorted?: boolean;
+            empty?: boolean;
         };
         AnswerDetail: {
             /**
@@ -2422,17 +2384,17 @@ export interface components {
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            last?: boolean;
+            first?: boolean;
+            /** Format: int32 */
+            numberOfElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["UserSummaryResponse"][];
             /** Format: int32 */
             number?: number;
             sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
             empty?: boolean;
         };
         ApiResponseListMenuClickStatResponse: {
@@ -3353,7 +3315,7 @@ export interface operations {
                     "application/json": components["schemas"]["ApiResponseError"];
                 };
             };
-            /** @description EMAIL-002: 이메일 중복 */
+            /** @description EMAIL-002: 이메일 중복 | PHONE-002: 휴대폰 번호 중복 */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -5736,47 +5698,6 @@ export interface operations {
             };
         };
     };
-    mockNewUser: {
-        parameters: {
-            query?: {
-                provider?: "KAKAO" | "NAVER";
-                redirect?: boolean;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": Record<string, never>;
-                };
-            };
-            /** @description 인증 토큰이 없거나 만료되었습니다. */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiResponseError"];
-                };
-            };
-            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiResponseError"];
-                };
-            };
-        };
-    };
     getMenuGroup: {
         parameters: {
             query?: {
@@ -5807,48 +5728,6 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ApiResponseAbTestGroupResponse"];
-                };
-            };
-            /** @description 인증 토큰이 없거나 만료되었습니다. */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiResponseError"];
-                };
-            };
-            /** @description 서버 내부 오류. 동일한 요청이 반복되면 백엔드 팀에 문의하세요. */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiResponseError"];
-                };
-            };
-        };
-    };
-    deleteUser: {
-        parameters: {
-            query: {
-                email: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": {
-                        [key: string]: string;
-                    };
                 };
             };
             /** @description 인증 토큰이 없거나 만료되었습니다. */
