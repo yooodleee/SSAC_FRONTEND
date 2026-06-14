@@ -40,7 +40,9 @@ export const ERROR_MESSAGES: Record<string, string> = {
   'ONBOARDING-003': '모든 문제에 응답해주세요.',
   'ONBOARDING-004': '유효하지 않은 문제입니다.',
   'ONBOARDING-005': '사용자 유형과 맞지 않는 문제입니다.',
-  'ONBOARDING-006': '온보딩 테스트를 먼저 완료해주세요.',
+  'ONBOARDING-006': '온보딩 재응시가 이미 진행 중입니다.',
+  'ONBOARDING-007': '관심사 선택 개수가 올바르지 않습니다.',
+  'ONBOARDING-008': '온보딩 테스트를 먼저 완료해주세요.',
 };
 
 const DEFAULT_ERROR_MESSAGE = '오류가 발생했습니다. 잠시 후 다시 시도해주세요.';

@@ -181,7 +181,7 @@ export function OnboardingResult() {
         router.replace('/login');
         return;
       }
-      if (error.status === 404 || error.code === 'ONBOARDING-006') {
+      if (error.status === 404 || error.code === 'ONBOARDING-008') {
         router.replace('/onboarding');
         return;
       }

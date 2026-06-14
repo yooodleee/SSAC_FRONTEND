@@ -8,8 +8,8 @@
 #   2. errors 목록 추가/변경/삭제
 #   3. FE 팀에 GitHub Issue 생성
 
-version: '1.2.0'
-updatedAt: '2026-05-14'
+version: '1.2.2'
+updatedAt: '2026-06-14'
 
 errors:
   AUTH-001:
@@ -121,6 +121,21 @@ errors:
     message: '사용자 유형과 맞지 않는 문제입니다.'
     httpStatus: 400
     description: 'POST /api/v1/onboarding/submit 요청 시 userType 불일치'
+
+  ONBOARDING-006:
+    message: '온보딩 재응시 요청이 충돌합니다.'
+    httpStatus: 409
+    description: '온보딩 재응시 중 충돌이 발생한 경우'
+
+  ONBOARDING-007:
+    message: '관심사 선택 개수가 올바르지 않습니다.'
+    httpStatus: 400
+    description: '관심사 선택 개수가 허용 범위를 벗어남'
+
+  ONBOARDING-008:
+    message: '온보딩 테스트를 먼저 완료해주세요.'
+    httpStatus: 404
+    description: '온보딩을 완료하지 않은 사용자가 온보딩 결과가 필요한 API에 접근'
 
   ADMIN-001:
     message: '관리자 코드가 올바르지 않습니다.'

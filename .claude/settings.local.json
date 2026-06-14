@@ -271,7 +271,9 @@
       "Bash(number)",
       "Bash(Table)",
       "Bash(has_column_header)",
-      "Bash(has_row_header)"
+      "Bash(has_row_header)",
+      "Bash(src/features/onboarding/OnboardingResult.tsx:184)",
+      "Bash(typecheck)"
     ]
   }
 }
