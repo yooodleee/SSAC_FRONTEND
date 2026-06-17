@@ -196,6 +196,31 @@ $ npm run test -- --watch         # 워치 모드
 → 구현 완료로 간주하지 않는다
 → 커버리지를 충족할 때까지 테스트를 추가한다
 
+### coverageThreshold 등록 규칙
+
+커버리지 기준을 충족한 파일은 반드시 `jest.config.mjs`의 `coverageThreshold`에 등록한다.
+등록하지 않으면 이후 코드 변경으로 커버리지가 낮아져도 CI가 감지하지 못한다.
+
+```js
+// jest.config.mjs — coverageThreshold 등록 패턴
+coverageThreshold: {
+  // 유틸리티 함수 (목표 90%)
+  './src/lib/utils.ts': { lines: 85, functions: 85, branches: 80, statements: 85 },
+
+  // 커스텀 훅 (목표 80%)
+  './src/hooks/useXxx.ts': { lines: 75, functions: 75, branches: 70, statements: 75 },
+
+  // 컴포넌트 (목표 70%)
+  './src/features/home/XxxCard.tsx': { lines: 65, functions: 65, branches: 60, statements: 65 },
+},
+```
+
+등록 기준:
+
+- 임계값은 **현재 실측 커버리지보다 5~10%p 낮게** 설정한다 (여유 마진)
+- 목표 커버리지에 도달하면 임계값을 목표치로 상향한다
+- 파일 삭제 또는 이동 시 해당 항목도 함께 제거한다
+
 ---
 
 ## STEP 5. 테스트 자가 점검
@@ -203,6 +228,7 @@ $ npm run test -- --watch         # 워치 모드
 ```
 □ 모든 테스트가 통과하는가 (npm run test)
 □ 커버리지 기준을 충족하는가 (npm run test:coverage)
+□ jest.config.mjs coverageThreshold에 해당 파일이 등록되었는가
 □ 테스트가 implementation detail에 의존하지 않는가
 □ MSW 핸들러가 api-contract 기준 응답 구조를 따르는가
 □ 에러 케이스 (4xx/5xx/네트워크 에러) 테스트가 포함되어 있는가

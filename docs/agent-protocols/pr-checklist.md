@@ -99,6 +99,10 @@ UI 변경 없는 경우:
    → 미존재 + testing.md BLOCKED(TD-001): ⚠️ 기술 부채 등록 후 허용
    → 미존재 + testing.md 해제 상태: ❌ PR 생성 중단
 □ 기존 테스트가 변경으로 인해 깨지지 않는가 (Jest 설치 후 확인)
+□ 커버리지 기준(컴포넌트 70% / 훅 80% / 유틸 90%)을 충족하는가
+   → npm run test:coverage 로 확인
+□ jest.config.mjs coverageThreshold에 해당 파일이 등록되어 있는가
+   → 미등록 시 testing.md "coverageThreshold 등록 규칙" 따라 추가
 ```
 
 ---

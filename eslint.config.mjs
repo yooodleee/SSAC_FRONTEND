@@ -1,6 +1,18 @@
 import nextCoreWebVitals from 'eslint-config-next/core-web-vitals';
 import nextTypescript from 'eslint-config-next/typescript';
 import prettierConfig from 'eslint-config-prettier';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
+
+// jsx-a11y recommended 규칙을 warn으로 적용 (TD-005)
+// nextCoreWebVitals가 jsx-a11y 플러그인을 이미 포함 → 플러그인 재선언 없이 severity만 오버라이드
+// 현재 코드베이스가 a11y 미준수 상태이므로 warn으로 시작 → 준수율 향상 후 error로 전환
+// 전환 기준: 전체 파일에서 해당 규칙 위반 0건 달성 시
+const jsxA11yWarnRules = Object.fromEntries(
+  Object.entries(jsxA11y.flatConfigs.recommended.rules ?? {}).map(([rule, config]) => [
+    rule,
+    Array.isArray(config) ? ['warn', ...config.slice(1)] : 'warn',
+  ]),
+);
 
 const eslintConfig = [
   // Next.js 16 native flat config (no FlatCompat needed)
@@ -9,6 +21,17 @@ const eslintConfig = [
 
   // Prettier: disable formatting rules that conflict with prettier
   prettierConfig,
+
+  // ──────────────────────────────────────────────────────────
+  // RULE 0: 접근성 (jsx-a11y) [TD-005]
+  // nextCoreWebVitals에 플러그인이 이미 포함되어 있으므로 rules만 오버라이드
+  // 현재: warn 모드 (기존 미준수 코드 허용, CI 차단 없음)
+  // 목표: 전체 위반 0건 달성 후 error로 전환
+  // 주요 규칙: alt-text, aria-props, interactive-supports-focus 등
+  // ──────────────────────────────────────────────────────────
+  {
+    rules: jsxA11yWarnRules,
+  },
 
   // ──────────────────────────────────────────────────────────
   // RULE 1: any 타입 금지

@@ -24,9 +24,23 @@ SSAC_FRONTEND — Next.js 15 + TypeScript strict + Tailwind CSS v4.
 | 포맷 적용                  | `npm run format`                      | `.prettierrc`                     |
 | 새 도메인 스캐폴딩         | `npm run scaffold -- --domain=<name>` | `scripts/scaffold.js`             |
 | ErrorCode 매핑 검증        | `npm run validate:error-mapping`      | `api-contract/error-contract.yml` |
+| E2E 브라우저 진단          | `npm run e2e:diagnose`                | `scripts/e2e-diagnose/runner.ts`  |
 
 **커밋 전 자동 실행**: `.githooks/pre-commit` → `npm run validate`
 활성화: `npm install` (prepare 스크립트가 git hooks 경로 설정)
+
+---
+
+## 최초 환경 설정 (1회만 실행)
+
+```bash
+# 1. Playwright 브라우저 바이너리 설치 (e2e:diagnose 실행 전 필수)
+npx playwright install chromium
+
+# 2. E2E 환경 변수 파일 생성
+cp .env.e2e.example .env.e2e
+# .env.e2e 파일을 열어 실제 값 입력 (팀 내 공유 문서 참조)
+```
 
 ---
 

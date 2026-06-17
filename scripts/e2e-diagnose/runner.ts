@@ -13,6 +13,21 @@ import { chromium, type Browser, type BrowserContext, type Page } from '@playwri
 import * as fs from 'fs';
 import * as path from 'path';
 
+// .env.e2e 자동 로드 (dotenv 미사용, 빌트인 fs만 사용)
+const envFilePath = path.join(process.cwd(), '.env.e2e');
+if (fs.existsSync(envFilePath)) {
+  const lines = fs.readFileSync(envFilePath, 'utf-8').split('\n');
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eqIdx = trimmed.indexOf('=');
+    if (eqIdx === -1) continue;
+    const key = trimmed.slice(0, eqIdx).trim();
+    const val = trimmed.slice(eqIdx + 1).trim();
+    if (key && !(key in process.env)) process.env[key] = val;
+  }
+}
+
 const SCENARIO = process.env.E2E_SCENARIO ?? 'all';
 const TARGET_URL = process.env.E2E_TARGET_URL ?? 'https://ssac.io';
 const OUTPUT_DIR = path.join(process.cwd(), 'scripts/e2e-diagnose/output');
