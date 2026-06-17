@@ -27,7 +27,7 @@
 | API / 서비스 레이어 | 🟡 Yellow | fetch 래퍼 존재, 에러 재시도 로직 없음                                    |
 | 테스트 커버리지     | 🟡 Yellow | Jest 30+RTL 16+MSW 2 설치 완료 (2026-06-11). 커버리지 0%, 작성 진행 중    |
 | 스타일 일관성       | 🟡 Yellow | Tailwind 설정 완료, 디자인 토큰 일부만 정의                               |
-| 접근성 (a11y)       | 🔴 Red    | aria 속성 검사 없음                                                       |
+| 접근성 (a11y)       | 🟡 Yellow | eslint-plugin-jsx-a11y 도입 완료 (2026-06-17), warn 모드 56건 위반 감지   |
 | 성능 모니터링       | ⚪ N/A    | 미구현                                                                    |
 | 에러 바운더리       | 🟡 Yellow | HTTP 에러 처리·토스트 UI 완료, ErrorBoundary 미완료                       |
 | 보안 헤더           | 🟢 Green  | next.config.ts에 CSP / X-Frame-Options 등 6개 헤더 설정 완료 (2026-06-17) |
@@ -91,12 +91,13 @@
   - `X-XSS-Protection`
 - **잔여 과제**: nonce 기반 CSP로 전환 시 `'unsafe-inline'` 제거 가능 (별도 ADR 필요, 낮은 우선순위)
 
-### TD-005 | 접근성 검사 없음
+### TD-005 | 접근성 검사 (진행 중)
 
 - **영향도**: 🟡 중간
-- **설명**: Button 등 UI 컴포넌트에 aria 속성이 불완전합니다.
-- **해결 방향**: `eslint-plugin-jsx-a11y` 도입
-- **예상 작업량**: 0.5 스프린트
+- **설명**: `eslint-plugin-jsx-a11y` 도입 완료 (2026-06-17). 현재 56건 warn 감지.
+  - 주요 위반: `label-has-associated-control`, `click-events-have-key-events`, `no-noninteractive-element-interactions`
+- **해결 방향**: warn 위반 건수를 0으로 줄인 후 `error`로 전환
+- **예상 작업량**: 0.5 스프린트 (위반 56건 수정)
 
 ---
 
