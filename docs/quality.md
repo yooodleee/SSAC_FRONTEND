@@ -19,18 +19,18 @@
 
 ## 영역별 현재 품질
 
-| 영역                | 등급      | 설명                                                                   |
-| ------------------- | --------- | ---------------------------------------------------------------------- |
-| 빌드 파이프라인     | 🟡 Yellow | 기본 `next build` 작동, CI 미구성                                      |
-| 타입 안전성         | 🟢 Green  | strict mode, `any` 금지 규칙 적용                                      |
-| 컴포넌트 구조       | 🟢 Green  | 초기 구조 클린, Button/Card 검증 완료                                  |
-| API / 서비스 레이어 | 🟡 Yellow | fetch 래퍼 존재, 에러 재시도 로직 없음                                 |
-| 테스트 커버리지     | 🟡 Yellow | Jest 30+RTL 16+MSW 2 설치 완료 (2026-06-11). 커버리지 0%, 작성 진행 중 |
-| 스타일 일관성       | 🟡 Yellow | Tailwind 설정 완료, 디자인 토큰 일부만 정의                            |
-| 접근성 (a11y)       | 🔴 Red    | aria 속성 검사 없음                                                    |
-| 성능 모니터링       | ⚪ N/A    | 미구현                                                                 |
-| 에러 바운더리       | 🟡 Yellow | HTTP 에러 처리·토스트 UI 완료, ErrorBoundary 미완료                    |
-| 보안 헤더           | 🔴 Red    | next.config.ts에 보안 헤더 미설정                                      |
+| 영역                | 등급      | 설명                                                                      |
+| ------------------- | --------- | ------------------------------------------------------------------------- |
+| 빌드 파이프라인     | 🟢 Green  | CI 4개 잡 구성 완료 (validate / type-contract / test / error-mapping)     |
+| 타입 안전성         | 🟢 Green  | strict mode, `any` 금지 규칙 적용                                         |
+| 컴포넌트 구조       | 🟢 Green  | 초기 구조 클린, Button/Card 검증 완료                                     |
+| API / 서비스 레이어 | 🟡 Yellow | fetch 래퍼 존재, 에러 재시도 로직 없음                                    |
+| 테스트 커버리지     | 🟡 Yellow | Jest 30+RTL 16+MSW 2 설치 완료 (2026-06-11). 커버리지 0%, 작성 진행 중    |
+| 스타일 일관성       | 🟡 Yellow | Tailwind 설정 완료, 디자인 토큰 일부만 정의                               |
+| 접근성 (a11y)       | 🔴 Red    | aria 속성 검사 없음                                                       |
+| 성능 모니터링       | ⚪ N/A    | 미구현                                                                    |
+| 에러 바운더리       | 🟡 Yellow | HTTP 에러 처리·토스트 UI 완료, ErrorBoundary 미완료                       |
+| 보안 헤더           | 🟢 Green  | next.config.ts에 CSP / X-Frame-Options 등 6개 헤더 설정 완료 (2026-06-17) |
 
 ---
 
@@ -79,12 +79,17 @@
 - **해결 방향**: exponential backoff 재시도 로직 추가 또는 React Query 도입
 - **예상 작업량**: 1 스프린트
 
-### TD-004 | 보안 헤더 미설정
+### TD-004 | 보안 헤더 ✅ 완료 (2026-06-17)
 
-- **영향도**: 🔴 높음 (프로덕션 배포 전 필수)
-- **설명**: `Content-Security-Policy`, `X-Frame-Options` 등 보안 헤더가 없습니다.
-- **해결 방향**: `next.config.ts`에 `headers()` 설정 추가
-- **예상 작업량**: 0.2 스프린트
+- **영향도**: ~~🔴 높음~~ → 해결됨
+- **설명**: `next.config.ts`에 6개 보안 헤더 설정 완료.
+  - `Content-Security-Policy` (script/style/img/connect-src 등)
+  - `X-Frame-Options: DENY`
+  - `X-Content-Type-Options: nosniff`
+  - `Referrer-Policy: strict-origin-when-cross-origin`
+  - `Permissions-Policy`
+  - `X-XSS-Protection`
+- **잔여 과제**: nonce 기반 CSP로 전환 시 `'unsafe-inline'` 제거 가능 (별도 ADR 필요, 낮은 우선순위)
 
 ### TD-005 | 접근성 검사 없음
 
