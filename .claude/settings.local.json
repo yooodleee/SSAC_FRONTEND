@@ -273,7 +273,12 @@
       "Bash(has_column_header)",
       "Bash(has_row_header)",
       "Bash(src/features/onboarding/OnboardingResult.tsx:184)",
-      "Bash(typecheck)"
+      "Bash(typecheck)",
+      "Bash(grep -E \"#[0-9a-fA-F]{3,6}\")",
+      "Bash(grep -vE \"#[0-9a-fA-F]{3,6}|tagColor|tagTextColor|\\\\.bg|\\\\.text|\\\\.color|\\\\.style|clamp\\\\\\(|var\\\\\\(--\")",
+      "Bash(grep -vE \"#[0-9a-fA-F]{3,6}|tagColor|tagTextColor|\\\\.bg|\\\\.text|\\\\.color|\\\\.style|background:|rgba\\\\\\(\")",
+      "Bash(.env.e2e.example)",
+      "Bash(scripts/e2e-diagnose/runner.ts)"
     ]
   }
 }
