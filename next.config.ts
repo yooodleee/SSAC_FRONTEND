@@ -4,14 +4,24 @@ import type { NextConfig } from 'next';
 // - script-src 'unsafe-inline': Next.js App Router 인라인 스크립트 필요
 // - style-src 'unsafe-inline': Tailwind CSS 인라인 스타일 필요
 // - img-src res.cloudinary.com: BE가 Cloudinary로 재업로드한 콘텐츠 이미지 CDN
+// - connect-src NEXT_PUBLIC_BACKEND_URL: 브라우저에서 BE를 직접 호출하는 서비스(signup 등) 허용
 // 강화 방향: nonce 기반 CSP(Middleware)로 전환 시 'unsafe-inline' 제거 가능 (별도 ADR 필요)
+const beOrigin = (() => {
+  try {
+    const url = process.env.NEXT_PUBLIC_BACKEND_URL;
+    return url ? new URL(url).origin : '';
+  } catch {
+    return '';
+  }
+})();
+
 const ContentSecurityPolicy = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://res.cloudinary.com",
   "font-src 'self' data:",
-  "connect-src 'self'",
+  `connect-src 'self'${beOrigin ? ` ${beOrigin}` : ''}`,
   "frame-ancestors 'none'",
   "object-src 'none'",
   "base-uri 'self'",
