@@ -22,63 +22,27 @@
 | Contract 동기화 | docs/agent-protocols/contract-sync.md    | API Contract 변경 시                     | 자동 (변경 감지 즉시)            |
 | 로그 기반 진단  | docs/agent-protocols/log-diagnose.md     | 오류 발생 즉시                           | 자동 (오류 즉시)                 |
 | 디자인 시스템   | DESIGN.md                                | UI/UX 관련 작업 시                       | 자동 (구현 전 필수)              |
+| 배포 절차       | docs/agent-protocols/claude-deploy.md    | Vercel 배포 실패 / main push 전          | 자동 (배포 관련 즉시)            |
 
 ---
 
 ## 🔁 Protocol Trigger Rules
 
-### ✅ 자동 실행 (에이전트가 반드시 실행해야 하는 프로토콜)
-
-[sc-harness.md] 다음 키워드가 포함된 작업 지시를 받은 경우
-
-- "SC", "Success Criteria", "성공 조건", "백로그"
-
-[new-feature.md] 다음 요청을 받은 경우
-
-- 새로운 페이지, 컴포넌트, API 연동, 기능 추가
-- "만들어줘", "추가해줘", "구현해줘"
-
-[testing.md] 다음 상황에서 실행
-
-- 신규 컴포넌트, 페이지, 훅 구현 완료 시
-- 신규 API 연동 코드 구현 완료 시
-- 사용자가 "테스트 작성", "test", "검증" 언급 시
-- quality.md TD-001 관련 작업 시
-
-[self-diagnose.md] 다음 상황에서 실행
-
-STEP 1~3 (경량 진단):
-
-- 구현 완료 직후
-- 에러 또는 예외 상황 발생 시 (최초 1회)
-- 사용자가 "확인해줘", "점검해줘" 요청 시
-
-STEP 1~5 전체 (하네스 강화):
-
-- lint / build 동일 오류 2회 이상 반복 시
-- CI가 같은 규칙 위반으로 2회 이상 PR 차단 시
-
-[DESIGN.md] 다음 상황에서 실행
-
-- 새로운 컴포넌트 / 페이지 생성 시
-- 기존 UI 수정 시
-- 사용자가 "디자인", "UI", "화면", "레이아웃" 언급 시
-
-### 🖐️ 수동 실행 (사용자 요청 또는 특정 시점에 실행)
-
-[harness-audit.md] 다음 상황에서 실행
-
-- 사용자가 "하네스 점검", "감사", "audit" 요청 시
-- 스프린트 종료 시점
-
-[adr-create.md] 다음 상황에서 실행
-
-- 기술 스택, 아키텍처, 설계 방식에 대한 의사결정이 발생했을 때
-- 사용자가 "기록해줘", "ADR", "의사결정" 언급 시
+| 프로토콜                    | 트리거 조건                                                                  |
+| --------------------------- | ---------------------------------------------------------------------------- |
+| sc-harness.md               | "SC", "Success Criteria", "성공 조건", "백로그"                              |
+| new-feature.md              | 새 페이지/컴포넌트/기능 추가 / "만들어줘", "추가해줘", "구현해줘"            |
+| testing.md                  | 신규 컴포넌트/훅/API 연동 구현 완료 / "테스트", "test", "검증" / TD-001 작업 |
+| self-diagnose.md (STEP 1~3) | 구현 완료 직후 / 에러 발생 최초 1회 / "확인해줘", "점검해줘"                 |
+| self-diagnose.md (STEP 1~5) | 동일 오류 2회 이상 반복 / CI 같은 규칙 2회 이상 차단                         |
+| DESIGN.md                   | 새 컴포넌트/페이지 생성 / 기존 UI 수정 / "디자인", "UI", "화면", "레이아웃"  |
+| harness-audit.md            | "하네스 점검", "감사", "audit" / 스프린트 종료                               |
+| adr-create.md               | 기술 의사결정 / "기록해줘", "ADR", "의사결정"                                |
+| claude-deploy.md            | "Vercel 배포 실패", "빌드 실패", "배포 안 됨" / main push 전                 |
 
 ---
 
-## ⚡ 전체 Protocol Execution Order
+## ⚡ Protocol Execution Order
 
 [작업 시작 전]
 0순위 token-optimize.md (STEP 1만) → 컨텍스트 최소화
@@ -101,10 +65,7 @@ STEP 1~5 전체 (하네스 강화):
 
 > 1순위 프로토콜 실행 결과가 중단(STOP)인 경우 이후 프로토콜은 실행되지 않는다.
 
----
-
-## ⚡ 오류 발생 시 Protocol Execution Order
-
+[오류 발생 시 순서]
 1순위 log-diagnose.md → 로그 기반 원인 진단 (즉시, 추측 기반 수정 금지)
 2순위 self-diagnose.md → 자가 점검
 3순위 testing.md → 재발 방지 테스트 추가
@@ -208,76 +169,3 @@ STEP 1~5 전체 (하네스 강화):
 - api-types.ts 확인 없이 타입 수동 정의
 - errorMessages.ts 확인 없이 ErrorCode 처리 추가
 - backlog-generate.md 실행 없이 new-feature.md 실행
-
----
-
-## 하네스 목록 (레거시 — 하위 호환용)
-
-| 하네스                        | 트리거 조건                       | 위치                                     |
-| ----------------------------- | --------------------------------- | ---------------------------------------- |
-| 토큰 최적화                   | 작업 시작 전 / 스프린트 종료      | docs/agent-protocols/token-optimize.md   |
-| SC 관심사 점검 및 자동 재작성 | 작업 지시에 SC 항목이 포함된 경우 | docs/agent-protocols/sc-harness.md       |
-| SC 생성/수정                  | SC 포함 작업 지시 시              | docs/agent-protocols/backlog-generate.md |
-| 로그 기반 진단                | 오류 발생 즉시                    | docs/agent-protocols/log-diagnose.md     |
-
----
-
-## ▲ Vercel 배포 실패 시 자동 진단 규칙
-
-트리거 조건:
-
-- "Vercel 배포 실패", "빌드 실패", "배포 안 됨" 언급 시
-- Vercel 대시보드에서 Error 상태 확인 시
-
-자동 실행 절차:
-
-1. `vercel ls`로 최신 배포 URL 확인
-2. `vercel logs <url>`로 빌드 로그 수집 (또는 `npm run logs:vercel`)
-3. log-diagnose.md Vercel 섹션 분류표 기준으로 원인 분류
-4. 로컬 `npm run build`로 동일 오류 재현 확인
-5. 원인 확정 후 수정 진행
-6. 수정 완료 후 `npm run logs:vercel:live`로 재배포 확인
-
-금지 규칙:
-
-- 로그 확인 없이 추측 기반으로 코드 수정 금지
-- 사용자가 로그를 직접 복사하여 제공하도록 요청 금지
-- 로컬 빌드 성공 확인 없이 push 금지
-
----
-
-## 🚀 배포 전 필수 절차
-
-main 브랜치에 push 전 반드시 아래 절차를 수행한다:
-
-1. `pr-checklist.md` 실행
-   → SC 달성 / 코드 품질 / DESIGN.md / 테스트 파일 확인
-
-2. `npm run pre-deploy` 실행
-   → TypeScript / ESLint / 빌드 모두 통과 확인
-
-3. 모두 통과한 경우에만 push 진행
-
-   ```bash
-   git push origin main
-   ```
-
-4. 배포 실패 시 즉시 실행:
-   ```bash
-   npm run logs:vercel
-   ```
-   → 로그 확인 후 log-diagnose.md 프로토콜 실행
-
----
-
-## 📐 디자인 작업 규칙
-
-UI/UX 관련 작업 트리거 조건:
-
-- 새로운 컴포넌트 / 페이지 생성 시
-- 기존 UI 수정 시
-- 사용자가 "디자인", "UI", "화면", "레이아웃" 언급 시
-
-→ 위 조건 해당 시 DESIGN.md를 반드시 먼저 읽고 작업 시작
-→ DESIGN.md 에이전트 준수 규칙의 체크리스트를 작업 완료 후 검증
-→ DESIGN.md에 정의되지 않은 디자인 결정은 임의로 하지 않고 사용자에게 확인 후 DESIGN.md에 추가
