@@ -92,7 +92,10 @@ export function HomeV1() {
       } catch (err: unknown) {
         const e = err as FetchError;
         if (e.loginRequired ?? e.status === 401) {
-          router.replace('/login');
+          // api.ts(request)가 이미 window.location.href 를 통해 /login?redirectTo=... 으로
+          // 리다이렉트를 예약한다. 여기서 router.replace('/login') 을 추가로 호출하면
+          // redirectTo 없는 소프트 네비게이션이 하드 리다이렉트보다 먼저 실행되어
+          // 세션 복원 후 /home 으로 잘못 이동하는 문제가 발생하므로 중복 호출을 제거한다.
           return;
         }
         // 백그라운드 갱신 실패: 기존 데이터 유지, 에러 UI 미표시

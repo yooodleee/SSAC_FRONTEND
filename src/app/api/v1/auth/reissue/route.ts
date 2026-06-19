@@ -64,5 +64,14 @@ export async function POST() {
   }
 
   // 기존 FE 파싱 호환성 유지: userData (unwrapped ReissueResponse) 반환
-  return NextResponse.json(userData);
+  const res = NextResponse.json(userData);
+
+  // BE가 실제로 토큰을 재발급했을 때 X-Reissued: true 헤더를 FE로 포워드
+  // FE는 이 헤더를 감지해 startup reissue 루프를 차단한다
+  const xReissued = beResponse.headers.get('X-Reissued');
+  if (xReissued) {
+    res.headers.set('X-Reissued', xReissued);
+  }
+
+  return res;
 }
