@@ -278,7 +278,9 @@
       "Bash(grep -vE \"#[0-9a-fA-F]{3,6}|tagColor|tagTextColor|\\\\.bg|\\\\.text|\\\\.color|\\\\.style|clamp\\\\\\(|var\\\\\\(--\")",
       "Bash(grep -vE \"#[0-9a-fA-F]{3,6}|tagColor|tagTextColor|\\\\.bg|\\\\.text|\\\\.color|\\\\.style|background:|rgba\\\\\\(\")",
       "Bash(.env.e2e.example)",
-      "Bash(scripts/e2e-diagnose/runner.ts)"
+      "Bash(scripts/e2e-diagnose/runner.ts)",
+      "Bash(src/components/auth/SessionRestoreProvider.tsx)",
+      "Bash(src/features/home/HomeV1.tsx)"
     ]
   }
 }

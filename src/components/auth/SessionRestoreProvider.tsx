@@ -71,10 +71,21 @@ export function SessionRestoreProvider() {
 
       if (authStore.getCurrent() !== null) return;
 
+      // startup reissue 루프 방지:
+      // BFF cookieStore.set() 이후 RSC 재렌더로 모듈이 재로드되면 _nonLoginAttempted가
+      // 초기화되어 reissue가 반복 호출될 수 있다.
+      // sessionStorage 타임스탬프로 10초 이내 중복 호출을 차단한다.
+      const lastReissuedAt = sessionStorage.getItem('startup-reissued-at');
+      if (lastReissuedAt && Date.now() - parseInt(lastReissuedAt, 10) < 10_000) return;
+
       (async () => {
         try {
           const res = await fetch('/api/v1/auth/reissue', { method: 'POST' });
           if (!res.ok) return;
+
+          // 성공한 startup reissue 시각을 기록해 루프 차단
+          // X-Reissued: true는 BE가 실제로 토큰을 재발급했음을 의미 (추가 확인 신호)
+          sessionStorage.setItem('startup-reissued-at', String(Date.now()));
 
           const data = (await res.json()) as ReissueResponse;
           authStore.set(data);
