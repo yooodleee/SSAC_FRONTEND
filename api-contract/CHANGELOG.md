@@ -1,3 +1,24 @@
+## 2026-06-20 수동 동기화 (BE 사전 반영)
+
+**응답 구조 변경 (Spring Page<T> → PageResponse<T>):**
+  ⚠️ GET /api/v1/quiz-attempts — page 파라미터 0-based → 1-based
+  ⚠️ GET /api/v1/quiz-attempts/guest — page 파라미터 0-based → 1-based
+  ⚠️ GET /api/v1/admin/users — page 파라미터 0-based → 1-based
+
+**필드 매핑:**
+  - content → data.items
+  - totalElements → data.totalCount
+  - pageable.pageNumber (0-based) → data.page (1-based)
+  - pageable.pageSize → data.size
+  - last: false 역산 → data.hasNext
+
+**제거된 스키마:**
+  - PageableObject (PageQuizAttemptSummaryResponse, PageUserSummaryResponse에서만 참조됨)
+
+> 3개 엔드포인트 모두 FE 미구현 상태 — BE swagger 업데이트 대기 중
+
+---
+
 ## 2026-05-18 18:16 동기화
 
 **추가된 엔드포인트:**

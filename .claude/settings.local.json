@@ -284,7 +284,11 @@
       "Bash(where python:*)",
       "Bash(where python3:*)",
       "Bash(C:/cygwin64/bin/python scripts/fix-page-param.py)",
-      "Bash(/c/Users/LEGION/.pyenv/pyenv-win/shims/python scripts/fix-page-param.py)"
+      "Bash(/c/Users/LEGION/.pyenv/pyenv-win/shims/python scripts/fix-page-param.py)",
+      "Bash(api-contract/swagger.json)",
+      "Bash(api-contract/CHANGELOG.md)",
+      "Bash(\"C:\\\\Users\\\\LEGION\\\\.pyenv\\\\pyenv-win\\\\shims\\\\python3.bat\" scripts/_slack_notify.py)",
+      "Bash(del scripts\\\\_slack_notify.py)"
     ]
   }
 }

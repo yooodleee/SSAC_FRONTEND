@@ -1989,32 +1989,15 @@ export interface components {
         };
         PageQuizAttemptSummaryResponse: {
             /** Format: int64 */
-            totalElements?: number;
+            totalCount?: number;
             /** Format: int32 */
             totalPages?: number;
-            pageable?: components["schemas"]["PageableObject"];
-            last?: boolean;
-            first?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
+            /** Format: int32 — 현재 페이지 (1-based) */
+            page?: number;
             /** Format: int32 */
             size?: number;
-            content?: components["schemas"]["QuizAttemptSummaryResponse"][];
-            /** Format: int32 */
-            number?: number;
-            sort?: components["schemas"]["SortObject"];
-            empty?: boolean;
-        };
-        PageableObject: {
-            paged?: boolean;
-            /** Format: int32 */
-            pageNumber?: number;
-            /** Format: int32 */
-            pageSize?: number;
-            unpaged?: boolean;
-            /** Format: int64 */
-            offset?: number;
-            sort?: components["schemas"]["SortObject"];
+            hasNext?: boolean;
+            items?: components["schemas"]["QuizAttemptSummaryResponse"][];
         };
         QuizAttemptSummaryResponse: {
             /**
@@ -2381,21 +2364,15 @@ export interface components {
         };
         PageUserSummaryResponse: {
             /** Format: int64 */
-            totalElements?: number;
+            totalCount?: number;
             /** Format: int32 */
             totalPages?: number;
-            pageable?: components["schemas"]["PageableObject"];
-            last?: boolean;
-            first?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
+            /** Format: int32 — 현재 페이지 (1-based) */
+            page?: number;
             /** Format: int32 */
             size?: number;
-            content?: components["schemas"]["UserSummaryResponse"][];
-            /** Format: int32 */
-            number?: number;
-            sort?: components["schemas"]["SortObject"];
-            empty?: boolean;
+            hasNext?: boolean;
+            items?: components["schemas"]["UserSummaryResponse"][];
         };
         ApiResponseListMenuClickStatResponse: {
             success?: boolean;
