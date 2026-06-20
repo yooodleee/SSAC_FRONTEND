@@ -1,3 +1,21 @@
+## 2026-06-20 수동 동기화 — 빈 응답 204 변경 (BE 사전 반영)
+
+**상태 코드 변경 (200 → 204 No Content):**
+  ⚠️ POST  /api/auth/terms              (saveTerms)
+  ⚠️ POST  /api/v1/auth/logout          (logout)
+  ⚠️ POST  /api/v1/users/me/logout      (logoutAll)
+  ⚠️ PATCH /api/notification/{id}/read  (markAsRead)
+  ⚠️ PATCH /api/notification/read-all   (markAllAsRead)
+
+**FE 코드 수정:** 없음
+  - saveTerms: signupFetch가 이미 204 처리
+  - logout BFF: BE 응답 무시 후 FE에 200 반환 (독립 처리)
+  - notification 2개: BFF pass-through, 훅에서 body 미참조
+
+> BE swagger 업데이트 대기 중 — 완료 후 npm run sync:api 재실행
+
+---
+
 ## 2026-06-20 수동 동기화 (BE 사전 반영)
 
 **응답 구조 변경 (Spring Page<T> → PageResponse<T>):**
