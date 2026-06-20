@@ -2648,13 +2648,11 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description 전체 디바이스 로그아웃 성공 */
-            200: {
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "*/*": components["schemas"]["ApiResponseVoid"];
-                };
+                content?: never;
             };
             /** @description 인증 토큰이 없거나 만료되었습니다. */
             401: {
@@ -3323,14 +3321,12 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description 로그아웃 성공 */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "*/*": components["schemas"]["ApiResponseVoid"];
-                };
+                content?: never;
             };
             /** @description 인증 토큰이 없거나 만료되었습니다. */
             401: {
@@ -3662,7 +3658,7 @@ export interface operations {
         };
         responses: {
             /** @description 약관 동의 저장 성공 */
-            200: {
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4083,14 +4079,12 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description 알림 읽음 처리 성공 */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "*/*": components["schemas"]["ApiResponseVoid"];
-                };
+                content?: never;
             };
             /** @description 인증 토큰이 없거나 만료되었습니다. */
             401: {
@@ -4121,14 +4115,12 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description 모든 알림 읽음 처리 성공 */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "*/*": components["schemas"]["ApiResponseVoid"];
-                };
+                content?: never;
             };
             /** @description 인증 토큰이 없거나 만료되었습니다. */
             401: {

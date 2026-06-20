@@ -288,7 +288,9 @@
       "Bash(api-contract/swagger.json)",
       "Bash(api-contract/CHANGELOG.md)",
       "Bash(\"C:\\\\Users\\\\LEGION\\\\.pyenv\\\\pyenv-win\\\\shims\\\\python3.bat\" scripts/_slack_notify.py)",
-      "Bash(del scripts\\\\_slack_notify.py)"
+      "Bash(del scripts\\\\_slack_notify.py)",
+      "Bash(\"C:\\\\Users\\\\LEGION\\\\.pyenv\\\\pyenv-win\\\\shims\\\\python3.bat\" scripts/_slack_notify2.py)",
+      "Bash(rm scripts/_slack_notify2.py)"
     ]
   }
 }

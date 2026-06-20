@@ -291,16 +291,6 @@
               }
             }
           },
-          "200": {
-            "description": "전체 디바이스 로그아웃 성공",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseVoid"
-                }
-              }
-            }
-          },
           "401": {
             "description": "인증 토큰이 없거나 만료되었습니다.",
             "content": {
@@ -330,6 +320,9 @@
                 }
               }
             }
+          },
+          "204": {
+            "description": "전체 디바이스 로그아웃 성공"
           }
         },
         "security": [
@@ -1278,16 +1271,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseVoid"
-                }
-              }
-            }
-          },
           "401": {
             "description": "인증 토큰이 없거나 만료되었습니다.",
             "content": {
@@ -1317,6 +1300,9 @@
                 }
               }
             }
+          },
+          "204": {
+            "description": "로그아웃 성공"
           }
         }
       }
@@ -1773,9 +1759,6 @@
               }
             }
           },
-          "200": {
-            "description": "약관 동의 저장 성공"
-          },
           "400": {
             "description": "TERMS-001: 필수 약관 미동의"
           },
@@ -1793,6 +1776,9 @@
                 }
               }
             }
+          },
+          "204": {
+            "description": "약관 동의 저장 성공"
           }
         }
       }
@@ -2331,16 +2317,6 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseVoid"
-                }
-              }
-            }
-          },
           "401": {
             "description": "인증 토큰이 없거나 만료되었습니다.",
             "content": {
@@ -2370,6 +2346,9 @@
                 }
               }
             }
+          },
+          "204": {
+            "description": "알림 읽음 처리 성공"
           }
         },
         "security": [
@@ -2388,16 +2367,6 @@
         "description": "사용자의 모든 알림을 읽음 처리한다.",
         "operationId": "markAllAsRead",
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponseVoid"
-                }
-              }
-            }
-          },
           "401": {
             "description": "인증 토큰이 없거나 만료되었습니다.",
             "content": {
@@ -2427,6 +2396,9 @@
                 }
               }
             }
+          },
+          "204": {
+            "description": "모든 알림 읽음 처리 성공"
           }
         },
         "security": [
