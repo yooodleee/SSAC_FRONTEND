@@ -280,7 +280,11 @@
       "Bash(.env.e2e.example)",
       "Bash(scripts/e2e-diagnose/runner.ts)",
       "Bash(src/components/auth/SessionRestoreProvider.tsx)",
-      "Bash(src/features/home/HomeV1.tsx)"
+      "Bash(src/features/home/HomeV1.tsx)",
+      "Bash(where python:*)",
+      "Bash(where python3:*)",
+      "Bash(C:/cygwin64/bin/python scripts/fix-page-param.py)",
+      "Bash(/c/Users/LEGION/.pyenv/pyenv-win/shims/python scripts/fix-page-param.py)"
     ]
   }
 }

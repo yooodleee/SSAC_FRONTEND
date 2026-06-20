@@ -2712,8 +2712,8 @@ export interface operations {
         parameters: {
             query?: {
                 /**
-                 * @description 페이지 번호 (0부터 시작)
-                 * @example 0
+                 * @description 페이지 번호 (1부터 시작)
+                 * @example 1
                  */
                 page?: number;
                 /**
@@ -4694,8 +4694,8 @@ export interface operations {
         parameters: {
             query?: {
                 /**
-                 * @description 페이지 번호 (0부터 시작)
-                 * @example 0
+                 * @description 페이지 번호 (1부터 시작)
+                 * @example 1
                  */
                 page?: number;
                 /**
@@ -5200,8 +5200,8 @@ export interface operations {
         parameters: {
             query?: {
                 /**
-                 * @description 페이지 번호 (0부터 시작)
-                 * @example 0
+                 * @description 페이지 번호 (1부터 시작)
+                 * @example 1
                  */
                 page?: number;
                 /**
